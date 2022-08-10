@@ -217,7 +217,7 @@ public class ArticlesService : IArticleService
                             result.Errors = new List<ErrorDto> {new() {Message = "Error while creating tags!"}};
                     }
                     else
-                        tags.Add(new ArticleTags {TagId = tag!.Id, ArticleId = articleToCreate.ArticleId});
+                        tags.Add(new ArticleTags {TagId = tag.Id, ArticleId = articleToCreate.ArticleId});
                 } 
             }
             await _ctx.Articles.AddAsync(articleToCreate);

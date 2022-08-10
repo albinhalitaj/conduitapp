@@ -1,5 +1,3 @@
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using webapp.API.ApiExtensions;
@@ -9,10 +7,8 @@ using webapp.API.Services;
 
 namespace webapp.API.Controllers;
 
-[ApiController]
 [Route("api/[controller]/{username}")]
-[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-public class ProfileController : ControllerBase
+public class ProfileController : ApiController
 {
     private readonly AppDbContext _ctx;
     private readonly CurrentUserService _currentUserService;

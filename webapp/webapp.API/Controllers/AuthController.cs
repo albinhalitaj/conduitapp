@@ -18,7 +18,7 @@ public class AuthController : ControllerBase
     [HttpPost,Route(nameof(Register))]
     public async Task<IActionResult> Register(RegisterRequest request)
     {
-        var response = new ResultDto<IdentityUser>();
+        var response = new ResultDto<User>();
         var result = await _identityService.RegisterAsync(request);
         if (result.IdentityResult.Succeeded)
         {
@@ -80,7 +80,7 @@ public class AuthController : ControllerBase
         return Ok();
     }
 }
-public record RegisterRequest(string FirstName,string LastName,string Username,string Email,string Password);
+public record RegisterRequest(string FirstName,string LastName,string Username,string? Bio,string Email,string Password);
 public record LoginRequest(string UsernameOrEmail,string Password);
 public record EmailExistsRequest(string? Email);
 public record UsernameExistsRequest(string? Username);

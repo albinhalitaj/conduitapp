@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Identity;
 using webapp.API.Controllers;
 using webapp.API.DTOs;
 using webapp.API.Models;
@@ -21,6 +22,7 @@ public class ArticleProfiles : Profile
             .ReverseMap();
         CreateMap<ApplicationUser, UserResponse>();
         CreateMap<UpdateUserRequest, ApplicationUser>();
+        CreateMap<ApplicationUser, User>();
     }
 }
 

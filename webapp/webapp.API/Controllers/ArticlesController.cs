@@ -1,5 +1,3 @@
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using webapp.API.ApiExtensions;
 using webapp.API.DTOs;
@@ -7,10 +5,7 @@ using webapp.API.Interfaces;
 
 namespace webapp.API.Controllers;
 
-[ApiController]
-[Route("api/[controller]")]
-[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-public class ArticlesController : ControllerBase
+public class ArticlesController : ApiController
 {
     private readonly IArticleService _articleService;
     private readonly ICommentService _commentService;
@@ -35,7 +30,7 @@ public class ArticlesController : ControllerBase
     {
         var response = new ResultDto<ArticleResponse>();
         var result = await _articleService.GetArticleAsync(slug);
-        if (result == null)
+        if (result is null)
         {
             response.Errors = new List<ErrorDto>
                 {new() {Message = $"No articles found with slug {slug}", ErrorCode = "NotFound"}};
@@ -72,14 +67,6 @@ public class ArticlesController : ControllerBase
         response.Value = result;
         return Ok(response);
     }
-    
-    [HttpGet,Route("favorited")]
-    public async Task<IActionResult> GetArticleByFavorites([FromQuery] string author)
-    {
-        var result = await _articleService.GetArticleByFavorites(author);
-        return Ok(result);
-    }
-    
 
     [HttpPost]
     public async Task<IActionResult> CreateArticle([FromBody] CreateArticle request)

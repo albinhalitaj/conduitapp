@@ -1,6 +1,4 @@
 using AutoMapper;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using webapp.API.ApiExtensions;
@@ -10,10 +8,7 @@ using webapp.API.Services;
 
 namespace webapp.API.Controllers;
 
-[ApiController]
-[Route("api/[controller]")]
-[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-public class UserController : ControllerBase
+public class UserController : ApiController
 {
     private readonly AppDbContext _ctx;
     private readonly CurrentUserService _currentUserService;

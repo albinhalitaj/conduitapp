@@ -1,6 +1,7 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using AutoMapper;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
@@ -17,31 +18,36 @@ public class IdentityService : IIdentityService
 {
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly SignInManager<ApplicationUser> _signInManager;
+    private readonly IMapper _mapper;
     private readonly ApplicationSettings _appSettings;
     
 
     public IdentityService(UserManager<ApplicationUser> userManager,
         SignInManager<ApplicationUser> signInManager,
-        IOptions<ApplicationSettings> appSettings)
+        IOptions<ApplicationSettings> appSettings,
+        IMapper mapper)
     {
         _userManager = userManager;
         _signInManager = signInManager;
+        _mapper = mapper;
         _appSettings = appSettings.Value;
     }
     
     public async Task<RegisterResult> RegisterAsync(RegisterRequest model)
     {
-        var (firstName,lastName,username, email, password) = model;
+        var (firstName,lastName,username,bio, email, password) = model;
         var user = new ApplicationUser
         {
             UserName = username,
             Email = email,
+            Bio = bio,
             FirstName = firstName,
             LastName = lastName
         };
         var registerResult = await _userManager.CreateAsync(user, password);
         await _userManager.AddToRoleAsync(user, RoleConstants.Admin);
-        return new RegisterResult(registerResult,user);
+        var userResult = _mapper.Map<User>(user);
+        return new RegisterResult(registerResult,userResult);
     }
 
     public async Task<LoginResult> LoginAsync(LoginRequest request)
@@ -117,8 +123,8 @@ public class IdentityService : IIdentityService
     }
 }
 
-public record RegisterResult(IdentityResult IdentityResult, IdentityUser User);
-public record User( string Id,string Username, string Email,string[] Roles, DateTimeOffset ExpiresAt);
+public record RegisterResult(IdentityResult IdentityResult, User User);
+public record User(string Id,string Username, string Email,string[] Roles, DateTimeOffset ExpiresAt);
 public class LoginResult
 {
     public string? Token { get; set; }
