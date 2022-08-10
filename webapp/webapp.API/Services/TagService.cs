@@ -29,6 +29,6 @@ public class TagService : ITagService
     public async Task<bool> TagExists(string tagName)
     {
         var result = await _ctx.Tags.AsNoTracking().FirstOrDefaultAsync(x => x.Text == tagName);
-        return result != null;
+        return result is not null;
     }
 }

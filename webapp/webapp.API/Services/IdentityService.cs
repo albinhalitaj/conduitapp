@@ -53,7 +53,7 @@ public class IdentityService : IIdentityService
             ? await _userManager.FindByEmailAsync(usernameOrEmail)
             : await _userManager.FindByNameAsync(usernameOrEmail);
 
-        if (userAccount != null)
+        if (userAccount is not null)
         {
             var user = await _signInManager.CheckPasswordSignInAsync(userAccount,password,false);
             
@@ -77,13 +77,13 @@ public class IdentityService : IIdentityService
     public async Task<bool> EmailExists(string email)
     {
         var result = await _userManager.FindByEmailAsync(email);
-        return result != null;
+        return result is not null;
     }
 
     public async Task<bool> UsernameExists(string username)
     {
         var result = await _userManager.FindByNameAsync(username);
-        return result != null;
+        return result is not null;
     }
 
     private async Task<string> GenerateToken(ApplicationUser user)

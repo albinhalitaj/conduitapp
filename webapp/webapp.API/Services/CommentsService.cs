@@ -39,7 +39,7 @@ public class CommentsService : ICommentService
                 x.Bio,
                 x.Image
             }).FirstOrDefaultAsync();
-        if (article == null)
+        if (article is null)
             errors.Add(new ErrorDto {Message = $"Article with slug {articleSlug} was not found!"});
         else
         {

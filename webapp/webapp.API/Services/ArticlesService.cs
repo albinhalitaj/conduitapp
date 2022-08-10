@@ -24,11 +24,7 @@ public class ArticlesService : IArticleService
         _tagService = tagService;
     }
 
-    public async Task<List<ArticleResponse>> GetAllArticlesAsync()
-    {
-        var articles = await GetArticleByTypeAsync(ArticleType.All,string.Empty);
-        return articles;
-    }
+    public async Task<List<ArticleResponse>> GetAllArticlesAsync() => await GetArticleByTypeAsync(ArticleType.All,string.Empty);
 
     public async Task<ArticleResponse?> GetArticleAsync(string slug)
     {
@@ -53,7 +49,7 @@ public class ArticlesService : IArticleService
     {
         var result = new ResultDto<ArticleResponse>();
         var article = await _ctx.Articles.FirstOrDefaultAsync(x => x.Slug == slug);
-        if (article != null)
+        if (article is not null)
         {
             try
             {
@@ -87,7 +83,7 @@ public class ArticlesService : IArticleService
         var article = await _ctx.Articles.FirstOrDefaultAsync(x => x.Slug == slug);
         try
         {
-            if (article != null)
+            if (article is not null)
             {
                 var userFavoriteArticle = await _ctx.UserFavorites.FirstOrDefaultAsync(x =>
                     x.ArticleId == article.ArticleId && x.UserId == _currentUserService.UserId);
@@ -156,9 +152,9 @@ public class ArticlesService : IArticleService
                 }).OrderByDescending(x=>x.CreatedAt).ToListAsync();
             }
         }
-        
 
-        return articles.Count == 0 ? new List<ArticleResponse>() : articles
+
+        return !articles.Any() ? Enumerable.Empty<ArticleResponse>().ToList() : articles
             .Select(article => new
             {
                 article,
@@ -212,12 +208,16 @@ public class ArticlesService : IArticleService
                         {
                             Id = x.TagId
                         }).FirstOrDefaultAsync();
-                    if (tag == null)
+                    if (tag is null)
                     {
                         var tagId = await _tagService.CreateTagAsync(articleTag);
-                        tags.Add(new ArticleTags {TagId = tagId, ArticleId = articleToCreate.ArticleId});
+                        if (tagId != string.Empty)
+                            tags.Add(new ArticleTags {TagId = tagId, ArticleId = articleToCreate.ArticleId});
+                        else
+                            result.Errors = new List<ErrorDto> {new() {Message = "Error while creating tags!"}};
                     }
-                    tags.Add(new ArticleTags {TagId = tag!.Id, ArticleId = articleToCreate.ArticleId});
+                    else
+                        tags.Add(new ArticleTags {TagId = tag!.Id, ArticleId = articleToCreate.ArticleId});
                 } 
             }
             await _ctx.Articles.AddAsync(articleToCreate);
@@ -242,7 +242,7 @@ public class ArticlesService : IArticleService
         var result = new ResultDto<string>();
         var article = await _ctx.Articles.FirstOrDefaultAsync(x => x.Slug == slug);
         
-        if (article != null && article.AuthorId == _currentUserService.UserId)
+        if (article is not null && article.AuthorId == _currentUserService.UserId)
         {
             try
             {
