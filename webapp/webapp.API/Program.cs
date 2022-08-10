@@ -27,7 +27,7 @@ builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<CurrentUserService>();
 
 builder.Services.AddDbContext<AppDbContext>(
-    x => x.UseSqlServer(builder.Configuration.GetConnectionString("DevConn")));
+    x => x.UseSqlServer(builder.Configuration.GetConnectionString("DesktopConn")));
 
 builder.Services.ConfigureFluentValidation();
 builder.Services.AddJwtAuth(builder.Configuration);

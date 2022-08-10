@@ -1,20 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "/home/albik/Desktop/React/webapp/webapp.API/webapp.API.csproj": {}
+    "C:\\Users\\albikk\\Desktop\\ConduitApp\\webapp\\webapp.API\\webapp.API.csproj": {}
   },
   "projects": {
-    "/home/albik/Desktop/React/webapp/webapp.API/webapp.API.csproj": {
+    "C:\\Users\\albikk\\Desktop\\ConduitApp\\webapp\\webapp.API\\webapp.API.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/home/albik/Desktop/React/webapp/webapp.API/webapp.API.csproj",
+        "projectUniqueName": "C:\\Users\\albikk\\Desktop\\ConduitApp\\webapp\\webapp.API\\webapp.API.csproj",
         "projectName": "webapp.API",
-        "projectPath": "/home/albik/Desktop/React/webapp/webapp.API/webapp.API.csproj",
-        "packagesPath": "/home/albik/.nuget/packages/",
-        "outputPath": "/home/albik/Desktop/React/webapp/webapp.API/obj/",
+        "projectPath": "C:\\Users\\albikk\\Desktop\\ConduitApp\\webapp\\webapp.API\\webapp.API.csproj",
+        "packagesPath": "C:\\Users\\albikk\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\albikk\\Desktop\\ConduitApp\\webapp\\webapp.API\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "/home/albik/.nuget/NuGet/NuGet.Config"
+          "C:\\Users\\albikk\\AppData\\Roaming\\NuGet\\NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net6.0"
@@ -115,7 +115,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "/usr/share/dotnet/sdk/6.0.300/RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.302\\RuntimeIdentifierGraph.json"
         }
       }
     }

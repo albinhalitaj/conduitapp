@@ -33,7 +33,7 @@ public class ArticlesService : IArticleService
     public async Task<ArticleResponse?> GetArticleAsync(string slug)
     {
         var article = await GetArticleByTypeAsync(ArticleType.Slug, slug);
-        return article.First();
+        return article.FirstOrDefault();
     }
     
     public async Task<List<ArticleResponse>?> GetArticleByAuthorAsync(string authorName) => await GetArticleByTypeAsync(ArticleType.Author, authorName);
@@ -115,26 +115,9 @@ public class ArticlesService : IArticleService
     {
         var articles = type switch
         {
-            ArticleType.Author => await _ctx.Articles.Include(x=>x.Author)
-                .Where(x => x.Author!.UserName == value)
-                .Include(x => x.Tags)
-                .ThenInclude(x=>x.Tag)
-                .OrderByDescending(x=>x.CreatedAt)
-                .AsNoTracking()
-                .ToListAsync(),
-            ArticleType.Slug => await _ctx.Articles.Where(x => x.Slug == value)
-                .Include(x => x.Tags)
-                .ThenInclude(x=>x.Tag)
-                .Include(x => x.Author)
-                .OrderByDescending(x=>x.CreatedAt)
-                .AsNoTracking()
-                .ToListAsync(),
-            ArticleType.All => await _ctx.Articles.Include(x => x.Tags)
-                .ThenInclude(x=>x.Tag)
-                .Include(x=>x.Author)
-                .OrderByDescending(x=>x.CreatedAt)
-                .AsNoTracking()
-                .ToListAsync(),
+            ArticleType.Author => await GetArticlesByAuthorOrSlug(ArticleType.Author,value),
+            ArticleType.Slug => await GetArticlesByAuthorOrSlug(ArticleType.Slug,value),
+            ArticleType.All => await GetArticlesByAuthorOrSlug(ArticleType.All,string.Empty),
             ArticleType.Tag => await _ctx.ArticleTags.AsNoTracking().Where(x => x.Tag!.Text == value)
             .Select(a => new Article
             {
@@ -182,9 +165,31 @@ public class ArticlesService : IArticleService
                 author = new Author(article.Author!.UserName, article.Author.Bio, article.Author.Image,
                     article.IsFollowing)
             })
-            .Select(@t => new ArticleResponse(t.article.Slug, t.article.Title, t.article.Description,
+            .Select(t => new ArticleResponse(t.article.Slug, t.article.Title, t.article.Description,
                 t.article.Body, t.article.CreatedAt, t.article.UpdatedAt, t.article.FavoritesCount,
                 t.article.TagsArray, t.author)).ToList();
+    }
+
+
+    private async Task<List<Article>> GetArticlesByAuthorOrSlug(ArticleType type, string value)
+    {
+        return await _ctx.Articles.AsNoTracking()
+            .Where(x => type == ArticleType.Slug ? x.Slug == value :
+                type != ArticleType.Author || x.Author!.UserName == value)
+            .Select(a => new Article
+            {
+                Author = a.Author,
+                Slug = a.Slug,
+                Title = a.Title,
+                Description = a.Description,
+                Body = a.Body,
+                CreatedAt = a.CreatedAt,
+                UpdatedAt = a.UpdatedAt,
+                FavoritesCount = a.FavoritesCount,
+                TagsArray = a.Tags.Select(x => x.Tag!.Text).ToArray(),
+                IsFollowing = _ctx.UserFollowers.Any(x =>
+                    x.FollowerId == _currentUserService.UserId && x.UserId == a.Author!.Id)
+            }).OrderByDescending(x => x.CreatedAt).ToListAsync();
     }
 
     public async Task<ResultDto<ArticleResponse>> CreateArticleAsync(CreateArticle article)
@@ -207,7 +212,11 @@ public class ArticlesService : IArticleService
                         {
                             Id = x.TagId
                         }).FirstOrDefaultAsync();
-                    if (tag != null) await _tagService.CreateTagAsync(articleTag);
+                    if (tag == null)
+                    {
+                        var tagId = await _tagService.CreateTagAsync(articleTag);
+                        tags.Add(new ArticleTags {TagId = tagId, ArticleId = articleToCreate.ArticleId});
+                    }
                     tags.Add(new ArticleTags {TagId = tag!.Id, ArticleId = articleToCreate.ArticleId});
                 } 
             }
