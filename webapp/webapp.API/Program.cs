@@ -22,9 +22,10 @@ builder.Services.AddScoped<IIdentityService, IdentityService>();
 builder.Services.AddScoped<ITagService, TagService>();
 builder.Services.AddScoped<IArticleService, ArticlesService>();
 builder.Services.AddScoped<ICommentService, CommentsService>();
+builder.Services.AddScoped<IProfileService, ProfileService>();
+builder.Services.AddScoped<CurrentUserService>();
 
 builder.Services.AddHttpContextAccessor();
-builder.Services.AddScoped<CurrentUserService>();
 
 builder.Services.AddDbContext<AppDbContext>(
     x => x.UseSqlServer(builder.Configuration.GetConnectionString("DesktopConn")));

@@ -45,7 +45,7 @@ public class IdentityService : IIdentityService
             LastName = lastName
         };
         var registerResult = await _userManager.CreateAsync(user, password);
-        await _userManager.AddToRoleAsync(user, RoleConstants.Admin);
+        await _userManager.AddToRoleAsync(user, RoleConstants.User);
         var userResult = _mapper.Map<User>(user);
         return new RegisterResult(registerResult,userResult);
     }

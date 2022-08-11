@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using webapp.API.ApiExtensions;
 using webapp.API.Interfaces;
@@ -15,8 +14,8 @@ public class AuthController : ControllerBase
 
     public AuthController(IIdentityService identityService) => _identityService = identityService;
 
-    [HttpPost,Route(nameof(Register))]
-    public async Task<IActionResult> Register(RegisterRequest request)
+    [HttpPost]
+    public async Task<IActionResult> Register([FromBody] RegisterRequest request)
     {
         var response = new ResultDto<User>();
         var result = await _identityService.RegisterAsync(request);
@@ -73,7 +72,7 @@ public class AuthController : ControllerBase
         });
     }
 
-    [Route(nameof(Logout)),HttpGet]
+    [HttpDelete]
     public IActionResult Logout()
     {
         Response.Cookies.Delete("token");
