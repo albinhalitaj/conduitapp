@@ -24,26 +24,43 @@ public class ArticlesService : IArticleService
         _tagService = tagService;
     }
 
-    public async Task<List<ArticleResponse>> GetAllArticlesAsync() => await GetArticleByTypeAsync(ArticleType.All,string.Empty);
+    public async Task<ResultDto<List<ArticleResponse>>> GetAllArticlesAsync() =>
+        new()
+        {
+            Value = await GetArticleByTypeAsync(ArticleType.All, string.Empty)
+        };
 
-    public async Task<ArticleResponse?> GetArticleAsync(string slug)
+    public async Task<ResultDto<ArticleResponse>> GetArticleAsync(string slug)
     {
+        var response = new ResultDto<ArticleResponse>();
         var article = await GetArticleByTypeAsync(ArticleType.Slug, slug);
-        return article.FirstOrDefault();
+        if (article.Any())
+        {
+            response.Value = article.FirstOrDefault();
+            return response;
+        }
+        response.Errors = new List<ErrorDto>
+            {new() {Message = "Article with slug {slug} was not found!", ErrorCode = "NotFound"}};
+        return response;
     }
     
-    public async Task<List<ArticleResponse>?> GetArticleByAuthorAsync(string authorName) => await GetArticleByTypeAsync(ArticleType.Author, authorName);
-    
-    public async Task<List<ArticleResponse>?> GetArticleByTagAsync(string tag) => await GetArticleByTypeAsync(ArticleType.Tag, tag);
-    
-    public async Task<ResultDto<List<ArticleResponse>>> GetArticleByFavorites(string author)
-    {
-        var result = new ResultDto<List<ArticleResponse>>
+    public async Task<ResultDto<List<ArticleResponse>>> GetArticleByAuthorAsync(string authorName) =>
+        new()
+        {
+            Value = await GetArticleByTypeAsync(ArticleType.Author, authorName)
+        };
+
+    public async Task<ResultDto<List<ArticleResponse>>> GetArticleByTagAsync(string tag) =>
+        new()
+        {
+            Value = await GetArticleByTypeAsync(ArticleType.Tag, tag)
+        };
+
+    public async Task<ResultDto<List<ArticleResponse>>> GetArticleByFavorites(string author) =>
+        new()
         {
             Value = await GetArticleByTypeAsync(ArticleType.AuthorFavorites, author)
         };
-        return result;
-    }
 
     public async Task<ResultDto<ArticleResponse>> FavoriteArticle(string slug)
     {

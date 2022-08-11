@@ -7,10 +7,10 @@ namespace webapp.API.Interfaces;
 
 public interface IArticleService
 {
-    Task<List<ArticleResponse>> GetAllArticlesAsync();
-    Task<ArticleResponse?> GetArticleAsync(string slug);
-    Task<List<ArticleResponse>?> GetArticleByAuthorAsync(string author);
-    Task<List<ArticleResponse>?> GetArticleByTagAsync(string tag);
+    Task<ResultDto<List<ArticleResponse>>> GetAllArticlesAsync();
+    Task<ResultDto<ArticleResponse>> GetArticleAsync(string slug);
+    Task<ResultDto<List<ArticleResponse>>> GetArticleByAuthorAsync(string author);
+    Task<ResultDto<List<ArticleResponse>>> GetArticleByTagAsync(string tag);
     Task<ResultDto<List<ArticleResponse>>> GetArticleByFavorites(string author);
     Task<ResultDto<ArticleResponse>> FavoriteArticle(string slug);
     Task<ResultDto<ArticleResponse>> UnFavoriteArticle(string slug);
