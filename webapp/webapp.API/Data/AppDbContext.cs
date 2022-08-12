@@ -10,21 +10,13 @@ public sealed class AppDbContext : IdentityDbContext<ApplicationUser>
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
     {
         ChangeTracker.LazyLoadingEnabled = false;
-    } 
-    public DbSet<Article> Articles { get; set; }
-    public DbSet<Comment> Comments { get; set; }
-    public DbSet<UserFavorite> UserFavorites { get; set; }
-    public DbSet<UserFollower> UserFollowers { get; set; }
-    public DbSet<ArticleTags> ArticleTags { get; set; }
-    public DbSet<Tag> Tags { get; set; }
-
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-    {
-        optionsBuilder.UseSqlServer(options =>
-        {
-            options.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
-        });
     }
+    public DbSet<Article> Articles { get; set; } = null!;
+    public DbSet<Comment> Comments { get; set; } = null!;
+    public DbSet<UserFavorite> UserFavorites { get; set; } = null!;
+    public DbSet<UserFollower> UserFollowers { get; set; } = null!;
+    public DbSet<ArticleTags> ArticleTags { get; set; } = null!;
+    public DbSet<Tag> Tags { get; set; } = null!;
 
     protected override void OnModelCreating(ModelBuilder builder)
     {

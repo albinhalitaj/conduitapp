@@ -9,6 +9,7 @@ using webapp.API.ApiExtensions;
 using webapp.API.AppSettings;
 using webapp.API.Constants;
 using webapp.API.Controllers;
+using webapp.API.Controllers.V1;
 using webapp.API.Interfaces;
 using webapp.API.Models;
 

@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using webapp.API.Interfaces;
 
-namespace webapp.API.Controllers;
+namespace webapp.API.Controllers.V1;
 
 public class TagsController : ApiController
 {

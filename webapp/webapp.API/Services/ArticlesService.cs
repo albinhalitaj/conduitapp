@@ -2,6 +2,7 @@ using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using webapp.API.ApiExtensions;
 using webapp.API.Controllers;
+using webapp.API.Controllers.V1;
 using webapp.API.Data;
 using webapp.API.DTOs;
 using webapp.API.ExtensionMethods;

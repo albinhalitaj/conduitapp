@@ -14,11 +14,13 @@ builder.Services.AddControllers(opt =>
 }).AddNewtonsoftJson(options =>
     options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
 );
-builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(s =>
 {
-    s.SwaggerDoc("v1", new OpenApiInfo() { Title = "Real World Conduit App API", Version = "v1"});
+    s.SwaggerDoc("v1", new OpenApiInfo { Title = "Real World Conduit App API", Version = "v1"});
+    s.SwaggerDoc("v2", new OpenApiInfo { Title = "Real World Conduit App API", Version = "v2"});
 });
+
+builder.Services.ConfigureApiVersioning();
 builder.Services.Configure<RouteOptions>(options => { options.LowercaseUrls = true; });
 
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
@@ -43,13 +45,18 @@ var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
 {
+    app.UseDeveloperExceptionPage();
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(x =>
+    {
+        x.SwaggerEndpoint("/swagger/v1/swagger.json","Version 1");
+        x.SwaggerEndpoint("/swagger/v2/swagger.json","Version 2");
+    });
     app.UseCors(x => x.AllowAnyHeader()
         .WithOrigins("http://localhost:3000", "http://localhost:4200")
         .AllowCredentials()
         .AllowAnyMethod());
-    await app.SeedData();
+    //await app.SeedData();
 }
 
 app.UseAuthentication();

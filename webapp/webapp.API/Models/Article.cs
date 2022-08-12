@@ -23,10 +23,8 @@ public class Article
     [NotMapped]
     public bool IsFollowing { get; set; }
     [NotMapped]
-    public string?[] TagsArray { get; set; }
-
+    public string?[]? TagsArray { get; set; }
     public ICollection<Comment>? Comments { get; set; }
-    
     public string? AuthorId { get; set; }
     public virtual ApplicationUser? Author { get; set; }
     public ICollection<UserFavorite>? Favorites { get; set; }

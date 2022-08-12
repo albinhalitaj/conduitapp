@@ -1,5 +1,6 @@
 using FluentValidation;
 using webapp.API.Controllers;
+using webapp.API.Controllers.V1;
 
 namespace webapp.API.Validators;
 

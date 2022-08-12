@@ -8,10 +8,11 @@ using webapp.API.DTOs;
 using webapp.API.Interfaces;
 using webapp.API.Services;
 
-namespace webapp.API.Controllers;
+namespace webapp.API.Controllers.V1;
 
 [ApiController]
-[Route("api/[controller]")]
+[ApiVersion("1.0")]
+[Route("api/v{version:apiVersion}/[controller]")]
 public class UserController : ControllerBase
 {
     private readonly AppDbContext _ctx;

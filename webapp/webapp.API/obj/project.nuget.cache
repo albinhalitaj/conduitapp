@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "zuT4w235ue0o2VTmnojr15zY2Z3dzVA8NItg8YQV5f5LMxCTR3UsHUFbESVvkuUBcsrHXxrKCeJ4hRRNjtcyew==",
+  "dgSpecHash": "vD1rEb5r+N4B8T58xT3Jnk1ENKnWwWojlWgYwNt/VLPNKp1O1ED6GGUl+X3XcEmLT+VUN8O1QuSd8jeB2Okt0Q==",
   "success": true,
   "projectFilePath": "C:\\Users\\albikk\\Desktop\\ConduitApp\\webapp\\webapp.API\\webapp.API.csproj",
   "expectedPackageFiles": [
@@ -29,6 +29,8 @@
     "C:\\Users\\albikk\\.nuget\\packages\\microsoft.aspnetcore.identity.entityframeworkcore\\6.0.7\\microsoft.aspnetcore.identity.entityframeworkcore.6.0.7.nupkg.sha512",
     "C:\\Users\\albikk\\.nuget\\packages\\microsoft.aspnetcore.jsonpatch\\6.0.7\\microsoft.aspnetcore.jsonpatch.6.0.7.nupkg.sha512",
     "C:\\Users\\albikk\\.nuget\\packages\\microsoft.aspnetcore.mvc.newtonsoftjson\\6.0.7\\microsoft.aspnetcore.mvc.newtonsoftjson.6.0.7.nupkg.sha512",
+    "C:\\Users\\albikk\\.nuget\\packages\\microsoft.aspnetcore.mvc.versioning\\5.0.0\\microsoft.aspnetcore.mvc.versioning.5.0.0.nupkg.sha512",
+    "C:\\Users\\albikk\\.nuget\\packages\\microsoft.aspnetcore.mvc.versioning.apiexplorer\\5.0.0\\microsoft.aspnetcore.mvc.versioning.apiexplorer.5.0.0.nupkg.sha512",
     "C:\\Users\\albikk\\.nuget\\packages\\microsoft.aspnetcore.webutilities\\2.2.0\\microsoft.aspnetcore.webutilities.2.2.0.nupkg.sha512",
     "C:\\Users\\albikk\\.nuget\\packages\\microsoft.csharp\\4.7.0\\microsoft.csharp.4.7.0.nupkg.sha512",
     "C:\\Users\\albikk\\.nuget\\packages\\microsoft.data.sqlclient\\2.1.4\\microsoft.data.sqlclient.2.1.4.nupkg.sha512",

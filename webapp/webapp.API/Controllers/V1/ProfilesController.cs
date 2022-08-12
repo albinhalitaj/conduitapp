@@ -1,9 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
 using webapp.API.Interfaces;
 
-namespace webapp.API.Controllers;
+namespace webapp.API.Controllers.V1;
 
-[Route("api/[controller]/{username}")]
+[Route("api/v{version:apiVersion}/[controller]/{username}")]
 public class ProfilesController : ApiController
 {
     private readonly IProfileService _profileService;

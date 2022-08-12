@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using webapp.API.DTOs;
 using webapp.API.Interfaces;
 
-namespace webapp.API.Controllers;
+namespace webapp.API.Controllers.V1;
 
 public class ArticlesController : ApiController
 {
@@ -49,7 +49,7 @@ public class ArticlesController : ApiController
         var result = await _articleService.GetArticleByTagAsync(tag);
         return result.Success ? Ok(result) : BadRequest(result);
     }
-
+    
     [HttpPost]
     public async Task<IActionResult> CreateArticle([FromBody] CreateArticle request)
     {

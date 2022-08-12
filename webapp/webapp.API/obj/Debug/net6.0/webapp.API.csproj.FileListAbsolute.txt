@@ -74,3 +74,5 @@ C:\Users\albikk\Desktop\ConduitApp\webapp\webapp.API\obj\Debug\net6.0\refint\web
 C:\Users\albikk\Desktop\ConduitApp\webapp\webapp.API\obj\Debug\net6.0\webapp.API.pdb
 C:\Users\albikk\Desktop\ConduitApp\webapp\webapp.API\obj\Debug\net6.0\webapp.API.genruntimeconfig.cache
 C:\Users\albikk\Desktop\ConduitApp\webapp\webapp.API\obj\Debug\net6.0\ref\webapp.API.dll
+C:\Users\albikk\Desktop\ConduitApp\webapp\webapp.API\bin\Debug\net6.0\Microsoft.AspNetCore.Mvc.Versioning.dll
+C:\Users\albikk\Desktop\ConduitApp\webapp\webapp.API\bin\Debug\net6.0\Microsoft.AspNetCore.Mvc.Versioning.ApiExplorer.dll
