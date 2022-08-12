@@ -1,4 +1,5 @@
 using System.IdentityModel.Tokens.Jwt;
+using System.Net;
 using System.Security.Claims;
 using System.Text;
 using AutoMapper;
@@ -19,22 +20,25 @@ public class IdentityService : IIdentityService
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly SignInManager<ApplicationUser> _signInManager;
     private readonly IMapper _mapper;
+    private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly ApplicationSettings _appSettings;
     
-
     public IdentityService(UserManager<ApplicationUser> userManager,
         SignInManager<ApplicationUser> signInManager,
         IOptions<ApplicationSettings> appSettings,
-        IMapper mapper)
+        IMapper mapper,
+        IHttpContextAccessor httpContextAccessor)
     {
         _userManager = userManager;
         _signInManager = signInManager;
         _mapper = mapper;
+        _httpContextAccessor = httpContextAccessor;
         _appSettings = appSettings.Value;
     }
     
-    public async Task<RegisterResult> RegisterAsync(RegisterRequest model)
+    public async Task<ResultDto<RegisterResponse>> RegisterAsync(RegisterRequest model)
     {
+        var response = new ResultDto<RegisterResponse>();
         var (firstName,lastName,username,bio, email, password) = model;
         var user = new ApplicationUser
         {
@@ -45,14 +49,21 @@ public class IdentityService : IIdentityService
             LastName = lastName
         };
         var registerResult = await _userManager.CreateAsync(user, password);
-        await _userManager.AddToRoleAsync(user, RoleConstants.User);
-        var userResult = _mapper.Map<User>(user);
-        return new RegisterResult(registerResult,userResult);
+        if (registerResult.Succeeded)
+        {
+            await _userManager.AddToRoleAsync(user, RoleConstants.User);
+            var userResult = _mapper.Map<RegisterResponse>(user);
+            response.Value = userResult;
+            return response;
+        }
+        response.Errors = registerResult.Errors
+            .Select(error => new ErrorDto {Message = error.Description, ErrorCode = error.Code}).ToList();
+        return response;
     }
 
-    public async Task<LoginResult> LoginAsync(LoginRequest request)
+    public async Task<ResultDto<User>> LoginAsync(LoginRequest request)
     {
-        var result = new LoginResult();
+        var response = new ResultDto<User>();
         var (usernameOrEmail, password) = request;
         var isEmail = usernameOrEmail.Contains('@');
         var userAccount = isEmail
@@ -66,18 +77,25 @@ public class IdentityService : IIdentityService
             if (user.Succeeded)
             {
                 var roles = await _userManager.GetRolesAsync(userAccount);
-                result.Token = await GenerateToken(userAccount);
-                result.User = new User(userAccount.Id, userAccount.UserName, userAccount.Email,roles.ToArray(),DateTimeOffset.UtcNow.AddHours(1));
+                var token = await GenerateToken(userAccount);
+                _httpContextAccessor.HttpContext?.Response.Cookies.Append("token",token,new CookieOptions
+                {
+                    Secure = true,
+                    HttpOnly = true,
+                    SameSite = SameSiteMode.Strict,
+                    Expires = DateTimeOffset.UtcNow.AddHours(1)
+                });
+                response.Value = new User(userAccount.Id, userAccount.UserName, userAccount.Email,roles.ToArray(),DateTimeOffset.UtcNow.AddHours(1));
+                return response;
             }
-            else
-                result.Errors = new List<ErrorDto>
-                    {new() {Message = "Username or Email is incorrect", ErrorCode = "IncorrectUsernameOrEmail"}};
+            response.Errors = new List<ErrorDto>
+                {new() {Message = "Username or Email is incorrect", ErrorCode = "IncorrectUsernameOrEmail"}};
         }
         else
-            result.Errors = new List<ErrorDto>
+            response.Errors = new List<ErrorDto>
                 {new() {Message = "User does not exists", ErrorCode = "UserDoesNotExists"}};
 
-        return result;
+        return response;
     }
 
     public async Task<bool> EmailExists(string email)
@@ -124,6 +142,8 @@ public class IdentityService : IIdentityService
 }
 
 public record RegisterResult(IdentityResult IdentityResult, User User);
+
+public record RegisterResponse(string Id, string UserName, string Email, string Role);
 public record User(string Id,string Username, string Email,string[] Roles, DateTimeOffset ExpiresAt);
 public class LoginResult
 {

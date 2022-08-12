@@ -17,37 +17,15 @@ public class AuthController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Register([FromBody] RegisterRequest request)
     {
-        var response = new ResultDto<User>();
         var result = await _identityService.RegisterAsync(request);
-        if (result.IdentityResult.Succeeded)
-        {
-            response.Value = result.User;
-            return Ok(response);
-        }
-        var errors = result.IdentityResult.Errors.
-            Select(error => new ErrorDto {Message = error.Description, ErrorCode = error.Code}).ToList();
-        response.Errors = errors;
-        return BadRequest(response);
+        return result.Success ? Ok(result) : BadRequest(result);
     }
 
     [Route(nameof(Login)),AllowAnonymous,HttpPost]
     public async Task<IActionResult> Login([FromBody] LoginRequest request)
     {
-        var response = new ResultDto<User>();
-        var result = await _identityService.LoginAsync(request);
-        if (!result.Succeeded)
-        {
-            response.Errors = result.Errors;
-            return BadRequest(response);
-        }
-        Response.Cookies.Append("token",result.Token ?? "", new CookieOptions
-        {
-            HttpOnly = true,
-            SameSite = SameSiteMode.Strict,
-            Expires = DateTimeOffset.UtcNow.AddHours(1)
-        });
-        response.Value = result.User;
-        return Ok(response);
+        var response = await _identityService.LoginAsync(request);
+        return response.Success ? Ok(response) : BadRequest(response);
     }
 
     [HttpPost,Route(nameof(EmailExists))]
@@ -75,7 +53,7 @@ public class AuthController : ControllerBase
     [HttpDelete]
     public IActionResult Logout()
     {
-        Response.Cookies.Delete("token");
+        if (Request.Cookies.ContainsKey("token")) Response.Cookies.Delete("token");
         return Ok();
     }
 }

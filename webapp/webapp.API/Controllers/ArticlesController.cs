@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Mvc;
-using webapp.API.ApiExtensions;
 using webapp.API.DTOs;
 using webapp.API.Interfaces;
 
