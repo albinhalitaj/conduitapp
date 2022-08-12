@@ -16,9 +16,9 @@ public class ArticlesController : ApiController
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetArticles()
+    public async Task<IActionResult> GetArticles([FromQuery] QueryParams queryParams)
     {
-        var result = await _articleService.GetAllArticlesAsync();
+        var result = await _articleService.GetAllArticlesAsync(queryParams);
         return result.Success ? Ok(result) : BadRequest(result);
     }
 
@@ -30,9 +30,9 @@ public class ArticlesController : ApiController
     }
 
     [HttpGet, Route("feed")]
-    public async Task<IActionResult> Feed()
+    public async Task<IActionResult> Feed([FromQuery] QueryParams queryParams)
     {
-        var result = await _articleService.Feed();
+        var result = await _articleService.Feed(queryParams);
         return result.Success ? Ok(result) : BadRequest(result);
     }
 
@@ -107,3 +107,5 @@ public class ArticlesController : ApiController
         return result.Success ? Ok(result) : BadRequest(result);
     }
 }
+
+public record QueryParams(int Limit, int Offset);

@@ -1,11 +1,13 @@
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using webapp.API.ApiExtensions;
+using webapp.API.Controllers;
 using webapp.API.Data;
 using webapp.API.DTOs;
 using webapp.API.ExtensionMethods;
 using webapp.API.Interfaces;
 using webapp.API.Models;
+using webapp.API.Utils;
 
 namespace webapp.API.Services;
 
@@ -24,17 +26,23 @@ public class ArticlesService : IArticleService
         _tagService = tagService;
     }
 
-    public async Task<ResultDto<List<ArticleResponse>>> GetAllArticlesAsync() =>
-        new()
-        {
-            Value = await GetArticleByTypeAsync(ArticleType.All, string.Empty)
-        };
+    public async Task<ResultDto<List<ArticleResponse>>> GetAllArticlesAsync(QueryParams queryParams)
+    {
+        var paginator = new Paginator(queryParams.Limit, queryParams.Offset);
+        var response = new ResultDto<List<ArticleResponse>>();
+        var articles = await GetArticleByTypeAsync(ArticleType.All, string.Empty);
+        response.Value = articles.Skip(paginator.Offset).Take(paginator.Limit).ToList();
+        return response;
+    }
 
-    public async Task<ResultDto<List<ArticleResponse>>> Feed() =>
-        new()
-        {
-            Value = await GetArticleByTypeAsync(ArticleType.Feed,string.Empty)
-        };
+    public async Task<ResultDto<List<ArticleResponse>>> Feed(QueryParams queryParams)
+    {
+        var paginator = new Paginator(queryParams.Limit, queryParams.Offset);
+        var response = new ResultDto<List<ArticleResponse>>();
+        var articles = await GetArticleByTypeAsync(ArticleType.Feed, string.Empty);
+        response.Value = articles.Skip(paginator.Offset).Take(paginator.Limit).ToList();
+        return response;
+    }
 
     public async Task<ResultDto<ArticleResponse>> GetArticleAsync(string slug)
     {
@@ -138,7 +146,7 @@ public class ArticlesService : IArticleService
             ArticleType.Slug => await GetArticlesByAuthorOrSlug(ArticleType.Slug,value),
             ArticleType.All => await GetArticlesByAuthorOrSlug(ArticleType.All,string.Empty),
             ArticleType.Feed => await _ctx.UserFollowers.AsNoTracking().Where(x => x.FollowerId == _currentUserService.UserId)
-                .Select(a => a.User!.Articles).SelectMany(t => t).ToListAsync(),
+                .Select(a => a.User!.Articles).SelectMany(t => t).OrderByDescending(x=>x.CreatedAt).ToListAsync(),
             ArticleType.Tag => await _ctx.ArticleTags.AsNoTracking().Where(x => x.Tag!.Text == value)
             .Select(a => new Article
             {

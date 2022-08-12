@@ -1,4 +1,5 @@
 using webapp.API.ApiExtensions;
+using webapp.API.Controllers;
 using webapp.API.DTOs;
 using webapp.API.Models;
 using webapp.API.Services;
@@ -7,8 +8,8 @@ namespace webapp.API.Interfaces;
 
 public interface IArticleService
 {
-    Task<ResultDto<List<ArticleResponse>>> GetAllArticlesAsync();
-    Task<ResultDto<List<ArticleResponse>>> Feed();
+    Task<ResultDto<List<ArticleResponse>>> GetAllArticlesAsync(QueryParams queryParams);
+    Task<ResultDto<List<ArticleResponse>>> Feed(QueryParams queryParams);
     Task<ResultDto<ArticleResponse>> GetArticleAsync(string slug);
     Task<ResultDto<List<ArticleResponse>>> GetArticleByAuthorAsync(string author);
     Task<ResultDto<List<ArticleResponse>>> GetArticleByTagAsync(string tag);

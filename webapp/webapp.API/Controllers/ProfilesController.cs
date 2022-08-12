@@ -4,10 +4,10 @@ using webapp.API.Interfaces;
 namespace webapp.API.Controllers;
 
 [Route("api/[controller]/{username}")]
-public class ProfileController : ApiController
+public class ProfilesController : ApiController
 {
     private readonly IProfileService _profileService;
-    public ProfileController(IProfileService profileService) => _profileService = profileService;
+    public ProfilesController(IProfileService profileService) => _profileService = profileService;
 
     [HttpGet,Route("")]
     public async Task<IActionResult> GetUser([FromRoute] string username)

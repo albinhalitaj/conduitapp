@@ -79,7 +79,6 @@ public class IdentityService : IIdentityService
                 var token = await GenerateToken(userAccount);
                 _httpContextAccessor.HttpContext?.Response.Cookies.Append("token",token,new CookieOptions
                 {
-                    Secure = true,
                     HttpOnly = true,
                     SameSite = SameSiteMode.Strict,
                     Expires = DateTimeOffset.UtcNow.AddHours(1)
