@@ -28,7 +28,14 @@ public class ArticlesController : ApiController
         var result = await _articleService.GetArticleAsync(slug);
         return result.Success ? Ok(result) : BadRequest(result);
     }
-    
+
+    [HttpGet, Route("feed")]
+    public async Task<IActionResult> Feed()
+    {
+        var result = await _articleService.Feed();
+        return result.Success ? Ok(result) : BadRequest(result);
+    }
+
     [HttpGet,Route("byAuthor")]
     public async Task<IActionResult> GetArticleByAuthor([FromQuery] string author)
     {

@@ -8,6 +8,7 @@ namespace webapp.API.Interfaces;
 public interface IArticleService
 {
     Task<ResultDto<List<ArticleResponse>>> GetAllArticlesAsync();
+    Task<ResultDto<List<ArticleResponse>>> Feed();
     Task<ResultDto<ArticleResponse>> GetArticleAsync(string slug);
     Task<ResultDto<List<ArticleResponse>>> GetArticleByAuthorAsync(string author);
     Task<ResultDto<List<ArticleResponse>>> GetArticleByTagAsync(string tag);
@@ -26,5 +27,6 @@ public enum ArticleType
     Slug = 1,
     Tag = 2,
     All = 3,
-    AuthorFavorites = 4
+    AuthorFavorites = 4,
+    Feed = 5
 }

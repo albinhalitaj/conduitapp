@@ -30,6 +30,12 @@ public class ArticlesService : IArticleService
             Value = await GetArticleByTypeAsync(ArticleType.All, string.Empty)
         };
 
+    public async Task<ResultDto<List<ArticleResponse>>> Feed() =>
+        new()
+        {
+            Value = await GetArticleByTypeAsync(ArticleType.Feed,string.Empty)
+        };
+
     public async Task<ResultDto<ArticleResponse>> GetArticleAsync(string slug)
     {
         var response = new ResultDto<ArticleResponse>();
@@ -131,6 +137,8 @@ public class ArticlesService : IArticleService
             ArticleType.Author => await GetArticlesByAuthorOrSlug(ArticleType.Author,value),
             ArticleType.Slug => await GetArticlesByAuthorOrSlug(ArticleType.Slug,value),
             ArticleType.All => await GetArticlesByAuthorOrSlug(ArticleType.All,string.Empty),
+            ArticleType.Feed => await _ctx.UserFollowers.AsNoTracking().Where(x => x.FollowerId == _currentUserService.UserId)
+                .Select(a => a.User!.Articles).SelectMany(t => t).ToListAsync(),
             ArticleType.Tag => await _ctx.ArticleTags.AsNoTracking().Where(x => x.Tag!.Text == value)
             .Select(a => new Article
             {
