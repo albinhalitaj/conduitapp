@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using webapp.API.ApiExtensions;
 using webapp.API.Data;
 using webapp.API.Interfaces;
 using webapp.API.Models;
@@ -24,11 +25,14 @@ public class TagService : ITagService
         return result > 0 ? tagToCreate.TagId : string.Empty;
     }
 
-    public async Task<List<Tag>> GetAllTagsAsync() => await _ctx.Tags.AsNoTracking().ToListAsync();
-
-    public async Task<bool> TagExists(string tagName)
+    public async Task<ResultDto<List<Tag>>> GetAllTagsAsync()
     {
-        var result = await _ctx.Tags.AsNoTracking().FirstOrDefaultAsync(x => x.Text == tagName);
-        return result is not null;
+        return new ResultDto<List<Tag>>
+        {
+            Value = await _ctx.Tags.AsNoTracking().Select(x => new Tag
+            {
+                Text = x.Text
+            }).ToListAsync()
+        };
     }
 }

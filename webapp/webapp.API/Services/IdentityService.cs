@@ -1,5 +1,4 @@
 using System.IdentityModel.Tokens.Jwt;
-using System.Net;
 using System.Security.Claims;
 using System.Text;
 using AutoMapper;
@@ -141,14 +140,5 @@ public class IdentityService : IIdentityService
     }
 }
 
-public record RegisterResult(IdentityResult IdentityResult, User User);
-
 public record RegisterResponse(string Id, string UserName, string Email, string Role);
 public record User(string Id,string Username, string Email,string[] Roles, DateTimeOffset ExpiresAt);
-public class LoginResult
-{
-    public string? Token { get; set; }
-    public List<ErrorDto> Errors { get; set; } = new();
-    public User? User { get; set; }
-    public bool Succeeded => !Errors.Any();
-}
