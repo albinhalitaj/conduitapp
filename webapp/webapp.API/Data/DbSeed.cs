@@ -10,7 +10,7 @@ internal static class DbSeed
         await ctx.Database.EnsureCreatedAsync();
         if(ctx.Roles.Any()) return;
 
-        var roles = new List<IdentityRole>()
+        var roles = new List<IdentityRole>
         {
             new()
             {

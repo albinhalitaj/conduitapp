@@ -1,14 +1,12 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using AutoMapper;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using webapp.API.ApiExtensions;
 using webapp.API.AppSettings;
 using webapp.API.Constants;
-using webapp.API.Controllers;
 using webapp.API.Controllers.V1;
 using webapp.API.Interfaces;
 using webapp.API.Models;
@@ -19,19 +17,16 @@ public class IdentityService : IIdentityService
 {
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly SignInManager<ApplicationUser> _signInManager;
-    private readonly IMapper _mapper;
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly ApplicationSettings _appSettings;
     
     public IdentityService(UserManager<ApplicationUser> userManager,
         SignInManager<ApplicationUser> signInManager,
         IOptions<ApplicationSettings> appSettings,
-        IMapper mapper,
         IHttpContextAccessor httpContextAccessor)
     {
         _userManager = userManager;
         _signInManager = signInManager;
-        _mapper = mapper;
         _httpContextAccessor = httpContextAccessor;
         _appSettings = appSettings.Value;
     }
@@ -52,7 +47,7 @@ public class IdentityService : IIdentityService
         if (registerResult.Succeeded)
         {
             await _userManager.AddToRoleAsync(user, RoleConstants.User);
-            var userResult = _mapper.Map<RegisterResponse>(user);
+            var userResult = new RegisterResponse(user.Id, user.UserName, user.Email, RoleConstants.User);
             response.Value = userResult;
             return response;
         }

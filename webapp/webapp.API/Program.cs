@@ -36,12 +36,13 @@ builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddDbContext<AppDbContext>(
     x => x.UseSqlServer(builder.Configuration.GetConnectionString("DesktopConn")));
-
+    
 builder.Services.ConfigureFluentValidation();
 builder.Services.AddJwtAuth(builder.Configuration);
 builder.Services.ConfigureIdentityProviders();
 
 var app = builder.Build();
+
 
 if (app.Environment.IsDevelopment())
 {
@@ -56,12 +57,11 @@ if (app.Environment.IsDevelopment())
         .WithOrigins("http://localhost:3000", "http://localhost:4200")
         .AllowCredentials()
         .AllowAnyMethod());
-    //await app.SeedData();
+    await app.SeedData();
 }
 
+app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
-
 app.MapControllers();
-
 app.Run();

@@ -1,0 +1,36 @@
+﻿version: '3.9'
+services:
+  db:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: db
+    environment:
+      - ACCEPT_EULA=Y
+      - MSSQL_SA_PASSWORD=Albinhalitaj@1
+    ports:
+      - "1433:1433"
+    networks:
+      webapp:
+    volumes:
+      - db:/var/lib/mssqlql/data
+  webapi:
+    build: .
+    container_name: webapi
+    depends_on:
+      - db
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=https://+:443;http://+:80
+      - ASPNETCORE_Kestrel__Certificates__Default__Password=password
+      - ASPNETCORE_Kestrel__Certificates__Default__Path=/https/aspnetapp.pfx
+      - CONNECTIONSTRINGS__DESKTOPCONN=Server=db,1433;Database=ConduitApp;User ID=sa;Password=Albinhalitaj@1;MultipleActiveResultSets=true;
+    ports:
+      - "5000:80"
+      - "5001:443"
+    networks:
+      webapp:
+    volumes:
+      - ~/.aspnet/https/aspnetapp.pfx:/https/aspnetapp.pfx:ro
+volumes:
+  db:
+networks:
+  webapp:

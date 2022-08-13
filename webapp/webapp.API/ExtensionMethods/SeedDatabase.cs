@@ -1,3 +1,5 @@
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Internal;
 using webapp.API.Data;
 
 namespace webapp.API.ExtensionMethods;
@@ -13,6 +15,8 @@ public static class SeedDatabase
         try
         {
             var context = services.GetRequiredService<AppDbContext>();
+            Console.WriteLine("Migrating...");
+            await context.Database.MigrateAsync();
             await DbSeed.Initialize(context);
         }
         catch (Exception ex)
