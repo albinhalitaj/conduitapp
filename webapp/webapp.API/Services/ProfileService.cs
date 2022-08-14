@@ -36,7 +36,7 @@ public class ProfileService : IProfileService
             response.Value = new Profile(profile.Username, profile.Bio, profile.Image, isFollowing);
             return response;
         }
-        response.Errors = new List<ErrorDto> {new() {Message = $"User {username} not Found"}};
+        response.Errors = new List<ErrorDto> {new() {Message = $"User {username} not Found", ErrorCode = "NotFound"}};
         return response;
     }
 
@@ -47,7 +47,7 @@ public class ProfileService : IProfileService
         if (userToFollow is null)
         {
             response.Errors = new List<ErrorDto>
-                {new() {Message = $"No user found with username {username}"}};
+                {new() {Message = $"No user found with username {username}", ErrorCode = "NotFound"}};
             return response;
         }
 
@@ -59,7 +59,7 @@ public class ProfileService : IProfileService
             response.Errors = new List<ErrorDto> {new() {Message = $"You are already following {username}"}};
             return response;
         }
-        
+
         var userFollower = new UserFollower
         {
             UserId = userToFollow.Id,
@@ -81,10 +81,10 @@ public class ProfileService : IProfileService
             }).FirstOrDefaultAsync();
         if (userToUnfollow is null)
         {
-            response.Errors = new List<ErrorDto> {new() {Message = $"Profile not found with username {username}"}};
+            response.Errors = new List<ErrorDto> {new() {Message = $"Profile not found with username {username}", ErrorCode = "NotFound"}};
             return response;
         }
-        
+
         var followedUser = await _ctx.UserFollowers.Where(x =>
                 x.FollowerId == _currentUserService.UserId && x.UserId == userToUnfollow.Id)
             .Select(x=> new

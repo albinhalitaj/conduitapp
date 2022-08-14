@@ -3,7 +3,7 @@ using webapp.API.DTOs;
 
 namespace webapp.API.Validators;
 
-public class CreateArticleRequestValidator : AbstractValidator<CreateArticle>
+public class CreateArticleRequestValidator : AbstractValidator<CreateArticleRequest>
 {
     public CreateArticleRequestValidator()
     {

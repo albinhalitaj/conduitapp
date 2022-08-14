@@ -1,13 +1,17 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using AutoMapper;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using webapp.API.ApiExtensions;
 using webapp.API.AppSettings;
 using webapp.API.Constants;
 using webapp.API.Controllers.V1;
+using webapp.API.Data;
+using webapp.API.DTOs;
 using webapp.API.Interfaces;
 using webapp.API.Models;
 
@@ -18,19 +22,28 @@ public class IdentityService : IIdentityService
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly SignInManager<ApplicationUser> _signInManager;
     private readonly IHttpContextAccessor _httpContextAccessor;
+    private readonly AppDbContext _ctx;
+    private readonly CurrentUserService _currentUserService;
+    private readonly IMapper _mapper;
     private readonly ApplicationSettings _appSettings;
-    
+
     public IdentityService(UserManager<ApplicationUser> userManager,
         SignInManager<ApplicationUser> signInManager,
         IOptions<ApplicationSettings> appSettings,
-        IHttpContextAccessor httpContextAccessor)
+        IHttpContextAccessor httpContextAccessor,
+        AppDbContext ctx,
+        CurrentUserService currentUserService,
+        IMapper mapper)
     {
         _userManager = userManager;
         _signInManager = signInManager;
         _httpContextAccessor = httpContextAccessor;
+        _ctx = ctx;
+        _currentUserService = currentUserService;
+        _mapper = mapper;
         _appSettings = appSettings.Value;
     }
-    
+
     public async Task<ResultDto<RegisterResponse>> RegisterAsync(RegisterRequest model)
     {
         var response = new ResultDto<RegisterResponse>();
@@ -47,8 +60,7 @@ public class IdentityService : IIdentityService
         if (registerResult.Succeeded)
         {
             await _userManager.AddToRoleAsync(user, RoleConstants.User);
-            var userResult = new RegisterResponse(user.Id, user.UserName, user.Email, RoleConstants.User);
-            response.Value = userResult;
+            response.Value = new RegisterResponse(user.Id, user.UserName, user.Email, RoleConstants.User);
             return response;
         }
         response.Errors = registerResult.Errors
@@ -67,27 +79,29 @@ public class IdentityService : IIdentityService
 
         if (userAccount is not null)
         {
-            var user = await _signInManager.CheckPasswordSignInAsync(userAccount,password,false);
-            
+            var user = await _signInManager.CheckPasswordSignInAsync(userAccount, password, false);
+
             if (user.Succeeded)
             {
                 var roles = await _userManager.GetRolesAsync(userAccount);
                 var token = await GenerateToken(userAccount);
-                _httpContextAccessor.HttpContext?.Response.Cookies.Append("token",token,new CookieOptions
+                _httpContextAccessor.HttpContext?.Response.Cookies.Append("token", token, new CookieOptions
                 {
                     HttpOnly = true,
                     SameSite = SameSiteMode.Strict,
                     Expires = DateTimeOffset.UtcNow.AddHours(1)
                 });
-                response.Value = new User(userAccount.Id, userAccount.UserName, userAccount.Email,roles.ToArray(),DateTimeOffset.UtcNow.AddHours(1));
+                response.Value = new User(userAccount.Id, userAccount.UserName, userAccount.Email, roles.ToArray(), DateTimeOffset.UtcNow.AddHours(1));
                 return response;
             }
             response.Errors = new List<ErrorDto>
                 {new() {Message = "Username or Email is incorrect", ErrorCode = "IncorrectUsernameOrEmail"}};
         }
         else
+        {
             response.Errors = new List<ErrorDto>
                 {new() {Message = "User does not exists", ErrorCode = "UserDoesNotExists"}};
+        }
 
         return response;
     }
@@ -102,6 +116,29 @@ public class IdentityService : IIdentityService
     {
         var result = await _userManager.FindByNameAsync(username);
         return result is not null;
+    }
+
+    public async Task<ResultDto<UserResponse>> UpdateUser(UpdateUserRequest user)
+    {
+        var result = new ResultDto<UserResponse>();
+        try
+        {
+            var currentUser = await _ctx.Users.FirstOrDefaultAsync(x => x.Id == _currentUserService.UserId);
+
+            currentUser!.UserName = user.Username.Contains(' ') ? user.Username.Replace(" ", "") : user.Username;
+            currentUser.UserName = user.Username;
+            currentUser.Email = user.Email;
+            currentUser.Bio = user.Bio;
+            currentUser.Image = user.Image;
+
+            await _ctx.SaveChangesAsync();
+            result.Value = _mapper.Map<UserResponse>(currentUser);
+        }
+        catch (Exception e)
+        {
+            result.Errors = new List<ErrorDto> {new() {Message = e.Message, ErrorCode = e.HelpLink}};
+        }
+        return result;
     }
 
     private async Task<string> GenerateToken(ApplicationUser user)

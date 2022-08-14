@@ -13,6 +13,6 @@ public class TagsController : ApiController
     public async Task<IActionResult> Get()
     {
         var response = await _tagService.GetAllTagsAsync();
-        return response.Success ? Ok(response) : BadRequest(response);
+        return response.Success ? Ok(response) : Problem(response.Errors);
     }
 }

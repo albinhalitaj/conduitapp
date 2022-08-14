@@ -13,20 +13,20 @@ public class ProfilesController : ApiController
     public async Task<IActionResult> GetUser([FromRoute] string username)
     {
         var response = await _profileService.GetUser(username);
-        return response.Success ? Ok(response) : BadRequest(response);
+        return response.Success ? Ok(response.Value) : Problem(response.Errors);
     }
-    
+
     [HttpPost,Route("follow")]
     public async Task<IActionResult> FollowUser([FromRoute] string username)
     {
         var response = await _profileService.FollowUser(username);
-        return response.Success ? Ok(response) : BadRequest(response);
+        return response.Success ? Ok(response.Value) : Problem(response.Errors);
     }
-    
+
     [HttpDelete,Route("follow")]
     public async Task<IActionResult> UnfollowUser([FromRoute] string username)
     {
         var response = await _profileService.UnFollowUser(username);
-        return response.Success ? Ok(response) : BadRequest(response);
+        return response.Success ? Ok(response.Value) : Problem(response.Errors);
     }
 }

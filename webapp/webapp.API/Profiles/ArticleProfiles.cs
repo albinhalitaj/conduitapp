@@ -16,7 +16,7 @@ public class ArticleProfiles : Profile
                 opt => opt.Ignore());
         CreateMap<CreateCommentRequest,Comment>();
         CreateMap<Comment, CommentResponse>();
-        CreateMap<CreateArticle, Article>()
+        CreateMap<CreateArticleRequest, Article>()
             .ForMember(x=>x.Tags,opt => opt.Ignore())
             .ReverseMap();
         CreateMap<ApplicationUser, UserResponse>();

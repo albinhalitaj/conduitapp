@@ -35,4 +35,14 @@ public class TagService : ITagService
             }).ToListAsync()
         };
     }
+
+    public async Task<string?> CheckIfExists(string tagName)
+    {
+        var tag = await _ctx.Tags.Where(x => x.Text == tagName)
+            .Select(x => new
+            {
+                Id = x.TagId
+            }).FirstOrDefaultAsync();
+        return tag?.Id;
+    }
 }

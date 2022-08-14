@@ -18,8 +18,8 @@ public interface IArticleService
     Task<ResultDto<ArticleResponse>> FavoriteArticle(string slug);
     Task<ResultDto<ArticleResponse>> UnFavoriteArticle(string slug);
     Task<List<ArticleResponse>> GetArticleByTypeAsync(ArticleType type,string value);
-    Task<ResultDto<ArticleResponse>> CreateArticleAsync(CreateArticle article);
-    Task<ArticleResponse> UpdateArticleAsync(Guid id, UpdateArticle updatedArticle);
+    Task<ResultDto<ArticleResponse>> CreateArticleAsync(CreateArticleRequest article);
+    Task<ResultDto<ArticleResponse>> UpdateArticleAsync(string slug, UpdateArticleRequest updatedArticle);
     Task<ResultDto<string>> DeleteArticleAsync(string slug);
 }
 

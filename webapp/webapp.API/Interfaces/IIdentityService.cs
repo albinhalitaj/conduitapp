@@ -12,4 +12,5 @@ public interface IIdentityService
     Task<ResultDto<User>> LoginAsync(LoginRequest request);
     Task<bool> EmailExists(string email);
     Task<bool> UsernameExists(string username);
+    Task<ResultDto<UserResponse>> UpdateUser(UpdateUserRequest user);
 }

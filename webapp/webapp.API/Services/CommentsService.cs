@@ -20,7 +20,7 @@ public class CommentsService : ICommentService
         _currentUserService = currentUserService;
         _mapper = mapper;
     }
-    
+
     public async Task<ResultDto<CommentResponse>> CreateComment(string articleSlug,CreateCommentRequest comment)
     {
         var response = new ResultDto<CommentResponse>();
@@ -40,7 +40,9 @@ public class CommentsService : ICommentService
                 x.Image
             }).FirstOrDefaultAsync();
         if (article is null)
-            errors.Add(new ErrorDto {Message = $"Article with slug {articleSlug} was not found!"});
+        {
+            errors.Add(new ErrorDto { Message = $"Article with slug {articleSlug} was not found!" });
+        }
         else
         {
             try
@@ -60,8 +62,8 @@ public class CommentsService : ICommentService
             }
             catch (Exception e)
             {
-                errors.Add(new ErrorDto {Message = e.Message});
-            }            
+                errors.Add(new ErrorDto { Message = e.Message });
+            }
         }
         response.Errors = errors;
         return response;
@@ -82,8 +84,10 @@ public class CommentsService : ICommentService
                     result.Value = $"Comment with id: {commentId} deleted successfully";
                 }
                 else
+                {
                     result.Errors = new List<ErrorDto>
                         {new() {Message = $"Could not find comment with id: {commentId}"}};
+                }
             }
             catch (Exception e)
             {
@@ -104,16 +108,11 @@ public class CommentsService : ICommentService
             foreach (var comment in article.Comments)
             {
                 var commentAuthor = await _ctx.Users.Where(x=>x.Id == comment.AuthorId)
-                    .Select(x=> new
-                    {
-                        Username = x.UserName,
-                        x.Bio,
-                        x.Image
-                    }).FirstOrDefaultAsync();
+                    .Select(x => new CommentAuthor(x.UserName, x.Bio, x.Image)).FirstOrDefaultAsync();
                 var isFollowing = await _ctx.UserFollowers.AsNoTracking().AnyAsync(x =>
                     x.FollowerId == _currentUserService.UserId && x.UserId == comment.Author.Id);
                 var author = new Author(commentAuthor!.Username, commentAuthor.Bio, commentAuthor.Image, isFollowing);
-                comments.Add(new CommentResponse(comment.CommentId!,comment.CreatedAt,comment.UpdatedAt,comment.Body!,author)); 
+                comments.Add(new CommentResponse(comment.CommentId!,comment.CreatedAt,comment.UpdatedAt,comment.Body!,author));
             }
             response.Value = comments;
             return response;
@@ -122,3 +121,5 @@ public class CommentsService : ICommentService
 }
 
 public record CommentResponse(string Id,DateTimeOffset CreatedAt,DateTimeOffset UpdatedAt,string Body,Author Author);
+
+internal record CommentAuthor(string Username, string Bio, string Image);

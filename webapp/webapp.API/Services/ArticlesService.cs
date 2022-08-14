@@ -1,7 +1,6 @@
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using webapp.API.ApiExtensions;
-using webapp.API.Controllers;
 using webapp.API.Controllers.V1;
 using webapp.API.Data;
 using webapp.API.DTOs;
@@ -19,7 +18,8 @@ public class ArticlesService : IArticleService
     private readonly IMapper _mapper;
     private readonly ITagService _tagService;
 
-    public ArticlesService(AppDbContext ctx,CurrentUserService currentUserService,IMapper mapper,ITagService tagService)
+    public ArticlesService(AppDbContext ctx, CurrentUserService currentUserService, IMapper mapper,
+        ITagService tagService)
     {
         _ctx = ctx;
         _currentUserService = currentUserService;
@@ -49,27 +49,29 @@ public class ArticlesService : IArticleService
     {
         var response = new ResultDto<ArticleResponse>();
         var article = await GetArticleByTypeAsync(ArticleType.Slug, slug);
-        if (article.Any())
+        if (article.Count > 0)
         {
             response.Value = article.FirstOrDefault();
             return response;
         }
         response.Errors = new List<ErrorDto>
-            {new() {Message = "Article with slug {slug} was not found!", ErrorCode = "NotFound"}};
+            {new() {Message = $"Article with slug {slug} was not found!", ErrorCode = "NotFound"}};
         return response;
     }
-    
+
     public async Task<ResultDto<List<ArticleResponse>>> GetArticleByAuthorAsync(string authorName) =>
         new()
         {
             Value = await GetArticleByTypeAsync(ArticleType.Author, authorName)
         };
 
-    public async Task<ResultDto<List<ArticleResponse>>> GetArticleByTagAsync(string tag) =>
-        new()
-        {
-            Value = await GetArticleByTypeAsync(ArticleType.Tag, tag)
-        };
+    public async Task<ResultDto<List<ArticleResponse>>> GetArticleByTagAsync(string tag)
+    {
+        var response = new ResultDto<List<ArticleResponse>>();
+        var result = await GetArticleByTypeAsync(ArticleType.Tag, tag);
+        response.Value = result;
+        return response;
+    }
 
     public async Task<ResultDto<List<ArticleResponse>>> GetArticleByFavorites(string author) =>
         new()
@@ -101,11 +103,14 @@ public class ArticlesService : IArticleService
             }
             catch (Exception e)
             {
-                result.Errors = new List<ErrorDto> { new() { Message = e.Message }};
+                result.Errors = new List<ErrorDto> { new() { Message = e.Message } };
             }
         }
         else
-            result.Errors = new List<ErrorDto> { new() {Message = $"Could not find article with slug: {slug}"}};
+        {
+            result.Errors = new List<ErrorDto> { new() { Message = $"Could not find article with slug: {slug}" } };
+        }
+
         return result;
     }
 
@@ -122,15 +127,19 @@ public class ArticlesService : IArticleService
                 if (userFavoriteArticle != null)
                 {
                     _ctx.UserFavorites.Remove(userFavoriteArticle);
-                    article.FavoritesCount -= 1;
+                    article.FavoritesCount = article.FavoritesCount > 0 ? article.FavoritesCount-- : 0;
                     await _ctx.SaveChangesAsync();
                 }
                 else
+                {
                     result.Errors = new List<ErrorDto>
-                        {new() {Message = $"No article favorited found with slug: {slug}"}};
+                        {new() {Message = $"No article favorite found with slug: {slug}"}};
+                }
             }
             else
-                result.Errors = new List<ErrorDto> {new() {Message = $"No article found with slug: {slug}"}};
+            {
+                result.Errors = new List<ErrorDto> { new() { Message = $"No article found with slug: {slug}" } };
+            }
         }
         catch (Exception e)
         {
@@ -151,7 +160,7 @@ public class ArticlesService : IArticleService
             ArticleType.Tag => await _ctx.ArticleTags.AsNoTracking().Where(x => x.Tag!.Text == value)
             .Select(a => new Article
             {
-                Author = a.Article!.Author,
+                Author = new ApplicationUser { UserName = a.Article!.Author!.UserName, Bio = a.Article.Author.Bio, Image = a.Article.Author.Image },
                 Slug = a.Article.Slug,
                 Title = a.Article.Title,
                 Description = a.Article.Description,
@@ -186,9 +195,8 @@ public class ArticlesService : IArticleService
                 }).OrderByDescending(x=>x.CreatedAt).ToListAsync();
             }
         }
-
-
-        return !articles.Any() ? Enumerable.Empty<ArticleResponse>().ToList() : articles
+        
+        return articles.Count == 0 ? Enumerable.Empty<ArticleResponse>().ToList() : articles
             .Select(article => new
             {
                 article,
@@ -208,7 +216,7 @@ public class ArticlesService : IArticleService
                 type != ArticleType.Author || x.Author!.UserName == value)
             .Select(a => new Article
             {
-                Author = a.Author,
+                Author = new ApplicationUser {UserName = a.Author!.UserName,Bio = a.Author.Bio,Image = a.Author.Image},
                 Slug = a.Slug,
                 Title = a.Title,
                 Description = a.Description,
@@ -222,7 +230,7 @@ public class ArticlesService : IArticleService
             }).OrderByDescending(x => x.CreatedAt).ToListAsync();
     }
 
-    public async Task<ResultDto<ArticleResponse>> CreateArticleAsync(CreateArticle article)
+    public async Task<ResultDto<ArticleResponse>> CreateArticleAsync(CreateArticleRequest article)
     {
         var result = new ResultDto<ArticleResponse>();
         var tags = new List<ArticleTags>();
@@ -232,27 +240,24 @@ public class ArticlesService : IArticleService
             articleToCreate.AuthorId = _currentUserService.UserId;
             articleToCreate.ArticleId = Guid.NewGuid().ToString();
             articleToCreate.Slug = articleToCreate.Title!.Slugify();
-            
-            if (article.Tags.Length > 0)
+            if (article.Tags is not null && article.Tags.Length > 0)
             {
                 foreach (var articleTag in article.Tags)
                 {
-                    var tag = await _ctx.Tags.Where(x => x.Text == articleTag)
-                        .Select(x => new
-                        {
-                            Id = x.TagId
-                        }).FirstOrDefaultAsync();
+                    var tag = await _tagService.CheckIfExists(articleTag);
                     if (tag is null)
                     {
                         var tagId = await _tagService.CreateTagAsync(articleTag);
                         if (tagId != string.Empty)
-                            tags.Add(new ArticleTags {TagId = tagId, ArticleId = articleToCreate.ArticleId});
+                            tags.Add(new ArticleTags { TagId = tagId, ArticleId = articleToCreate.ArticleId });
                         else
-                            result.Errors = new List<ErrorDto> {new() {Message = "Error while creating tags!"}};
+                            result.Errors = new List<ErrorDto> { new() { Message = "Error while creating tags!" } };
                     }
                     else
-                        tags.Add(new ArticleTags {TagId = tag.Id, ArticleId = articleToCreate.ArticleId});
-                } 
+                    {
+                        tags.Add(new ArticleTags { TagId = tag, ArticleId = articleToCreate.ArticleId });
+                    }
+                }
             }
             await _ctx.Articles.AddAsync(articleToCreate);
             await _ctx.ArticleTags.AddRangeAsync(tags);
@@ -260,7 +265,7 @@ public class ArticlesService : IArticleService
             if (res > 0)
             {
                 var response = await GetArticleByTypeAsync(ArticleType.Slug,articleToCreate.Slug!);
-                result.Value = response.First();
+                result.Value = response[0];
             }
         }
         catch (Exception e)
@@ -270,12 +275,11 @@ public class ArticlesService : IArticleService
         return result;
     }
 
-
     public async Task<ResultDto<string>> DeleteArticleAsync(string slug)
     {
         var result = new ResultDto<string>();
         var article = await _ctx.Articles.FirstOrDefaultAsync(x => x.Slug == slug);
-        
+
         if (article is not null && article.AuthorId == _currentUserService.UserId)
         {
             try
@@ -286,17 +290,76 @@ public class ArticlesService : IArticleService
             }
             catch (Exception e)
             {
-                result.Errors = new List<ErrorDto> {new() {Message = e.Message}};
+                result.Errors = new List<ErrorDto> { new() { Message = e.Message } };
             }
         }
         else
-            result.Errors = new List<ErrorDto> {new() {Message = $"No article found with slug: {slug}"}};
+        {
+            result.Errors = new List<ErrorDto> { new() { Message = $"No article found with slug: {slug}" } };
+        }
 
         return result;
     }
 
-    public Task<ArticleResponse> UpdateArticleAsync(Guid id, UpdateArticle updatedArticle)
+    public async Task<ResultDto<ArticleResponse>> UpdateArticleAsync(string slug, UpdateArticleRequest updatedArticle)
     {
-        throw new NotImplementedException();
+        var result = new ResultDto<ArticleResponse>();
+        try
+        {
+            var article = await _ctx.Articles.Include(x=>x.Tags).FirstOrDefaultAsync(x => x.Slug == slug);
+            if (article is null)
+            {
+                result.Errors = new List<ErrorDto> {new() {Message = $"Article with slug {slug} was not found!"}};
+                return result;
+            }
+
+            if (article.Title != updatedArticle.Title)
+            {
+                article.Slug = updatedArticle.Title.Slugify();
+            }
+
+            article.Title = updatedArticle.Title;
+            article.Body = updatedArticle.Body;
+            article.Description = updatedArticle.Description;
+            article.UpdatedAt = DateTimeOffset.UtcNow;
+            var tags = new List<ArticleTags>();
+            if (updatedArticle.Tags is not null && updatedArticle.Tags.Length > 0)
+            {
+                foreach (var articleTag in article.Tags)
+                {
+                    _ctx.Remove(articleTag);
+                }
+                foreach (var articleTag in updatedArticle.Tags)
+                {
+                    var id = await _tagService.CheckIfExists(articleTag);
+                    if (id is null)
+                    {
+                        var tagId = await _tagService.CreateTagAsync(articleTag);
+                        if (tagId != string.Empty)
+                            tags.Add(new ArticleTags { TagId = tagId, ArticleId = article.ArticleId });
+                        else
+                            result.Errors = new List<ErrorDto> { new() { Message = "Error while creating tags!" } };
+                    }
+                    else
+                    {
+                        tags.Add(new ArticleTags { TagId = id, ArticleId = article.ArticleId });
+                    }
+                }
+            }
+
+            await _ctx.ArticleTags.AddRangeAsync(tags);
+            var res = await _ctx.SaveChangesAsync();
+            if (res > 0)
+            {
+                var response = await GetArticleByTypeAsync(ArticleType.Slug,article.Slug!);
+                result.Value = response[0];
+            }
+        }
+        catch (Exception e)
+        {
+            result.Errors = new List<ErrorDto> {new() {Message = e.Message, ErrorCode = e.HelpLink}};
+        }
+
+        return result;
     }
 }

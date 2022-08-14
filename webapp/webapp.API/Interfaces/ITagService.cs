@@ -7,4 +7,5 @@ public interface ITagService
 {
     Task<string> CreateTagAsync(string tag);
     Task<ResultDto<List<Tag>>> GetAllTagsAsync();
+    Task<string?> CheckIfExists(string tag);
 }
