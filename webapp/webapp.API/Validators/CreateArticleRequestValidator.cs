@@ -1,5 +1,5 @@
 using FluentValidation;
-using webapp.API.DTOs;
+using webapp.Contracts.Articles;
 
 namespace webapp.API.Validators;
 

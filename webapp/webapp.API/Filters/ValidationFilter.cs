@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using webapp.API.ApiExtensions;
+using webapp.Contracts.Common;
 
 namespace webapp.API.Filters;
 

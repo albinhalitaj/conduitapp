@@ -3,10 +3,9 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using webapp.API.Data;
-using webapp.API.DTOs;
-using webapp.API.Interfaces;
 using webapp.API.Services;
+using webapp.Application.Interfaces;
+using webapp.Contracts.Users;
 
 namespace webapp.API.Controllers.V1;
 
@@ -15,12 +14,12 @@ namespace webapp.API.Controllers.V1;
 [Route("api/v{version:apiVersion}/[controller]")]
 public class UserController : ControllerBase
 {
-    private readonly AppDbContext _ctx;
-    private readonly CurrentUserService _currentUserService;
+    private readonly IAppDbContext _ctx;
+    private readonly ICurrentUserService _currentUserService;
     private readonly IMapper _mapper;
     private readonly IIdentityService _identityService;
 
-    public UserController(AppDbContext ctx, CurrentUserService currentUserService, IMapper mapper, IIdentityService identityService)
+    public UserController(IAppDbContext ctx, ICurrentUserService currentUserService, IMapper mapper, IIdentityService identityService)
     {
         _ctx = ctx;
         _currentUserService = currentUserService;
@@ -90,8 +89,3 @@ public class UserController : ControllerBase
     }
 }
 
-public record UpdateUserRequest(string Email,string Username, string? Image,string? Bio);
-public record RegisterRequest(string FirstName,string LastName,string Username,string? Bio,string Email,string Password);
-public record LoginRequest(string UsernameOrEmail,string Password);
-public record EmailExistsRequest(string Email);
-public record UsernameExistsRequest(string Username);

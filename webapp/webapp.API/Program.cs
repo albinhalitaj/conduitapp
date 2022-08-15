@@ -1,10 +1,11 @@
-using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
-using webapp.API.Data;
 using webapp.API.ExtensionMethods;
 using webapp.API.Filters;
-using webapp.API.Interfaces;
 using webapp.API.Services;
+using webapp.Application;
+using webapp.Application.Interfaces;
+using webapp.Infrastructure;
+using webapp.Infrastructure.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -23,29 +24,21 @@ builder.Services.AddSwaggerGen(s =>
 builder.Services.ConfigureApiVersioning();
 builder.Services.Configure<RouteOptions>(options => { options.LowercaseUrls = true; });
 
-builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
-
-builder.Services.AddScoped<IIdentityService, IdentityService>();
-builder.Services.AddScoped<ITagService, TagService>();
-builder.Services.AddScoped<IArticleService, ArticlesService>();
-builder.Services.AddScoped<ICommentService, CommentsService>();
-builder.Services.AddScoped<IProfileService, ProfileService>();
-builder.Services.AddScoped<CurrentUserService>();
-
+builder.Services.AddSingleton<ICurrentUserService, CurrentUserService>();
 builder.Services.AddHttpContextAccessor();
 
-builder.Services.AddDbContext<AppDbContext>(
-    x => x.UseSqlServer(builder.Configuration.GetConnectionString("DesktopConn")));
-    
+builder.Services
+    .AddInfrastructure(builder.Configuration)
+    .AddApplication();
+
 builder.Services.ConfigureFluentValidation();
-builder.Services.AddJwtAuth(builder.Configuration);
-builder.Services.ConfigureIdentityProviders();
 
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
 {
     app.UseDeveloperExceptionPage();
+    app.UseExceptionHandler("/error");
     app.UseSwagger();
     app.UseSwaggerUI(x =>
     {

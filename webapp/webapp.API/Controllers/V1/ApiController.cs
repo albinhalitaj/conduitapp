@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using webapp.API.ApiExtensions;
+using webapp.Contracts.Common;
 
 namespace webapp.API.Controllers.V1;
 

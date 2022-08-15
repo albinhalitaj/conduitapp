@@ -1,7 +1,8 @@
-using webapp.API.Controllers.V1;
-using webapp.API.DTOs;
-using webapp.API.Models;
-using webapp.API.Services;
+using webapp.Contracts.Articles;
+using webapp.Contracts.Authors;
+using webapp.Contracts.Comments;
+using webapp.Contracts.Users;
+using webapp.Domain.Entities;
 using Profile = AutoMapper.Profile;
 
 namespace webapp.API.Profiles;
@@ -24,5 +25,3 @@ public class ArticleProfiles : Profile
         CreateMap<ApplicationUser, User>();
     }
 }
-
-public record AuthorResponse(string Username,string Bio,string Image);

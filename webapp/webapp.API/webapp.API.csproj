@@ -34,4 +34,10 @@
       <None Remove=".dockerignore" />
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\webapp.Contracts\webapp.Contracts.csproj" />
+      <ProjectReference Include="..\webapp.Domain\webapp.Domain.csproj" />
+      <ProjectReference Include="..\webapp.Infrastructure\webapp.Infrastructure.csproj" />
+    </ItemGroup>
+
 </Project>

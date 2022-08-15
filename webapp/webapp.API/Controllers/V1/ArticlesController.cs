@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
-using webapp.API.DTOs;
-using webapp.API.Interfaces;
+using webapp.Application.Interfaces;
+using webapp.Contracts.Articles;
+using webapp.Contracts.Comments;
+using webapp.Contracts.Common;
 
 namespace webapp.API.Controllers.V1;
 
@@ -114,5 +116,3 @@ public class ArticlesController : ApiController
         return result.Success ? Ok(result.Value) : Problem(result.Errors);
     }
 }
-
-public record QueryParams(int Limit, int Offset);
