@@ -23,12 +23,9 @@ public sealed class AppDbContext : IdentityDbContext<ApplicationUser>, IAppDbCon
         return await base.SaveChangesAsync();
     }
 
-    public new void Remove<TEntity>(TEntity entity)
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-        if (entity != null)
-        {
-            base.Remove(entity);
-        }
+        optionsBuilder.UseSqlServer(x => x.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery));
     }
 
     protected override void OnModelCreating(ModelBuilder builder)
@@ -41,7 +38,7 @@ public sealed class AppDbContext : IdentityDbContext<ApplicationUser>, IAppDbCon
             .WithMany(x => x.Tags)
             .HasForeignKey(x=>x.ArticleId)
             .OnDelete(DeleteBehavior.Cascade);
-        
+
         builder.Entity<ArticleTags>()
             .HasOne(x => x.Tag)
             .WithMany(x => x.Articles)
@@ -65,13 +62,10 @@ public sealed class AppDbContext : IdentityDbContext<ApplicationUser>, IAppDbCon
             .WithMany(x => x.Favorites)
             .HasForeignKey(x => x.ArticleId)
             .OnDelete(DeleteBehavior.Cascade);
-        
+
         base.OnModelCreating(builder);
-        
-        var keysProperties = builder.Model.GetEntityTypes().Select(x => x.FindPrimaryKey()).SelectMany(x => x!.Properties);
-        foreach (var property in keysProperties)
-        {
+
+        foreach (var property in builder.Model.GetEntityTypes().Select(x => x.FindPrimaryKey()).SelectMany(x => x!.Properties))
             property.ValueGenerated = ValueGenerated.OnAdd;
-        }
     }
 }

@@ -13,6 +13,9 @@ public class TagsController : ApiController
     public async Task<IActionResult> Get()
     {
         var response = await _tagService.GetAllTagsAsync();
-        return response.Success ? Ok(response) : Problem(response.Errors);
+        return response.Success ? Ok(new
+        {
+            Tags = response.Value
+        }) : Problem(response.Errors);
     }
 }

@@ -1,4 +1,4 @@
-using AutoMapper;
+using MapsterMapper;
 using Microsoft.EntityFrameworkCore;
 using webapp.Application.Interfaces;
 using webapp.Contracts.Authors;
@@ -108,9 +108,9 @@ public class CommentsService : ICommentService
             foreach (var comment in article.Comments)
             {
                 var commentAuthor = await _ctx.Users.Where(x=>x.Id == comment.AuthorId)
-                    .Select(x => new CommentAuthor(x.UserName, x.Bio, x.Image)).FirstOrDefaultAsync();
+                    .Select(x => new CommentAuthor(x.Id,x.UserName, x.Bio, x.Image)).FirstOrDefaultAsync();
                 var isFollowing = await _ctx.UserFollowers.AsNoTracking().AnyAsync(x =>
-                    x.FollowerId == _currentUserService.UserId && x.UserId == comment.Author.Id);
+                    commentAuthor != null && x.FollowerId == _currentUserService.UserId && x.UserId == commentAuthor.Id);
                 var author = new Author(commentAuthor!.Username, commentAuthor.Bio, commentAuthor.Image, isFollowing);
                 comments.Add(new CommentResponse(comment.CommentId!,comment.CreatedAt,comment.UpdatedAt,comment.Body!,author));
             }
@@ -119,5 +119,3 @@ public class CommentsService : ICommentService
         }
     }
 }
-
-

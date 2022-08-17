@@ -7,7 +7,6 @@ internal static class DbSeed
     internal static async Task Initialize(AppDbContext ctx)
     {
         ArgumentNullException.ThrowIfNull(ctx, nameof(ctx));
-        await ctx.Database.EnsureCreatedAsync();
         if(ctx.Roles.Any()) return;
 
         var roles = new List<IdentityRole>
@@ -23,7 +22,7 @@ internal static class DbSeed
                 NormalizedName = "ADMIN"
             }
         };
-        
+
         await ctx.Roles.AddRangeAsync(roles);
         await ctx.SaveChangesAsync();
     }

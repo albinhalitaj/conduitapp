@@ -24,15 +24,16 @@ public class TagService : ITagService
         return result > 0 ? tagToCreate.TagId : string.Empty;
     }
 
-    public async Task<ResultDto<List<Tag>>> GetAllTagsAsync()
+    public async Task<ResultDto<string[]>> GetAllTagsAsync()
     {
-        return new ResultDto<List<Tag>>
+        var result = new ResultDto<string[]>();
+        var tags = await _ctx.Tags.Select(x => x.Text).ToArrayAsync();
+        if (tags.Length == 0)
         {
-            Value = await _ctx.Tags.AsNoTracking().Select(x => new Tag
-            {
-                Text = x.Text
-            }).ToListAsync()
-        };
+            result.Value = Array.Empty<string>();
+        }
+        result.Value = tags!;
+        return result;
     }
 
     public async Task<string?> CheckIfExists(string tagName)

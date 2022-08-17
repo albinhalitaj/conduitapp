@@ -1,3 +1,4 @@
+using webapp.Contracts.Authors;
 using webapp.Contracts.Common;
 using webapp.Contracts.Users;
 
@@ -10,4 +11,5 @@ public interface IIdentityService
     Task<bool> EmailExists(string email);
     Task<bool> UsernameExists(string username);
     Task<ResultDto<UserResponse>> UpdateUser(UpdateUserRequest user);
+    Task<ResultDto<UserResponse>> GetUser(string userId);
 }

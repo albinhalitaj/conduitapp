@@ -12,7 +12,7 @@ public class ValidationFilter : IAsyncActionFilter
         {
             var errorModelState = context.ModelState
                 .Where(x => x.Value!.Errors.Count > 0)
-                .ToDictionary(kvp => kvp.Key, 
+                .ToDictionary(kvp => kvp.Key,
                     kvp => kvp.Value!.Errors.Select(x=>x.ErrorMessage)).ToArray();
 
             var response = new ResultDto<ErrorDto>();
@@ -25,7 +25,6 @@ public class ValidationFilter : IAsyncActionFilter
             context.Result = new BadRequestObjectResult(response);
             return;
         }
-        
         await next();
     }
 }

@@ -3,9 +3,9 @@ using webapp.Domain.Entities;
 
 namespace webapp.Application.Interfaces;
 
-public interface ITagService 
+public interface ITagService
 {
     Task<string> CreateTagAsync(string tag);
-    Task<ResultDto<List<Tag>>> GetAllTagsAsync();
+    Task<ResultDto<string[]>> GetAllTagsAsync();
     Task<string?> CheckIfExists(string tag);
 }

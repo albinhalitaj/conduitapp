@@ -5,13 +5,12 @@ namespace webapp.Application.Interfaces;
 
 public interface IAppDbContext
 {
-    DbSet<Article> Articles { get; set; } 
-    DbSet<Comment> Comments { get; set; } 
-    DbSet<ApplicationUser> Users { get; set; }
-    DbSet<UserFavorite> UserFavorites { get; set; } 
-    DbSet<UserFollower> UserFollowers { get; set; }
-    DbSet<ArticleTags> ArticleTags { get; set; } 
-    DbSet<Tag> Tags { get; set; }
+    DbSet<Article> Articles { get; }
+    DbSet<Comment> Comments { get; }
+    DbSet<ApplicationUser> Users { get; }
+    DbSet<UserFavorite> UserFavorites { get; }
+    DbSet<UserFollower> UserFollowers { get; }
+    DbSet<ArticleTags> ArticleTags { get; }
+    DbSet<Tag> Tags { get; }
     Task<int> SaveChangesAsync();
-    void Remove<TEntity>(TEntity entity);
 }

@@ -7,5 +7,5 @@ public class UserFavorite
     public string? ArticleId { get; set; }
 
     public virtual ApplicationUser? User { get; set; }
-    public virtual Article? Article { get; set; } 
+    public virtual Article? Article { get; set; }
 }

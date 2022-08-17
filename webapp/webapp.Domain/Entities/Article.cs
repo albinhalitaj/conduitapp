@@ -10,14 +10,14 @@ public class Article
         Comments = new HashSet<Comment>();
         Favorites = new HashSet<UserFavorite>();
     }
-    
+
     public string? ArticleId { get; set; }
     public string? Slug { get; set; }
     public string? Title { get; set; }
     public string? Description { get; set; }
     public ICollection<ArticleTags> Tags { get; set; }
     public DateTimeOffset? CreatedAt { get; set; } = DateTimeOffset.UtcNow;
-    public string? Body { get; set; } 
+    public string? Body { get; set; }
     public DateTimeOffset UpdatedAt { get; set; }
     public int FavoritesCount {get; set; }
     [NotMapped]

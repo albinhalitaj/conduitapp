@@ -12,13 +12,10 @@ public static class ConfigureServices
 {
     public static IServiceCollection AddInfrastructure(this IServiceCollection services,IConfiguration configuration)
     {
-        services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
         services.AddDbContext<AppDbContext>(
             x => x.UseSqlServer(configuration.GetConnectionString("DesktopConn"),
                 b => b.MigrationsAssembly(typeof(AppDbContext).Assembly.FullName)));
-        
         services.AddScoped<IAppDbContext>(provider => provider.GetService<AppDbContext>() ?? throw new InvalidOperationException());
-
         services.AddScoped<IIdentityService, IdentityService>();
         services.AddJwtAuth(configuration);
         services.ConfigureIdentityProviders();

@@ -1,13 +1,15 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using AutoMapper;
+using Mapster;
+using MapsterMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using webapp.Application.Interfaces;
+using webapp.Contracts.Authors;
 using webapp.Contracts.Common;
 using webapp.Contracts.Users;
 using webapp.Domain.Constants;
@@ -137,6 +139,21 @@ public class IdentityService : IIdentityService
         return result;
     }
 
+    public async Task<ResultDto<UserResponse>> GetUser(string userId)
+    {
+        var result = new ResultDto<UserResponse>();
+        var user = await _ctx.Users.Where(x=>x.Id == userId)
+            .ProjectToType<UserResponse>().FirstOrDefaultAsync();
+        if (user != null)
+        {
+            result.Value = user;
+            return result;
+        }
+        result.Errors = new List<ErrorDto>
+            {new() {Message = $"User with is {userId} was not found!", ErrorCode = "NotFound"}};
+        return result;
+    }
+
     private async Task<string> GenerateToken(ApplicationUser user)
     {
         var tokenHandler = new JwtSecurityTokenHandler();
@@ -160,7 +177,7 @@ public class IdentityService : IIdentityService
             Audience = "www.companyName.com"
         };
 
-        foreach (var role in roles) 
+        foreach (var role in roles)
             tokenDescriptor.Subject.AddClaim(new Claim(ClaimTypes.Role, role));
 
         var token = tokenHandler.CreateToken(tokenDescriptor);
