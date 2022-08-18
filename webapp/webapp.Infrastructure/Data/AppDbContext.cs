@@ -22,12 +22,6 @@ public sealed class AppDbContext : IdentityDbContext<ApplicationUser>, IAppDbCon
     {
         return await base.SaveChangesAsync();
     }
-
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-    {
-        optionsBuilder.UseSqlServer(x => x.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery));
-    }
-
     protected override void OnModelCreating(ModelBuilder builder)
     {
         builder.Entity<ArticleTags>()

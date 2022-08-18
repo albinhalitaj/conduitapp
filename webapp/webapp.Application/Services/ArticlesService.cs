@@ -83,25 +83,34 @@ public class ArticlesService : IArticleService
         var article = await _ctx.Articles.FirstOrDefaultAsync(x => x.Slug == slug);
         if (article is not null)
         {
-            try
+            var isAlreadyFavorited = await _ctx.UserFavorites
+                .AnyAsync(x=>x.ArticleId == article.ArticleId && x.UserId == _currentUserService.UserId);
+            if (!isAlreadyFavorited)
             {
-                var userFavorite = new UserFavorite
+                try
                 {
-                    ArticleId = article.ArticleId,
-                    UserId = _currentUserService.UserId
-                };
-                await _ctx.UserFavorites.AddAsync(userFavorite);
-                article.FavoritesCount++;
-                var res = await _ctx.SaveChangesAsync();
-                if (res > 0)
+                    var userFavorite = new UserFavorite
+                    {
+                        ArticleId = article.ArticleId,
+                        UserId = _currentUserService.UserId
+                    };
+                    await _ctx.UserFavorites.AddAsync(userFavorite);
+                    article.FavoritesCount++;
+                    var res = await _ctx.SaveChangesAsync();
+                    if (res > 0)
+                    {
+                        var art = await GetArticleByTypeAsync(ArticleType.Slug, article.Slug!);
+                        result.Value = art.SingleOrDefault();
+                    }
+                }
+                catch (Exception e)
                 {
-                    var art = await GetArticleByTypeAsync(ArticleType.Slug, article.Slug!);
-                    result.Value = art.SingleOrDefault();
+                    result.Errors = new List<ErrorDto> { new() { Message = e.Message } };
                 }
             }
-            catch (Exception e)
+            else
             {
-                result.Errors = new List<ErrorDto> { new() { Message = e.Message } };
+                result.Errors = new List<ErrorDto>() { new() { Message = "Article is already favorited!", ErrorCode = "AlreadyFavorited" } };
             }
         }
         else
@@ -153,9 +162,9 @@ public class ArticlesService : IArticleService
             ArticleType.Author => await GetArticlesByAuthorOrSlug(ArticleType.Author,value),
             ArticleType.Slug => await GetArticlesByAuthorOrSlug(ArticleType.Slug,value),
             ArticleType.All => await GetArticlesByAuthorOrSlug(ArticleType.All,string.Empty),
-            ArticleType.Feed => await _ctx.UserFollowers.AsNoTracking().Where(x => x.FollowerId == _currentUserService.UserId)
+            ArticleType.Feed => await _ctx.UserFollowers.AsSplitQuery().AsNoTracking().Where(x => x.FollowerId == _currentUserService.UserId)
                 .Select(a => a.User!.Articles).SelectMany(t => t).OrderByDescending(x=>x.CreatedAt).ToListAsync(),
-            ArticleType.Tag => await _ctx.ArticleTags.AsNoTracking()
+            ArticleType.Tag => await _ctx.ArticleTags.AsSingleQuery().AsNoTracking()
                 .Where(x => x.Tag!.Text == value)
                 .ProjectToType<Article>().OrderByDescending(x => x.CreatedAt).ToListAsync(),
             _ => new List<Article>()
@@ -166,7 +175,7 @@ public class ArticlesService : IArticleService
             var user = await _ctx.Users.AsNoTracking().AnyAsync(x => x.UserName == value);
             if (user)
             {
-                articles = await _ctx.UserFavorites.Where(x => x.UserId == x.User!.Id)
+                articles = await _ctx.UserFavorites.AsSplitQuery().AsNoTracking().Where(x => x.UserId == x.User!.Id)
                     .ProjectToType<Article>()
                     .OrderByDescending(x => x.CreatedAt)
                     .ToListAsync();
@@ -190,6 +199,7 @@ public class ArticlesService : IArticleService
     private async Task<List<Article>> GetArticlesByAuthorOrSlug(ArticleType type, string value)
     {
         var articles = await _ctx.Articles.AsNoTracking()
+            .AsSplitQuery()
             .Where(x => type == ArticleType.Slug ? x.Slug == value :
                 type != ArticleType.Author || x.Author!.UserName == value)
             .ProjectToType<Article>()
