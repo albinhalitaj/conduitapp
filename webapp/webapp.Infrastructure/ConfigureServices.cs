@@ -13,7 +13,7 @@ public static class ConfigureServices
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddDbContext<AppDbContext>(
-            x => x.UseSqlServer(configuration.GetConnectionString("DesktopConn"),
+            x => x.UseSqlServer(configuration.GetConnectionString("AppConn"),
                 b => b.MigrationsAssembly(typeof(AppDbContext).Assembly.FullName)));
         services.AddScoped<IAppDbContext>(provider =>
             provider.GetService<AppDbContext>() ?? throw new InvalidOperationException());

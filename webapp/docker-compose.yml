@@ -5,7 +5,7 @@ services:
     container_name: db
     environment:
       - ACCEPT_EULA=Y
-      - MSSQL_SA_PASSWORD=Albinhalitaj@1
+      - MSSQL_SA_PASSWORD=YourSup3rSecur3Pa55word
     ports:
       - "1433:1433"
     networks:
@@ -22,7 +22,7 @@ services:
       - ASPNETCORE_URLS=https://+:443;http://+:80
       - ASPNETCORE_Kestrel__Certificates__Default__Password=password
       - ASPNETCORE_Kestrel__Certificates__Default__Path=/https/aspnetapp.pfx
-      - CONNECTIONSTRINGS__DESKTOPCONN=Server=db,1433;Database=ConduitApp;User ID=sa;Password=Albinhalitaj@1;MultipleActiveResultSets=true;
+      - CONNECTIONSTRINGS__DESKTOPCONN=Server=db,1433;Database=ConduitApp;User ID=sa;Password=YourSup3rSecur3Pa55word;MultipleActiveResultSets=true;
     ports:
       - "5000:80"
       - "5001:443"
