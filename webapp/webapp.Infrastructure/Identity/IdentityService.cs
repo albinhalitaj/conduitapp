@@ -9,7 +9,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using webapp.Application.Interfaces;
-using webapp.Contracts.Authors;
 using webapp.Contracts.Common;
 using webapp.Contracts.Users;
 using webapp.Domain.Constants;
@@ -25,6 +24,7 @@ public class IdentityService : IIdentityService
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly AppDbContext _ctx;
     private readonly IMapper _mapper;
+    private readonly ICurrentUserService _currentUserService;
     private readonly ApplicationSettings _appSettings;
 
     public IdentityService(UserManager<ApplicationUser> userManager,
@@ -32,20 +32,22 @@ public class IdentityService : IIdentityService
         IOptions<ApplicationSettings> appSettings,
         IHttpContextAccessor httpContextAccessor,
         AppDbContext ctx,
-        IMapper mapper)
+        IMapper mapper,
+        ICurrentUserService currentUserService)
     {
         _userManager = userManager;
         _signInManager = signInManager;
         _httpContextAccessor = httpContextAccessor;
         _ctx = ctx;
         _mapper = mapper;
+        _currentUserService = currentUserService;
         _appSettings = appSettings.Value;
     }
 
     public async Task<ResultDto<RegisterResponse>> RegisterAsync(RegisterRequest model)
     {
         var response = new ResultDto<RegisterResponse>();
-        var (firstName,lastName,username,bio, email, password) = model;
+        var (firstName, lastName, username, bio, email, password) = model;
         var user = new ApplicationUser
         {
             UserName = username,
@@ -61,6 +63,7 @@ public class IdentityService : IIdentityService
             response.Value = new RegisterResponse(user.Id, user.UserName, user.Email, RoleConstants.User);
             return response;
         }
+
         response.Errors = registerResult.Errors
             .Select(error => new ErrorDto {Message = error.Description, ErrorCode = error.Code}).ToList();
         return response;
@@ -70,7 +73,7 @@ public class IdentityService : IIdentityService
     {
         var response = new ResultDto<User>();
         var (usernameOrEmail, password) = request;
-        var isEmail = usernameOrEmail.Contains('@');
+        var isEmail = usernameOrEmail.Contains('@') && usernameOrEmail.Contains('.');
         var userAccount = isEmail
             ? await _userManager.FindByEmailAsync(usernameOrEmail)
             : await _userManager.FindByNameAsync(usernameOrEmail);
@@ -89,42 +92,35 @@ public class IdentityService : IIdentityService
                     SameSite = SameSiteMode.Strict,
                     Expires = DateTimeOffset.UtcNow.AddHours(1)
                 });
-                response.Value = new User(userAccount.Id, userAccount.UserName, userAccount.Email, roles.ToArray(), DateTimeOffset.UtcNow.AddHours(1));
+                response.Value = new User(userAccount.Id, userAccount.UserName, userAccount.Email, roles.ToArray(),
+                    DateTimeOffset.UtcNow.AddHours(1));
                 return response;
             }
+
             response.Errors = new List<ErrorDto>
-                {new() {Message = "Username or Email is incorrect", ErrorCode = "IncorrectUsernameOrEmail"}};
+                {new() {Message = "Username or Email is incorrect", ErrorCode = "InvalidCredentials"}};
         }
         else
         {
             response.Errors = new List<ErrorDto>
-                {new() {Message = "User does not exists", ErrorCode = "UserDoesNotExists"}};
+                {new() {Message = "User not Found!", ErrorCode = "NotFound"}};
         }
 
         return response;
     }
 
-    public async Task<bool> EmailExists(string email)
-    {
-        var result = await _userManager.FindByEmailAsync(email);
-        return result is not null;
-    }
+    public async Task<bool> EmailExists(string email) => await _ctx.Users.AnyAsync(x => x.Email == email);
 
-    public async Task<bool> UsernameExists(string username)
-    {
-        var result = await _userManager.FindByNameAsync(username);
-        return result is not null;
-    }
+    public async Task<bool> UsernameExists(string username) => await _ctx.Users.AnyAsync(x => x.UserName == username);
 
     public async Task<ResultDto<UserResponse>> UpdateUser(UpdateUserRequest user)
     {
         var result = new ResultDto<UserResponse>();
         try
         {
-            var currentUser = await _ctx.Users.FirstOrDefaultAsync(x => x.Id == "1");
+            var currentUser = await _ctx.Users.FirstOrDefaultAsync(x => x.Id == _currentUserService.UserId);
 
             currentUser!.UserName = user.Username.Contains(' ') ? user.Username.Replace(" ", "") : user.Username;
-            currentUser.UserName = user.Username;
             currentUser.Email = user.Email;
             currentUser.Bio = user.Bio;
             currentUser.Image = user.Image;
@@ -136,21 +132,23 @@ public class IdentityService : IIdentityService
         {
             result.Errors = new List<ErrorDto> {new() {Message = e.Message, ErrorCode = e.HelpLink}};
         }
+
         return result;
     }
 
     public async Task<ResultDto<UserResponse>> GetUser(string userId)
     {
         var result = new ResultDto<UserResponse>();
-        var user = await _ctx.Users.Where(x=>x.Id == userId)
+        var user = await _ctx.Users.Where(x => x.Id == userId)
             .ProjectToType<UserResponse>().FirstOrDefaultAsync();
         if (user != null)
         {
             result.Value = user;
             return result;
         }
+
         result.Errors = new List<ErrorDto>
-            {new() {Message = $"User with is {userId} was not found!", ErrorCode = "NotFound"}};
+            {new() {Message = $"User with id {userId} was not found!", ErrorCode = "NotFound"}};
         return result;
     }
 
@@ -166,7 +164,7 @@ public class IdentityService : IIdentityService
             Subject = new ClaimsIdentity(new[]
             {
                 new Claim(ClaimTypes.NameIdentifier, user.UserName),
-                new Claim(ClaimTypes.Name,user.Id),
+                new Claim(ClaimTypes.Name, user.Id),
                 new Claim(ClaimTypes.Email, user.Email),
             }),
             Expires = DateTime.UtcNow.AddHours(1),

@@ -21,7 +21,7 @@ public class CommentsService : ICommentService
         _mapper = mapper;
     }
 
-    public async Task<ResultDto<CommentResponse>> CreateComment(string articleSlug,CreateCommentRequest comment)
+    public async Task<ResultDto<CommentResponse>> CreateComment(string articleSlug, CreateCommentRequest comment)
     {
         var response = new ResultDto<CommentResponse>();
         var errors = new List<ErrorDto>();
@@ -41,7 +41,7 @@ public class CommentsService : ICommentService
             }).FirstOrDefaultAsync();
         if (article is null)
         {
-            errors.Add(new ErrorDto { Message = $"Article with slug {articleSlug} was not found!" });
+            errors.Add(new ErrorDto {Message = $"Article with slug {articleSlug} was not found!"});
         }
         else
         {
@@ -62,9 +62,10 @@ public class CommentsService : ICommentService
             }
             catch (Exception e)
             {
-                errors.Add(new ErrorDto { Message = e.Message });
+                errors.Add(new ErrorDto {Message = e.Message});
             }
         }
+
         response.Errors = errors;
         return response;
     }
@@ -76,17 +77,32 @@ public class CommentsService : ICommentService
         {
             try
             {
-                var commentToDelete = new Comment { CommentId = commentId };
-                if (commentToDelete.AuthorId == _currentUserService.UserId)
+                var cTd = await _ctx.Comments
+                    .Where(x => x.CommentId == commentId)
+                    .Select(x => new
+                    {
+                        x.CommentId,
+                        x.AuthorId
+                    }).FirstOrDefaultAsync();
+                if (cTd is not null)
                 {
-                    _ctx.Comments.Remove(commentToDelete);
-                    await _ctx.SaveChangesAsync();
-                    result.Value = $"Comment with id: {commentId} deleted successfully";
+                    var commentToDelete = new Comment {CommentId = cTd.CommentId};
+                    if (cTd.AuthorId == _currentUserService.UserId)
+                    {
+                        _ctx.Comments.Remove(commentToDelete);
+                        await _ctx.SaveChangesAsync();
+                        result.Value = $"Comment with id {commentId} deleted successfully";
+                    }
+                    else
+                    {
+                        result.Errors = new List<ErrorDto>
+                            {new() {Message = $"Could not find comment with id {commentId}", ErrorCode = "NotFound"}};
+                    }
                 }
                 else
                 {
                     result.Errors = new List<ErrorDto>
-                        {new() {Message = $"Could not find comment with id: {commentId}"}};
+                        {new() {Message = $"Could not find comment with id {commentId}", ErrorCode = "NotFound"}};
                 }
             }
             catch (Exception e)
@@ -94,26 +110,34 @@ public class CommentsService : ICommentService
                 result.Errors = new List<ErrorDto> {new() {Message = e.Message}};
             }
         }
-        result.Errors = new List<ErrorDto> {new() {Message = "Please provide article slug and comment id"}};
+        else
+        {
+            result.Errors = new List<ErrorDto> {new() {Message = "Please provide article slug and comment id"}};
+        }
+
         return result;
     }
 
     public async Task<ResultDto<List<CommentResponse>>> ListComments(string slug)
     {
         var response = new ResultDto<List<CommentResponse>>();
-        var article = await _ctx.Articles.AsNoTracking().Include(x=>x.Comments).FirstOrDefaultAsync(x => x.Slug == slug);
+        var article = await _ctx.Articles.AsNoTracking().Include(x => x.Comments)
+            .FirstOrDefaultAsync(x => x.Slug == slug);
         if (article is not {Comments: { }}) return response;
         {
             var comments = new List<CommentResponse>();
             foreach (var comment in article.Comments)
             {
-                var commentAuthor = await _ctx.Users.Where(x=>x.Id == comment.AuthorId)
-                    .Select(x => new CommentAuthor(x.Id,x.UserName, x.Bio, x.Image)).FirstOrDefaultAsync();
+                var commentAuthor = await _ctx.Users.Where(x => x.Id == comment.AuthorId)
+                    .Select(x => new CommentAuthor(x.Id, x.UserName, x.Bio, x.Image)).FirstOrDefaultAsync();
                 var isFollowing = await _ctx.UserFollowers.AsNoTracking().AnyAsync(x =>
-                    commentAuthor != null && x.FollowerId == _currentUserService.UserId && x.UserId == commentAuthor.Id);
+                    commentAuthor != null && x.FollowerId == _currentUserService.UserId &&
+                    x.UserId == commentAuthor.Id);
                 var author = new Author(commentAuthor!.Username, commentAuthor.Bio, commentAuthor.Image, isFollowing);
-                comments.Add(new CommentResponse(comment.CommentId!,comment.CreatedAt,comment.UpdatedAt,comment.Body!,author));
+                comments.Add(new CommentResponse(comment.CommentId!, comment.CreatedAt, comment.UpdatedAt,
+                    comment.Body!, author));
             }
+
             response.Value = comments;
             return response;
         }

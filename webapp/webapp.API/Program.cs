@@ -15,11 +15,8 @@ var builder = WebApplication.CreateBuilder(args);
 
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment())
-{
-    app.ConfigureApp();
-    await app.SeedData();
-}
+app.ConfigureApp();
+await app.SeedData();
 
 // Middlewares
 {

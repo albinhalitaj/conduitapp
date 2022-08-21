@@ -12,16 +12,19 @@ public sealed class AppDbContext : IdentityDbContext<ApplicationUser>, IAppDbCon
     {
         ChangeTracker.LazyLoadingEnabled = false;
     }
+
     public DbSet<Article> Articles { get; set; } = null!;
     public DbSet<Comment> Comments { get; set; } = null!;
     public DbSet<UserFavorite> UserFavorites { get; set; } = null!;
     public DbSet<UserFollower> UserFollowers { get; set; } = null!;
     public DbSet<ArticleTags> ArticleTags { get; set; } = null!;
     public DbSet<Tag> Tags { get; set; } = null!;
+
     public async Task<int> SaveChangesAsync()
     {
         return await base.SaveChangesAsync();
     }
+
     protected override void OnModelCreating(ModelBuilder builder)
     {
         builder.Entity<ArticleTags>()
@@ -30,13 +33,13 @@ public sealed class AppDbContext : IdentityDbContext<ApplicationUser>, IAppDbCon
         builder.Entity<ArticleTags>()
             .HasOne(x => x.Article)
             .WithMany(x => x.Tags)
-            .HasForeignKey(x=>x.ArticleId)
+            .HasForeignKey(x => x.ArticleId)
             .OnDelete(DeleteBehavior.Cascade);
 
         builder.Entity<ArticleTags>()
             .HasOne(x => x.Tag)
             .WithMany(x => x.Articles)
-            .HasForeignKey(x=>x.TagId)
+            .HasForeignKey(x => x.TagId)
             .OnDelete(DeleteBehavior.Cascade);
 
         builder.Entity<Article>()
@@ -59,7 +62,8 @@ public sealed class AppDbContext : IdentityDbContext<ApplicationUser>, IAppDbCon
 
         base.OnModelCreating(builder);
 
-        foreach (var property in builder.Model.GetEntityTypes().Select(x => x.FindPrimaryKey()).SelectMany(x => x!.Properties))
+        foreach (var property in builder.Model.GetEntityTypes().Select(x => x.FindPrimaryKey())
+                     .SelectMany(x => x!.Properties))
             property.ValueGenerated = ValueGenerated.OnAdd;
     }
 }

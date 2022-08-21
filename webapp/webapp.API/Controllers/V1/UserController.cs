@@ -24,14 +24,16 @@ public class UserController : ControllerBase
     public async Task<IActionResult> Get()
     {
         var response = await _identityService.GetUser(_currentUserService.UserId!);
-        return response.Success ? Ok(new
-        {
-            User = response.Value
-        }) : Problem(statusCode: StatusCodes.Status400BadRequest, title: response.Errors.SingleOrDefault()?.Message);
+        return response.Success
+            ? Ok(new
+            {
+                User = response.Value
+            })
+            : Problem(statusCode: StatusCodes.Status400BadRequest, title: response.Errors.SingleOrDefault()?.Message);
     }
 
     [HttpPost]
-    public async Task<IActionResult> Register([FromBody] RegisterRequest request)
+    public async Task<IActionResult> Register(RegisterRequest request)
     {
         var result = await _identityService.RegisterAsync(request);
         return result.Success
@@ -43,7 +45,7 @@ public class UserController : ControllerBase
     }
 
     [Route(nameof(Login)), AllowAnonymous, HttpPost]
-    public async Task<IActionResult> Login([FromBody] LoginRequest request)
+    public async Task<IActionResult> Login(LoginRequest request)
     {
         var response = await _identityService.LoginAsync(request);
         return response.Success
@@ -55,7 +57,7 @@ public class UserController : ControllerBase
     }
 
     [HttpPost, Route(nameof(EmailExists))]
-    public async Task<IActionResult> EmailExists([FromBody] EmailExistsRequest req)
+    public async Task<IActionResult> EmailExists(EmailExistsRequest req)
     {
         var result = await _identityService.EmailExists(req.Email);
         return Ok(new
@@ -65,7 +67,7 @@ public class UserController : ControllerBase
     }
 
     [HttpPost, Route(nameof(UsernameExists))]
-    public async Task<IActionResult> UsernameExists([FromBody] UsernameExistsRequest req)
+    public async Task<IActionResult> UsernameExists(UsernameExistsRequest req)
     {
         var result = await _identityService.UsernameExists(req.Username);
         return Ok(new
@@ -83,7 +85,7 @@ public class UserController : ControllerBase
     }
 
     [HttpPut, Authorize]
-    public async Task<IActionResult> UpdateUser([FromBody] UpdateUserRequest request)
+    public async Task<IActionResult> UpdateUser(UpdateUserRequest request)
     {
         var response = await _identityService.UpdateUser(request);
         return response.Success

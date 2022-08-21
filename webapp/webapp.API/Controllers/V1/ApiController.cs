@@ -16,6 +16,6 @@ public class ApiController : ControllerBase
         var error = errors.SingleOrDefault();
         return error!.ErrorCode == "NotFound"
             ? Problem(statusCode: StatusCodes.Status404NotFound, title: error.Message)
-            : Problem(statusCode: StatusCodes.Status400BadRequest, title: error?.Message);
+            : Problem(statusCode: StatusCodes.Status400BadRequest, title: error.Message);
     }
 }

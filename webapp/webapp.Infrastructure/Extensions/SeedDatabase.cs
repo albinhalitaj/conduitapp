@@ -16,7 +16,6 @@ public static class SeedDatabase
         try
         {
             var context = services.GetRequiredService<AppDbContext>();
-            Console.WriteLine("Migrating...");
             await context.Database.MigrateAsync();
             await DbSeed.Initialize(context);
         }

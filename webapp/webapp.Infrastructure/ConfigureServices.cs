@@ -10,12 +10,13 @@ namespace webapp.Infrastructure;
 
 public static class ConfigureServices
 {
-    public static IServiceCollection AddInfrastructure(this IServiceCollection services,IConfiguration configuration)
+    public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddDbContext<AppDbContext>(
             x => x.UseSqlServer(configuration.GetConnectionString("DesktopConn"),
                 b => b.MigrationsAssembly(typeof(AppDbContext).Assembly.FullName)));
-        services.AddScoped<IAppDbContext>(provider => provider.GetService<AppDbContext>() ?? throw new InvalidOperationException());
+        services.AddScoped<IAppDbContext>(provider =>
+            provider.GetService<AppDbContext>() ?? throw new InvalidOperationException());
         services.AddScoped<IIdentityService, IdentityService>();
         services.AddJwtAuth(configuration);
         services.ConfigureIdentityProviders();

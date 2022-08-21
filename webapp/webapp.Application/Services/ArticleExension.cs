@@ -14,11 +14,11 @@ public static class ArticleExtension
         foreach (var follower in isUserFollowing)
         {
             foreach (var article in source)
-            { 
+            {
                 article.IsFollowing = follower == article.AuthorId;
             }
         }
-        
+
         return source;
     }
 }

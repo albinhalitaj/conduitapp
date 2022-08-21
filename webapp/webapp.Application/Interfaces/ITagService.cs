@@ -1,5 +1,4 @@
 using webapp.Contracts.Common;
-using webapp.Domain.Entities;
 
 namespace webapp.Application.Interfaces;
 

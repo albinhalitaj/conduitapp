@@ -7,7 +7,7 @@ internal static class DbSeed
     internal static async Task Initialize(AppDbContext ctx)
     {
         ArgumentNullException.ThrowIfNull(ctx, nameof(ctx));
-        if(ctx.Roles.Any()) return;
+        if (ctx.Roles.Any()) return;
 
         var roles = new List<IdentityRole>
         {

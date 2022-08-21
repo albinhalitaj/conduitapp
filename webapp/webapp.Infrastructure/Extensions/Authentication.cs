@@ -6,12 +6,13 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using webapp.Domain.Entities;
 using webapp.Infrastructure.Data;
+using webapp.Infrastructure.Identity;
 
 namespace webapp.Infrastructure.Extensions;
 
 public static class Authentication
 {
-    public static IServiceCollection AddJwtAuth(this IServiceCollection service,IConfiguration configuration)
+    public static IServiceCollection AddJwtAuth(this IServiceCollection service, IConfiguration configuration)
     {
         var appSettingsSection = configuration.GetSection(nameof(ApplicationSettings));
         service.Configure<ApplicationSettings>(appSettingsSection);
@@ -53,14 +54,14 @@ public static class Authentication
     public static IServiceCollection ConfigureIdentityProviders(this IServiceCollection services)
     {
         services.AddIdentity<ApplicationUser, IdentityRole>(opt =>
-        {
-            opt.Password.RequiredLength = 8;
-            opt.Password.RequireUppercase = true;
-            opt.Password.RequireLowercase = true;
-            opt.Password.RequireDigit = true;
-        })
-        .AddEntityFrameworkStores<AppDbContext>()
-        .AddDefaultTokenProviders();
+            {
+                opt.Password.RequiredLength = 8;
+                opt.Password.RequireUppercase = true;
+                opt.Password.RequireLowercase = true;
+                opt.Password.RequireDigit = true;
+            })
+            .AddEntityFrameworkStores<AppDbContext>()
+            .AddDefaultTokenProviders();
         return services;
     }
 }

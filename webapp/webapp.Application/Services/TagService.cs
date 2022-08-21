@@ -13,13 +13,21 @@ public class TagService : ITagService
 
     public async Task<string> CreateTagAsync(string tag)
     {
+        int result;
         var tagToCreate = new Tag
         {
             TagId = Guid.NewGuid().ToString(),
             Text = tag
         };
-        await _ctx.Tags.AddAsync(tagToCreate);
-        var result = await _ctx.SaveChangesAsync();
+        try
+        {
+            await _ctx.Tags.AddAsync(tagToCreate);
+            result = await _ctx.SaveChangesAsync();
+        }
+        catch (Exception e)
+        {
+            return e.Message;
+        }
 
         return result > 0 ? tagToCreate.TagId : string.Empty;
     }
@@ -32,6 +40,7 @@ public class TagService : ITagService
         {
             result.Value = Array.Empty<string>();
         }
+
         result.Value = tags!;
         return result;
     }

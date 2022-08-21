@@ -1,4 +1,3 @@
-using webapp.Contracts.Authors;
 using webapp.Contracts.Common;
 using webapp.Contracts.Users;
 

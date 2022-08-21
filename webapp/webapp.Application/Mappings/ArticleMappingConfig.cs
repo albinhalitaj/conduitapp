@@ -16,15 +16,6 @@ public class ArticleMappingConfig : IRegister
             .Map(dest => dest.AuthorId, _ => MapContext.Current.GetService<ICurrentUserService>().UserId)
             .Ignore(x => x.Tags);
 
-        // void Action(ArticleTags at,Article article)
-        // {
-        //     var context = MapContext.Current.GetService<IAppDbContext>();
-        //     var currentUser = MapContext.Current.GetService<ICurrentUserService>();
-        //     Console.WriteLine($"Current USer: {currentUser.UserId}");
-        //     article.IsFollowing = context.UserFollowers
-        //         .Any(x => x.FollowerId == currentUser.UserId && x.UserId == at.Article!.AuthorId!);
-        // }
-
         config.NewConfig<ArticleTags, Article>()
             .Map(dest => dest.Author,
                 src => new ApplicationUser

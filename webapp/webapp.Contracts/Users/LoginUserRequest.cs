@@ -1,3 +1,3 @@
 ﻿namespace webapp.Contracts.Users;
 
-public record LoginRequest(string UsernameOrEmail,string Password);
+public record LoginRequest(string UsernameOrEmail, string Password);

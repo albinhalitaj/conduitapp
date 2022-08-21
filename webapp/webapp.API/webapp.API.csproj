@@ -12,8 +12,6 @@
         <PackageReference Include="FluentValidation.AspNetCore" Version="11.1.2" />
         <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="11.1.0" />
         <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.7" />
-        <PackageReference Include="Microsoft.AspNetCore.Identity" Version="2.2.0" />
-        <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="6.0.7" />
         <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="6.0.7" />
         <PackageReference Include="Microsoft.AspNetCore.Mvc.Versioning" Version="5.0.0" />
         <PackageReference Include="Microsoft.AspNetCore.Mvc.Versioning.ApiExplorer" Version="5.0.0" />
@@ -22,11 +20,8 @@
           <PrivateAssets>all</PrivateAssets>
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="6.0.7" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.7" />
         <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
         <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3" />
-        <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="6.4.0" />
     </ItemGroup>
 
     <ItemGroup>
@@ -35,6 +30,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\webapp.Application\webapp.Application.csproj" />
       <ProjectReference Include="..\webapp.Contracts\webapp.Contracts.csproj" />
       <ProjectReference Include="..\webapp.Infrastructure\webapp.Infrastructure.csproj" />
     </ItemGroup>

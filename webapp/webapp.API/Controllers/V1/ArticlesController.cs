@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Mvc;
-using Swashbuckle.AspNetCore.Annotations;
 using webapp.Application.Interfaces;
 using webapp.Contracts.Articles;
 using webapp.Contracts.Comments;
@@ -19,9 +18,6 @@ public class ArticlesController : ApiController
     }
 
     [HttpGet]
-    [SwaggerResponse(StatusCodes.Status401Unauthorized)]
-    [SwaggerResponse(StatusCodes.Status200OK, "Returns a list of articles", typeof(ArticleResponse))]
-    [SwaggerResponse(StatusCodes.Status400BadRequest, "Returns an error", typeof(ProblemDetails))]
     [Produces("application/json")]
     public async Task<IActionResult> GetArticles([FromQuery] QueryParams queryParams)
     {
@@ -36,24 +32,24 @@ public class ArticlesController : ApiController
     }
 
     [HttpGet("{slug}")]
-    [SwaggerResponse(StatusCodes.Status401Unauthorized)]
-    [SwaggerResponse(StatusCodes.Status200OK, "Returns an article", typeof(ArticleResponse))]
-    [SwaggerResponse(StatusCodes.Status404NotFound, "Returns an error", typeof(ProblemDetails))]
-    [SwaggerResponse(StatusCodes.Status400BadRequest, "Returns an error", typeof(ProblemDetails))]
     public async Task<IActionResult> GetArticle([FromRoute] string slug)
     {
         var result = await _articleService.GetArticleAsync(slug);
-        return result.Success ? Ok(new
-        {
-            Article = result.Value
-        }) : Problem(result.Errors);
+        return result.Success
+            ? Ok(new
+            {
+                Article = result.Value
+            })
+            : Problem(result.Errors);
     }
 
     [HttpGet("feed")]
     public async Task<IActionResult> Feed([FromQuery] QueryParams queryParams)
     {
         var result = await _articleService.Feed(queryParams);
-        return !result.Success ? Problem(result.Errors) : Ok(new
+        return !result.Success
+            ? Problem(result.Errors)
+            : Ok(new
             {
                 Articles = result.Value,
                 ArticlesCount = result.Value!.Any() ? result.Value!.Count : 0
@@ -64,7 +60,9 @@ public class ArticlesController : ApiController
     public async Task<IActionResult> GetArticleByAuthor([FromQuery] string author)
     {
         var result = await _articleService.GetArticleByAuthorAsync(author);
-        return !result.Success ? Problem(result.Errors) : Ok(new
+        return !result.Success
+            ? Problem(result.Errors)
+            : Ok(new
             {
                 Articles = result.Value,
                 ArticlesCount = result.Value!.Any() ? result.Value!.Count : 0
@@ -88,64 +86,75 @@ public class ArticlesController : ApiController
     public async Task<IActionResult> CreateArticle([FromBody] CreateArticleRequest request)
     {
         var result = await _articleService.CreateArticleAsync(request);
-        return result.Success ? Ok(new
-        {
-            Article = result.Value
-        }) : Problem(result.Errors);
+        return result.Success
+            ? Ok(new
+            {
+                Article = result.Value
+            })
+            : Problem(result.Errors);
     }
 
     [HttpPut("{slug}")]
-    public async Task<IActionResult> UpdateArticle([FromRoute] string slug,UpdateArticleRequest request)
+    public async Task<IActionResult> UpdateArticle([FromRoute] string slug, UpdateArticleRequest request)
     {
         var response = await _articleService.UpdateArticleAsync(slug, request);
-        return response.Success ? Ok(new
-        {
-            Article = response.Value
-        }) : Problem(response.Errors);
+        return response.Success
+            ? Ok(new
+            {
+                Article = response.Value
+            })
+            : Problem(response.Errors);
     }
 
     [HttpPost("{slug}/favorite")]
     public async Task<IActionResult> FavoriteArticle([FromRoute] string slug)
     {
         var result = await _articleService.FavoriteArticle(slug);
-        return result.Success ? Ok(new
-        {
-            Article = result.Value
-        }) : Problem(result.Errors);
+        return result.Success
+            ? Ok(new
+            {
+                Article = result.Value
+            })
+            : Problem(result.Errors);
     }
 
     [HttpDelete("{slug}/favorite")]
     public async Task<IActionResult> UnFavoriteArticle([FromRoute] string slug)
     {
         var result = await _articleService.UnFavoriteArticle(slug);
-        return result.Success ? Ok(new
-        {
-            Article = result.Value
-        }) : Problem(result.Errors);
+        return result.Success
+            ? Ok(new
+            {
+                Article = result.Value
+            })
+            : Problem(result.Errors);
     }
 
     [HttpGet("byFavorite")]
     public async Task<IActionResult> GetArticleByFavorite([FromQuery] string author)
     {
         var result = await _articleService.GetArticleByFavorites(author);
-        return !result.Success ? Problem(result.Errors) : result.Value!.Count > 1 ? Ok(new
-        {
-            Articles = result.Value,
-            ArticlesCount = result.Value.Count
-        }) : Ok(new
-        {
-            Article = result.Value.First()
-        });
+        return !result.Success ? Problem(result.Errors) :
+            result.Value!.Count > 1 ? Ok(new
+            {
+                Articles = result.Value,
+                ArticlesCount = result.Value.Count
+            }) : Ok(new
+            {
+                Article = result.Value.First()
+            });
     }
 
     [HttpPost("{slug}/comments")]
-    public async Task<IActionResult> CreateComment([FromRoute] string slug,CreateCommentRequest request)
+    public async Task<IActionResult> CreateComment([FromRoute] string slug, CreateCommentRequest request)
     {
-        var result = await _commentService.CreateComment(slug,request);
-        return result.Success ? Ok(new
-        {
-            Comment = result.Value
-        }) : Problem(result.Errors);
+        var result = await _commentService.CreateComment(slug, request);
+        return result.Success
+            ? Ok(new
+            {
+                Comment = result.Value
+            })
+            : Problem(result.Errors);
     }
 
     [HttpGet("{slug}/comments")]
@@ -161,9 +170,9 @@ public class ArticlesController : ApiController
     }
 
     [HttpDelete("{slug}/comments/{id}")]
-    public async Task<IActionResult> DeleteComment([FromRoute] string slug,[FromRoute] string id)
+    public async Task<IActionResult> DeleteComment([FromRoute] string slug, [FromRoute] string id)
     {
-        var result = await _commentService.DeleteCommentAsync(slug,id);
+        var result = await _commentService.DeleteCommentAsync(slug, id);
         return result.Success ? NoContent() : Problem(result.Errors);
     }
 

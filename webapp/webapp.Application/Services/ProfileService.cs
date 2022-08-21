@@ -11,7 +11,7 @@ public class ProfileService : IProfileService
     private readonly IAppDbContext _ctx;
     private readonly ICurrentUserService _currentUserService;
 
-    public ProfileService(IAppDbContext ctx,ICurrentUserService currentUserService)
+    public ProfileService(IAppDbContext ctx, ICurrentUserService currentUserService)
     {
         _ctx = ctx;
         _currentUserService = currentUserService;
@@ -21,8 +21,8 @@ public class ProfileService : IProfileService
     {
         var response = new ResultDto<ProfileResponse>();
         var profile = await _ctx.Users
-            .Where(x=>x.UserName == username)
-            .Select(x=> new
+            .Where(x => x.UserName == username)
+            .Select(x => new
             {
                 x.Id,
                 Username = x.UserName,
@@ -31,10 +31,12 @@ public class ProfileService : IProfileService
             }).FirstOrDefaultAsync();
         if (profile is not null)
         {
-            var isFollowing = await _ctx.UserFollowers.AsNoTracking().AnyAsync(x => x.UserId == profile.Id && x.FollowerId == _currentUserService.UserId);
+            var isFollowing = await _ctx.UserFollowers.AsNoTracking()
+                .AnyAsync(x => x.UserId == profile.Id && x.FollowerId == _currentUserService.UserId);
             response.Value = new ProfileResponse(profile.Username, profile.Bio, profile.Image, isFollowing);
             return response;
         }
+
         response.Errors = new List<ErrorDto> {new() {Message = $"User {username} not Found", ErrorCode = "NotFound"}};
         return response;
     }
@@ -80,15 +82,16 @@ public class ProfileService : IProfileService
             }).FirstOrDefaultAsync();
         if (userToUnfollow is null)
         {
-            response.Errors = new List<ErrorDto> {new() {Message = $"Profile not found with username {username}", ErrorCode = "NotFound"}};
+            response.Errors = new List<ErrorDto>
+                {new() {Message = $"Profile not found with username {username}", ErrorCode = "NotFound"}};
             return response;
         }
 
         var followedUser = await _ctx.UserFollowers.Where(x =>
                 x.FollowerId == _currentUserService.UserId && x.UserId == userToUnfollow.Id)
-            .Select(x=> new
+            .Select(x => new
             {
-                Profile = new ProfileResponse(x.User!.UserName,x.User.Bio,x.User.Image,false),
+                Profile = new ProfileResponse(x.User!.UserName, x.User.Bio, x.User.Image, false),
                 Id = x.UserFollowerId
             }).FirstOrDefaultAsync();
         if (followedUser is null)
@@ -96,6 +99,7 @@ public class ProfileService : IProfileService
             response.Errors = new List<ErrorDto> {new() {Message = $"You are not following {username}"}};
             return response;
         }
+
         var userFollowerToDelete = new UserFollower {UserFollowerId = followedUser.Id};
         _ctx.UserFollowers.Remove(userFollowerToDelete);
         await _ctx.SaveChangesAsync();

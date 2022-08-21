@@ -19,11 +19,9 @@ public class Article
     public DateTimeOffset? CreatedAt { get; set; } = DateTimeOffset.UtcNow;
     public string? Body { get; set; }
     public DateTimeOffset UpdatedAt { get; set; }
-    public int FavoritesCount {get; set; }
-    [NotMapped]
-    public bool IsFollowing { get; set; }
-    [NotMapped]
-    public string?[]? TagsArray { get; set; }
+    public int FavoritesCount { get; set; }
+    [NotMapped] public bool IsFollowing { get; set; }
+    [NotMapped] public string?[]? TagsArray { get; set; }
     public ICollection<Comment>? Comments { get; set; }
     public string? AuthorId { get; set; }
     public virtual ApplicationUser? Author { get; set; }
