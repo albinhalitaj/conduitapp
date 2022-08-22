@@ -65,7 +65,7 @@ public class IdentityService : IIdentityService
         }
 
         response.Errors = registerResult.Errors
-            .Select(error => new ErrorDto {Message = error.Description, ErrorCode = error.Code}).ToList();
+            .Select(error => new ErrorDto { Message = error.Description, ErrorCode = error.Code }).ToList();
         return response;
     }
 
@@ -89,7 +89,8 @@ public class IdentityService : IIdentityService
                 _httpContextAccessor.HttpContext?.Response.Cookies.Append("token", token, new CookieOptions
                 {
                     HttpOnly = true,
-                    SameSite = SameSiteMode.Strict,
+                    Secure = true,
+                    SameSite = SameSiteMode.None,
                     Expires = DateTimeOffset.UtcNow.AddHours(1)
                 });
                 response.Value = new User(userAccount.Id, userAccount.UserName, userAccount.Email, roles.ToArray(),
@@ -98,12 +99,12 @@ public class IdentityService : IIdentityService
             }
 
             response.Errors = new List<ErrorDto>
-                {new() {Message = "Username or Email is incorrect", ErrorCode = "InvalidCredentials"}};
+                { new() { Message = "Username or Email is incorrect", ErrorCode = "InvalidCredentials" } };
         }
         else
         {
             response.Errors = new List<ErrorDto>
-                {new() {Message = "User not Found!", ErrorCode = "NotFound"}};
+                { new() { Message = "User not Found!", ErrorCode = "NotFound" } };
         }
 
         return response;
@@ -118,7 +119,7 @@ public class IdentityService : IIdentityService
         var result = new ResultDto<UserResponse>();
         try
         {
-            var currentUser = await _ctx.Users.FirstOrDefaultAsync(x => x.Id == _currentUserService.UserId);
+            var currentUser = await _ctx.Users.AsTracking().FirstOrDefaultAsync(x => x.Id == _currentUserService.UserId);
 
             currentUser!.UserName = user.Username.Contains(' ') ? user.Username.Replace(" ", "") : user.Username;
             currentUser.Email = user.Email;
@@ -130,7 +131,7 @@ public class IdentityService : IIdentityService
         }
         catch (Exception e)
         {
-            result.Errors = new List<ErrorDto> {new() {Message = e.Message, ErrorCode = e.HelpLink}};
+            result.Errors = new List<ErrorDto> { new() { Message = e.Message, ErrorCode = e.HelpLink } };
         }
 
         return result;
@@ -147,8 +148,7 @@ public class IdentityService : IIdentityService
             return result;
         }
 
-        result.Errors = new List<ErrorDto>
-            {new() {Message = $"User with id {userId} was not found!", ErrorCode = "NotFound"}};
+        result.Errors = new List<ErrorDto> { new() { Message = $"User with id {userId} was not found!", ErrorCode = "NotFound" } };
         return result;
     }
 
@@ -165,14 +165,14 @@ public class IdentityService : IIdentityService
             {
                 new Claim(ClaimTypes.NameIdentifier, user.UserName),
                 new Claim(ClaimTypes.Name, user.Id),
-                new Claim(ClaimTypes.Email, user.Email),
+                new Claim(ClaimTypes.Email, user.Email)
             }),
             Expires = DateTime.UtcNow.AddHours(1),
             SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key),
                 SecurityAlgorithms.HmacSha256Signature),
-            Issuer = "www.companyName.com/api",
+            Issuer = "www.conduitapp.com/api",
             IssuedAt = DateTime.Now,
-            Audience = "www.companyName.com"
+            Audience = "www.conduitapp.com"
         };
 
         foreach (var role in roles)

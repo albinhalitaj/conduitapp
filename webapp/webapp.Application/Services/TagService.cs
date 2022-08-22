@@ -39,8 +39,8 @@ public class TagService : ITagService
         if (tags.Length == 0)
         {
             result.Value = Array.Empty<string>();
+            return result;
         }
-
         result.Value = tags!;
         return result;
     }

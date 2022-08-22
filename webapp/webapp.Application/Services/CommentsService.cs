@@ -53,7 +53,7 @@ public class CommentsService : ICommentService
                 await _ctx.Comments.AddAsync(commentToCreate);
                 var result = await _ctx.SaveChangesAsync();
                 if (result <= 0) return response;
-                var isFollowing = await _ctx.UserFollowers.AsNoTracking().AnyAsync(x =>
+                var isFollowing = await _ctx.UserFollowers.AnyAsync(x =>
                     x.FollowerId == _currentUserService.UserId && x.UserId == article.AuthorId);
                 var author = new Author(user.Username, user.Bio, user.Image, isFollowing);
                 response.Value = new CommentResponse(commentToCreate.CommentId!, commentToCreate.CreatedAt,
@@ -86,7 +86,7 @@ public class CommentsService : ICommentService
                     }).FirstOrDefaultAsync();
                 if (cTd is not null)
                 {
-                    var commentToDelete = new Comment {CommentId = cTd.CommentId};
+                    var commentToDelete = new Comment { CommentId = cTd.CommentId };
                     if (cTd.AuthorId == _currentUserService.UserId)
                     {
                         _ctx.Comments.Remove(commentToDelete);
@@ -96,23 +96,25 @@ public class CommentsService : ICommentService
                     else
                     {
                         result.Errors = new List<ErrorDto>
-                            {new() {Message = $"Could not find comment with id {commentId}", ErrorCode = "NotFound"}};
+                        {
+                            new() { Message = $"Could not find comment with id {commentId}", ErrorCode = "NotFound" }
+                        };
                     }
                 }
                 else
                 {
                     result.Errors = new List<ErrorDto>
-                        {new() {Message = $"Could not find comment with id {commentId}", ErrorCode = "NotFound"}};
+                        { new() { Message = $"Could not find comment with id {commentId}", ErrorCode = "NotFound" } };
                 }
             }
             catch (Exception e)
             {
-                result.Errors = new List<ErrorDto> {new() {Message = e.Message}};
+                result.Errors = new List<ErrorDto> { new() { Message = e.Message } };
             }
         }
         else
         {
-            result.Errors = new List<ErrorDto> {new() {Message = "Please provide article slug and comment id"}};
+            result.Errors = new List<ErrorDto> { new() { Message = "Please provide article slug and comment id" } };
         }
 
         return result;
@@ -121,7 +123,7 @@ public class CommentsService : ICommentService
     public async Task<ResultDto<List<CommentResponse>>> ListComments(string slug)
     {
         var response = new ResultDto<List<CommentResponse>>();
-        var article = await _ctx.Articles.AsNoTracking().Include(x => x.Comments)
+        var article = await _ctx.Articles.Include(x => x.Comments)
             .FirstOrDefaultAsync(x => x.Slug == slug);
         if (article is not {Comments: { }}) return response;
         {
@@ -130,7 +132,7 @@ public class CommentsService : ICommentService
             {
                 var commentAuthor = await _ctx.Users.Where(x => x.Id == comment.AuthorId)
                     .Select(x => new CommentAuthor(x.Id, x.UserName, x.Bio, x.Image)).FirstOrDefaultAsync();
-                var isFollowing = await _ctx.UserFollowers.AsNoTracking().AnyAsync(x =>
+                var isFollowing = await _ctx.UserFollowers.AnyAsync(x =>
                     commentAuthor != null && x.FollowerId == _currentUserService.UserId &&
                     x.UserId == commentAuthor.Id);
                 var author = new Author(commentAuthor!.Username, commentAuthor.Bio, commentAuthor.Image, isFollowing);

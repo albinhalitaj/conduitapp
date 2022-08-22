@@ -8,7 +8,7 @@ public static class ArticleExtension
 {
     public static IEnumerable<Article> MapIsFollowing(this List<Article> source, IAppDbContext db, string userId)
     {
-        var isUserFollowing = db.UserFollowers.AsNoTracking().Where(x =>
+        var isUserFollowing = db.UserFollowers.Where(x =>
             x.FollowerId == userId).Select(x => x.UserId).ToList();
 
         foreach (var follower in isUserFollowing)

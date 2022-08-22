@@ -30,7 +30,7 @@ public static class ConfigureServices
         return services;
     }
 
-    public static IApplicationBuilder ConfigureApp(this IApplicationBuilder app)
+    public static void ConfigureApp(this IApplicationBuilder app)
     {
         app.UseDeveloperExceptionPage();
         app.UseExceptionHandler("/error");
@@ -44,6 +44,5 @@ public static class ConfigureServices
             .WithOrigins("http://localhost:3000", "http://localhost:4200")
             .AllowCredentials()
             .AllowAnyMethod());
-        return app;
     }
 }

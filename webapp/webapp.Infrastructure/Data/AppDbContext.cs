@@ -11,6 +11,7 @@ public sealed class AppDbContext : IdentityDbContext<ApplicationUser>, IAppDbCon
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
     {
         ChangeTracker.LazyLoadingEnabled = false;
+        ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
     }
 
     public DbSet<Article> Articles { get; set; } = null!;

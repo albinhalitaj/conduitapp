@@ -12,7 +12,7 @@ namespace webapp.Infrastructure.Extensions;
 
 public static class Authentication
 {
-    public static IServiceCollection AddJwtAuth(this IServiceCollection service, IConfiguration configuration)
+    public static void AddJwtAuth(this IServiceCollection service, IConfiguration configuration)
     {
         var appSettingsSection = configuration.GetSection(nameof(ApplicationSettings));
         service.Configure<ApplicationSettings>(appSettingsSection);
@@ -35,8 +35,8 @@ public static class Authentication
                     IssuerSigningKey = new SymmetricSecurityKey(key),
                     ValidateIssuer = true,
                     ValidateAudience = true,
-                    ValidIssuer = "www.companyName.com/api",
-                    ValidAudience = "www.companyName.com"
+                    ValidIssuer = "www.conduitapp.com/api",
+                    ValidAudience = "www.conduitapp.com"
                 };
                 x.Events = new JwtBearerEvents
                 {
@@ -48,10 +48,9 @@ public static class Authentication
                     }
                 };
             });
-        return service;
     }
 
-    public static IServiceCollection ConfigureIdentityProviders(this IServiceCollection services)
+    public static void ConfigureIdentityProviders(this IServiceCollection services)
     {
         services.AddIdentity<ApplicationUser, IdentityRole>(opt =>
             {
@@ -62,6 +61,5 @@ public static class Authentication
             })
             .AddEntityFrameworkStores<AppDbContext>()
             .AddDefaultTokenProviders();
-        return services;
     }
 }

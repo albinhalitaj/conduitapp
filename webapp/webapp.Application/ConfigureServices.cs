@@ -7,13 +7,12 @@ namespace webapp.Application;
 
 public static class ConfigureServices
 {
-    public static IServiceCollection AddApplication(this IServiceCollection services)
+    public static void AddApplication(this IServiceCollection services)
     {
         services.AddMappers();
         services.AddScoped<IArticleService, ArticlesService>();
         services.AddScoped<ICommentService, CommentsService>();
         services.AddScoped<IProfileService, ProfileService>();
         services.AddScoped<ITagService, TagService>();
-        return services;
     }
 }

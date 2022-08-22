@@ -14,7 +14,7 @@ public interface IArticleService
     Task<ResultDto<List<ArticleResponse>>> GetArticleByFavorites(string author);
     Task<ResultDto<ArticleResponse>> FavoriteArticle(string slug);
     Task<ResultDto<ArticleResponse>> UnFavoriteArticle(string slug);
-    Task<List<ArticleResponse>> GetArticleByTypeAsync(ArticleType type,string value);
+    Task<List<ArticleResponse>> GetArticleByTypeAsync(ArticleType type,string value,QueryParams? queryParams);
     Task<ResultDto<ArticleResponse>> CreateArticleAsync(CreateArticleRequest article);
     Task<ResultDto<ArticleResponse>> UpdateArticleAsync(string slug, UpdateArticleRequest updatedArticle);
     Task<ResultDto<string>> DeleteArticleAsync(string slug);

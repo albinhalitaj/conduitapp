@@ -18,7 +18,6 @@ public class ArticlesController : ApiController
     }
 
     [HttpGet]
-    [Produces("application/json")]
     public async Task<IActionResult> GetArticles([FromQuery] QueryParams queryParams)
     {
         var result = await _articleService.GetAllArticlesAsync(queryParams);
@@ -32,7 +31,7 @@ public class ArticlesController : ApiController
     }
 
     [HttpGet("{slug}")]
-    public async Task<IActionResult> GetArticle([FromRoute] string slug)
+    public async Task<IActionResult> GetArticle(string slug)
     {
         var result = await _articleService.GetArticleAsync(slug);
         return result.Success
@@ -83,7 +82,7 @@ public class ArticlesController : ApiController
     }
 
     [HttpPost]
-    public async Task<IActionResult> CreateArticle([FromBody] CreateArticleRequest request)
+    public async Task<IActionResult> CreateArticle(CreateArticleRequest request)
     {
         var result = await _articleService.CreateArticleAsync(request);
         return result.Success
@@ -95,7 +94,7 @@ public class ArticlesController : ApiController
     }
 
     [HttpPut("{slug}")]
-    public async Task<IActionResult> UpdateArticle([FromRoute] string slug, UpdateArticleRequest request)
+    public async Task<IActionResult> UpdateArticle(string slug, UpdateArticleRequest request)
     {
         var response = await _articleService.UpdateArticleAsync(slug, request);
         return response.Success
@@ -107,7 +106,7 @@ public class ArticlesController : ApiController
     }
 
     [HttpPost("{slug}/favorite")]
-    public async Task<IActionResult> FavoriteArticle([FromRoute] string slug)
+    public async Task<IActionResult> FavoriteArticle(string slug)
     {
         var result = await _articleService.FavoriteArticle(slug);
         return result.Success
@@ -119,7 +118,7 @@ public class ArticlesController : ApiController
     }
 
     [HttpDelete("{slug}/favorite")]
-    public async Task<IActionResult> UnFavoriteArticle([FromRoute] string slug)
+    public async Task<IActionResult> UnFavoriteArticle(string slug)
     {
         var result = await _articleService.UnFavoriteArticle(slug);
         return result.Success
@@ -146,7 +145,7 @@ public class ArticlesController : ApiController
     }
 
     [HttpPost("{slug}/comments")]
-    public async Task<IActionResult> CreateComment([FromRoute] string slug, CreateCommentRequest request)
+    public async Task<IActionResult> CreateComment(string slug, CreateCommentRequest request)
     {
         var result = await _commentService.CreateComment(slug, request);
         return result.Success
@@ -158,26 +157,26 @@ public class ArticlesController : ApiController
     }
 
     [HttpGet("{slug}/comments")]
-    public async Task<IActionResult> ListComments([FromRoute] string slug)
+    public async Task<IActionResult> ListComments(string slug)
     {
         var result = await _commentService.ListComments(slug);
         return !result.Success
             ? Problem(result.Errors)
             : Ok(new
             {
-                Comments = result.Value,
+                Comments = result.Value
             });
     }
 
     [HttpDelete("{slug}/comments/{id}")]
-    public async Task<IActionResult> DeleteComment([FromRoute] string slug, [FromRoute] string id)
+    public async Task<IActionResult> DeleteComment(string slug, string id)
     {
         var result = await _commentService.DeleteCommentAsync(slug, id);
         return result.Success ? NoContent() : Problem(result.Errors);
     }
 
     [HttpDelete("{slug}")]
-    public async Task<IActionResult> DeleteArticle([FromRoute] string slug)
+    public async Task<IActionResult> DeleteArticle(string slug)
     {
         var result = await _articleService.DeleteArticleAsync(slug);
         return result.Success ? NoContent() : Problem(result.Errors);

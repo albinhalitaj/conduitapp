@@ -10,7 +10,7 @@ public class ProfilesController : ApiController
     public ProfilesController(IProfileService profileService) => _profileService = profileService;
 
     [HttpGet("")]
-    public async Task<IActionResult> GetUser([FromRoute] string username)
+    public async Task<IActionResult> GetUser(string username)
     {
         var response = await _profileService.GetUser(username);
         return response.Success
@@ -22,7 +22,7 @@ public class ProfilesController : ApiController
     }
 
     [HttpPost("follow")]
-    public async Task<IActionResult> FollowUser([FromRoute] string username)
+    public async Task<IActionResult> FollowUser(string username)
     {
         var response = await _profileService.FollowUser(username);
         return response.Success
@@ -34,7 +34,7 @@ public class ProfilesController : ApiController
     }
 
     [HttpDelete("follow")]
-    public async Task<IActionResult> UnfollowUser([FromRoute] string username)
+    public async Task<IActionResult> UnfollowUser(string username)
     {
         var response = await _profileService.UnFollowUser(username);
         return response.Success
