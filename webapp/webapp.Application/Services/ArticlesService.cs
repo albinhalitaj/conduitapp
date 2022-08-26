@@ -85,7 +85,7 @@ public class ArticlesService : IArticleService
     public async Task<ResultDto<ArticleResponse>> FavoriteArticle(string slug)
     {
         var result = new ResultDto<ArticleResponse>();
-        var article = await _ctx.Articles.FirstOrDefaultAsync(x => x.Slug == slug);
+        var article = await _ctx.Articles.AsTracking().FirstOrDefaultAsync(x => x.Slug == slug);
         if (article is not null)
         {
             var isAlreadyFavorited = await _ctx.UserFavorites.AnyAsync(x =>
@@ -129,7 +129,7 @@ public class ArticlesService : IArticleService
     public async Task<ResultDto<ArticleResponse>> UnFavoriteArticle(string slug)
     {
         var result = new ResultDto<ArticleResponse>();
-        var article = await _ctx.Articles.FirstOrDefaultAsync(x => x.Slug == slug);
+        var article = await _ctx.Articles.AsTracking().FirstOrDefaultAsync(x => x.Slug == slug);
         try
         {
             if (article is not null)
@@ -190,6 +190,7 @@ public class ArticlesService : IArticleService
             _ => new List<Article>()
         };
 
+        // ReSharper disable once InvertIf
         if (type == ArticleType.AuthorFavorites)
         {
             var user = await _ctx.Users.AnyAsync(x => x.UserName == value);
@@ -202,10 +203,14 @@ public class ArticlesService : IArticleService
                     .OrderByDescending(x => x.CreatedAt)
                     .ToListAsync();
             }
+            else
+            {
+                articles = new List<Article>();
+            }
         }
 
 
-        return!articles.Any()
+        return !articles.Any()
             ? Enumerable.Empty<ArticleResponse>().ToList()
             : articles
                 .MapIsFollowing(_ctx, _currentUserService.UserId ?? "")

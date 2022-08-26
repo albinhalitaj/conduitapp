@@ -93,7 +93,7 @@ public class IdentityService : IIdentityService
                     SameSite = SameSiteMode.None,
                     Expires = DateTimeOffset.UtcNow.AddHours(1)
                 });
-                response.Value = new User(userAccount.Id, userAccount.UserName, userAccount.Email, roles.ToArray(),
+                response.Value = new User(userAccount.Id, userAccount.UserName, userAccount.Email, roles[0],
                     DateTimeOffset.UtcNow.AddHours(1));
                 return response;
             }
@@ -142,6 +142,7 @@ public class IdentityService : IIdentityService
         var result = new ResultDto<UserResponse>();
         var user = await _ctx.Users.Where(x => x.Id == userId)
             .ProjectToType<UserResponse>().FirstOrDefaultAsync();
+        
         if (user != null)
         {
             result.Value = user;

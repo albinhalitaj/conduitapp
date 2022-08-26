@@ -137,10 +137,10 @@ public class ArticlesController : ApiController
             result.Value!.Count > 1 ? Ok(new
             {
                 Articles = result.Value,
-                ArticlesCount = result.Value.Count
+                ArticlesCount = result.Value!.Count
             }) : Ok(new
             {
-                Article = result.Value.First()
+                Article = result.Value.FirstOrDefault()
             });
     }
 

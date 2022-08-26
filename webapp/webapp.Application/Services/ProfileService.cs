@@ -36,7 +36,7 @@ public class ProfileService : IProfileService
             return response;
         }
 
-        response.Errors = new List<ErrorDto> { new() { Message = $"User {username} not Found", ErrorCode = "NotFound" } };
+        response.Errors = new List<ErrorDto> { new() { Message = $"User {username} was not found!", ErrorCode = "NotFound" } };
         return response;
     }
 
@@ -54,7 +54,7 @@ public class ProfileService : IProfileService
 
         if (isFollowing)
         {
-            response.Errors = new List<ErrorDto> { new() { Message = $"You are already following {username}" } };
+            response.Errors = new List<ErrorDto> { new() { Message = $"You are already following {username}!" } };
             return response;
         }
 
