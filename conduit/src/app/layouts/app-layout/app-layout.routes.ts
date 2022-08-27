@@ -2,13 +2,30 @@ import { Route } from '@angular/router';
 
 export const routes: Route[] = [
   {
-    path: 'home',
+    path: '',
     loadComponent: () =>
-      import('../../auth/login.component').then((l) => l.LoginComponent),
+      import('../../home/home.component').then((l) => l.HomeComponent),
   },
   {
-    path: 'articles',
+    path: 'profile/:username',
     loadComponent: () =>
-      import('../../auth/register.component').then((r) => r.RegisterComponent),
+      import('../../profile/profile.component').then((r) => r.ProfileComponent),
+  },
+  {
+    path: 'settings',
+    loadComponent: () =>
+      import('../../settings/settings.component').then(
+        (r) => r.SettingsComponent
+      ),
+  },
+  {
+    path: 'article/:slug',
+    loadComponent: () =>
+      import('../../article/article.component').then((a) => a.ArticleComponent),
+  },
+  {
+    path: 'editor',
+    loadComponent: () =>
+      import('../../editor/editor.component').then((a) => a.EditorComponent),
   },
 ];

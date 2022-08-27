@@ -1,5 +1,12 @@
-import { Component } from '@angular/core';
-import { RouterLinkWithHref } from '@angular/router';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { Router, RouterLinkWithHref } from '@angular/router';
+import {
+  FormBuilder,
+  FormGroup,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
+import { NgIf, NgStyle } from '@angular/common';
 
 @Component({
   standalone: true,
@@ -16,20 +23,42 @@ import { RouterLinkWithHref } from '@angular/router';
             <li>Invalid credentials</li>
           </ul>
 
-          <form>
+          <form [formGroup]="loginForm" (ngSubmit)="login()">
             <fieldset class="form-group">
               <input
                 class="form-control form-control-lg"
                 type="text"
-                placeholder="Email"
+                placeholder="Username or email"
+                formControlName="usernameOrEmail"
+                [ngStyle]="
+                  username?.touched && username?.invalid
+                    ? { border: '1px solid red' }
+                    : null
+                "
               />
+              <span
+                style="color: red"
+                *ngIf="username?.touched && username?.invalid"
+                >Username or email is required</span
+              >
             </fieldset>
             <fieldset class="form-group">
               <input
                 class="form-control form-control-lg"
                 type="password"
                 placeholder="Password"
+                formControlName="password"
+                [ngStyle]="
+                  password?.touched && password?.invalid
+                    ? { border: '1px solid red' }
+                    : null
+                "
               />
+              <span
+                style="color: red"
+                *ngIf="password?.touched && password?.invalid"
+                >Password is required</span
+              >
             </fieldset>
             <button class="btn btn-lg btn-primary pull-xs-right">
               Sign In
@@ -39,7 +68,26 @@ import { RouterLinkWithHref } from '@angular/router';
       </div>
     </div>
   </div>`,
-  styles: [],
-  imports: [RouterLinkWithHref],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [RouterLinkWithHref, ReactiveFormsModule, NgIf, NgStyle],
 })
-export class LoginComponent {}
+export class LoginComponent {
+  loginForm: FormGroup = this.fb.group({
+    usernameOrEmail: ['', Validators.required],
+    password: ['', Validators.required],
+  });
+  constructor(private fb: FormBuilder, private router: Router) {}
+
+  login() {
+    console.log(this.loginForm.getRawValue());
+    void this.router.navigate(['/home']);
+  }
+
+  get username() {
+    return this.loginForm.get('usernameOrEmail');
+  }
+
+  get password() {
+    return this.loginForm.get('password');
+  }
+}
