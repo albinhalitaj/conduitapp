@@ -6,8 +6,9 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
-import { NgIf, NgStyle } from '@angular/common';
+import { AsyncPipe, NgForOf, NgIf, NgStyle } from '@angular/common';
 import { RegisterStore } from './register.store';
+import { Observable } from 'rxjs';
 
 @Component({
   standalone: true,
@@ -20,8 +21,8 @@ import { RegisterStore } from './register.store';
             <a [routerLink]="['/auth/login']">Have an account?</a>
           </p>
 
-          <ul class="error-messages">
-            <li>That email is already taken</li>
+          <ul *ngIf="errors$ | async as errors" class="error-messages">
+            <li *ngFor="let error of errors">{{ error }}</li>
           </ul>
 
           <form [formGroup]="registerForm" (ngSubmit)="register()">
@@ -121,7 +122,14 @@ import { RegisterStore } from './register.store';
       </div>
     </div>
   </div>`,
-  imports: [RouterLinkWithHref, ReactiveFormsModule, NgStyle, NgIf],
+  imports: [
+    RouterLinkWithHref,
+    ReactiveFormsModule,
+    NgStyle,
+    NgIf,
+    NgForOf,
+    AsyncPipe,
+  ],
   providers: [RegisterStore],
 })
 export class RegisterComponent {
@@ -133,15 +141,9 @@ export class RegisterComponent {
     password: ['', Validators.required],
   });
 
-  constructor(private fb: FormBuilder, private store: RegisterStore) {}
+  errors$: Observable<Array<string> | null> = this.store.errors$;
 
-  register() {
-    if (this.registerForm.invalid) {
-      this.registerForm.markAllAsTouched();
-    } else {
-      this.store.register(this.registerForm.getRawValue());
-    }
-  }
+  constructor(private fb: FormBuilder, private store: RegisterStore) {}
 
   get firstName() {
     return this.registerForm.get('firstName');
@@ -161,5 +163,13 @@ export class RegisterComponent {
 
   get password() {
     return this.registerForm.get('password');
+  }
+
+  register() {
+    if (this.registerForm.invalid) {
+      this.registerForm.markAllAsTouched();
+    } else {
+      this.store.register(this.registerForm.getRawValue());
+    }
   }
 }

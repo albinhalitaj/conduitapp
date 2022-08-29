@@ -1,4 +1,3 @@
-using Microsoft.EntityFrameworkCore;
 using webapp.Application.Interfaces;
 using webapp.Domain.Entities;
 

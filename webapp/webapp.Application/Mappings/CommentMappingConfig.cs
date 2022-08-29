@@ -9,7 +9,7 @@ public class CommentMappingConfig : IRegister
     public void Register(TypeAdapterConfig config)
     {
         config.NewConfig<CreateCommentRequest, Comment>();
-
+        
         config.NewConfig<Comment, CommentResponse>()
             .Map(dest => dest.Id, src => src.CommentId);
     }

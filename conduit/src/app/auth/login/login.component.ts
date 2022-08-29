@@ -1,12 +1,14 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { Router, RouterLinkWithHref } from '@angular/router';
+import { RouterLinkWithHref } from '@angular/router';
 import {
   FormBuilder,
   FormGroup,
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
-import { NgIf, NgStyle } from '@angular/common';
+import { AsyncPipe, NgIf, NgStyle } from '@angular/common';
+import { LoginStore } from './login.store';
+import { Observable } from 'rxjs';
 
 @Component({
   standalone: true,
@@ -19,8 +21,14 @@ import { NgIf, NgStyle } from '@angular/common';
             <a [routerLink]="['/auth/register']">Don't have an account?</a>
           </p>
 
-          <ul class="error-messages">
-            <li>Invalid credentials</li>
+          <ng-template [ngIf]="loginSuccess$ | async">
+            <div class="alert alert-success" role="alert">
+              Login Successful. Redirecting to home...
+            </div>
+          </ng-template>
+
+          <ul *ngIf="error$ | async as error" class="error-messages">
+            <li>{{ error }}</li>
           </ul>
 
           <form [formGroup]="loginForm" (ngSubmit)="login()">
@@ -69,19 +77,19 @@ import { NgIf, NgStyle } from '@angular/common';
     </div>
   </div>`,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLinkWithHref, ReactiveFormsModule, NgIf, NgStyle],
+  imports: [RouterLinkWithHref, ReactiveFormsModule, NgIf, NgStyle, AsyncPipe],
+  providers: [LoginStore],
 })
 export class LoginComponent {
   loginForm: FormGroup = this.fb.group({
     usernameOrEmail: ['', Validators.required],
     password: ['', Validators.required],
   });
-  constructor(private fb: FormBuilder, private router: Router) {}
 
-  login() {
-    console.log(this.loginForm.getRawValue());
-    void this.router.navigate(['/home']);
-  }
+  error$: Observable<string> = this.store.error$;
+  loginSuccess$: Observable<boolean> = this.store.loginSuccess$;
+
+  constructor(private fb: FormBuilder, private store: LoginStore) {}
 
   get username() {
     return this.loginForm.get('usernameOrEmail');
@@ -89,5 +97,13 @@ export class LoginComponent {
 
   get password() {
     return this.loginForm.get('password');
+  }
+
+  login(): void {
+    if (this.loginForm.invalid) {
+      this.loginForm.markAllAsTouched();
+    } else {
+      this.store.login(this.loginForm.getRawValue());
+    }
   }
 }

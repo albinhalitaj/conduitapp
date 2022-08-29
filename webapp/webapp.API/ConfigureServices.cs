@@ -41,7 +41,7 @@ public static class ConfigureServices
             x.SwaggerEndpoint("/swagger/v2/swagger.json", "Version 2");
         });
         app.UseCors(x => x.AllowAnyHeader()
-            .WithOrigins("http://localhost:3000", "http://localhost:4200")
+            .WithOrigins("http://localhost:4200")
             .AllowCredentials()
             .AllowAnyMethod());
     }
