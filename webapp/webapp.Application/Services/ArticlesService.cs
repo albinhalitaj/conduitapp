@@ -1,5 +1,6 @@
 using Mapster;
 using MapsterMapper;
+using Markdig;
 using Microsoft.EntityFrameworkCore;
 using webapp.Application.Common;
 using webapp.Application.Interfaces;
@@ -209,6 +210,7 @@ public class ArticlesService : IArticleService
             }
         }
 
+        var pipeline = new MarkdownPipelineBuilder().UseAdvancedExtensions().Build();
 
         return !articles.Any()
             ? Enumerable.Empty<ArticleResponse>().ToList()
@@ -221,7 +223,7 @@ public class ArticlesService : IArticleService
                         article.IsFollowing)
                 })
                 .Select(t => new ArticleResponse(t.article.Slug, t.article.Title, t.article.Description,
-                    t.article.Body, t.article.CreatedAt, t.article.UpdatedAt, t.article.FavoritesCount,
+                    Markdown.ToHtml(t.article.Body ?? "",pipeline), t.article.CreatedAt, t.article.UpdatedAt, t.article.FavoritesCount,
                     t.article.TagsArray, t.author)).ToList();
     }
 

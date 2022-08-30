@@ -41,18 +41,8 @@ export class HomeStore
   extends ComponentStore<HomeState>
   implements OnStateInit
 {
-  constructor(private homeService: HomeService) {
-    super(initialState);
-  }
-
   readonly articles$: Observable<Article[]> = this.select((s) => s.articles);
   readonly tags$: Observable<string[]> = this.select((s) => s.tags);
-
-  ngrxOnStateInit(): void {
-    this.getArticles();
-    this.getTags();
-  }
-
   readonly getArticles = this.effect<void>(
     switchMap(() => {
       return this.homeService.getArticles().pipe(
@@ -65,7 +55,6 @@ export class HomeStore
       );
     })
   );
-
   readonly getTags = this.effect<void>(
     switchMap(() => {
       return this.homeService.getTags().pipe(
@@ -78,7 +67,6 @@ export class HomeStore
       );
     })
   );
-
   readonly getArticleByTags = this.effect(
     exhaustMap((tag: string) => {
       return this.homeService.getArticlesByTag(tag).pipe(
@@ -91,4 +79,25 @@ export class HomeStore
       );
     })
   );
+  readonly getFeed = this.effect<void>(
+    exhaustMap(() => {
+      return this.homeService.getFeed().pipe(
+        tapResponse(
+          (articles: Article[]) => {
+            this.patchState({ articles });
+          },
+          (error) => console.log(error)
+        )
+      );
+    })
+  );
+
+  constructor(private homeService: HomeService) {
+    super(initialState);
+  }
+
+  ngrxOnStateInit(): void {
+    this.getArticles();
+    this.getTags();
+  }
 }

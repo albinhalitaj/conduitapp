@@ -1,8 +1,19 @@
 import { Injectable } from '@angular/core';
-import { ComponentStore } from '@ngrx/component-store';
-import { catchError, defer, EMPTY, Observable, of, switchMap, tap } from 'rxjs';
+import { ComponentStore, tapResponse } from '@ngrx/component-store';
+import {
+  catchError,
+  defer,
+  EMPTY,
+  exhaustMap,
+  Observable,
+  of,
+  switchMap,
+  tap,
+} from 'rxjs';
 import { Router } from '@angular/router';
 import Cookies from 'js-cookie';
+import { AuthService } from './auth.service';
+import { HttpResponse } from '@angular/common/http';
 
 export interface User {
   id: string;
@@ -30,6 +41,19 @@ export class AuthStore extends ComponentStore<AuthState> {
     (s: AuthState) => s.isAuthenticated
   );
   user$: Observable<User | null> = this.select((s: AuthState) => s.user);
+  signOut = this.effect<void>(
+    exhaustMap(() =>
+      this.authService.signOut().pipe(
+        tapResponse(
+          () => {
+            Cookies.remove('user');
+            void this.router.navigate(['/login']);
+          },
+          (error) => console.log(error)
+        )
+      )
+    )
+  );
   private refresh = this.effect<void>(
     switchMap(() =>
       defer(() => {
@@ -54,7 +78,7 @@ export class AuthStore extends ComponentStore<AuthState> {
     )
   );
 
-  constructor(private router: Router) {
+  constructor(private router: Router, private authService: AuthService) {
     super(initialState);
   }
 

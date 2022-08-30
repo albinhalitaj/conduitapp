@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { delay, map, Observable } from 'rxjs';
+import { map, Observable } from 'rxjs';
 import { Article } from './home.store';
 import { API_URL } from '../app.component';
 
@@ -45,5 +45,13 @@ export class HomeService {
           return response.articles;
         })
       );
+  }
+
+  getFeed(): Observable<Article[]> {
+    return this.http
+      .get<Article[]>(`${this.apiBase}/articles/feed`, {
+        withCredentials: true,
+      })
+      .pipe(map((response: any) => response.articles));
   }
 }

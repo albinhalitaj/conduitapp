@@ -58,4 +58,8 @@ export class AuthService {
       withCredentials: true,
     });
   }
+
+  signOut() {
+    return this.http.delete(`${this.apiBase}/user`, { withCredentials: true });
+  }
 }

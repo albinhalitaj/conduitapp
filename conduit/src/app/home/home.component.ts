@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { Article, HomeStore } from './home.store';
 import { provideComponentStore } from '@ngrx/component-store';
 import { Observable } from 'rxjs';
-import { AsyncPipe, NgForOf, NgIf } from '@angular/common';
+import { AsyncPipe, DatePipe, NgForOf, NgIf } from '@angular/common';
 import { RouterLinkWithHref } from '@angular/router';
 
 @Component({
@@ -23,10 +23,10 @@ import { RouterLinkWithHref } from '@angular/router';
             <div class="feed-toggle">
               <ul class="nav nav-pills outline-active">
                 <li class="nav-item">
-                  <a class="nav-link disabled" href="">Your Feed</a>
+                  <a class="nav-link" (click)="getFeed()">Your Feed</a>
                 </li>
                 <li class="nav-item">
-                  <a class="nav-link active" href="">Global Feed</a>
+                  <a class="nav-link active">Global Feed</a>
                 </li>
               </ul>
             </div>
@@ -41,7 +41,9 @@ import { RouterLinkWithHref } from '@angular/router';
                       <a href="" class="author">{{
                         article.author.username
                       }}</a>
-                      <span class="date">{{ article.createdAt }}</span>
+                      <span class="date">{{
+                        article.createdAt | date: 'medium'
+                      }}</span>
                     </div>
                     <button
                       class="btn btn-outline-primary btn-sm pull-xs-right"
@@ -49,7 +51,10 @@ import { RouterLinkWithHref } from '@angular/router';
                       <i class="ion-heart"></i> {{ article.favoritesCount }}
                     </button>
                   </div>
-                  <a href="" class="preview-link">
+                  <a
+                    [routerLink]="['/article/', article.slug]"
+                    class="preview-link"
+                  >
                     <h1>{{ article.title }}</h1>
                     <p>{{ article.description }}</p>
                     <span>Read more...</span>
@@ -82,7 +87,7 @@ import { RouterLinkWithHref } from '@angular/router';
   `,
   providers: [provideComponentStore(HomeStore)],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [NgIf, AsyncPipe, NgForOf, RouterLinkWithHref],
+  imports: [NgIf, AsyncPipe, NgForOf, RouterLinkWithHref, DatePipe],
 })
 export class HomeComponent {
   readonly articles$: Observable<Article[]> = this.store.articles$;
@@ -92,5 +97,9 @@ export class HomeComponent {
 
   getArticleByTag(tag: string) {
     this.store.getArticleByTags(tag);
+  }
+
+  getFeed() {
+    this.store.getFeed();
   }
 }

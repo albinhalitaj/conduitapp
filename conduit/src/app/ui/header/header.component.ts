@@ -38,11 +38,16 @@ import { AsyncPipe, NgIf } from '@angular/common';
               <i class="ion-gear-a"></i>&nbsp;Settings
             </a>
           </li>
-          <li class="nav-item">
-            <a class="nav-link" *ngIf="user$ | async as user">
-              {{ user.username }}
-            </a>
-          </li>
+          <ng-container *ngIf="user$ | async as user">
+            <li class="nav-item">
+              <a class="nav-link" *ngIf="user$ | async as user">
+                {{ user.username }}
+              </a>
+            </li>
+            <li class="nav-item">
+              <a (click)="signOut()" class="nav-link"> Sign out </a>
+            </li>
+          </ng-container>
         </ng-container>
         <ng-template #notAuthenticated>
           <li class="nav-item">
@@ -59,9 +64,12 @@ import { AsyncPipe, NgIf } from '@angular/common';
   imports: [RouterLinkWithHref, RouterLinkActive, AsyncPipe, NgIf],
 })
 export class HeaderComponent {
-  readonly isAuthenticated$: Observable<boolean> =
-    this.authStore.isAuthenticated$;
-  readonly user$: Observable<User | null> = this.authStore.user$;
+  readonly isAuthenticated$: Observable<boolean> = this.store.isAuthenticated$;
+  readonly user$: Observable<User | null> = this.store.user$;
 
-  constructor(private authStore: AuthStore) {}
+  constructor(private store: AuthStore) {}
+
+  signOut() {
+    this.store.signOut();
+  }
 }
