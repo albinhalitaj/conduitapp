@@ -97,14 +97,14 @@ public class IdentityService : IIdentityService
                     DateTimeOffset.UtcNow.AddHours(1),userAccount.Bio,userAccount.Image);
                 return response;
             }
-
+            
             response.Errors = new List<ErrorDto>
                 { new() { Message = "Username or Email is incorrect", ErrorCode = "InvalidCredentials" } };
         }
         else
         {
             response.Errors = new List<ErrorDto>
-                { new() { Message = "User not Found!", ErrorCode = "NotFound" } };
+                { new() { Message = "Username or password is incorrect!", ErrorCode = "InvalidCredentials" } };
         }
 
         return response;

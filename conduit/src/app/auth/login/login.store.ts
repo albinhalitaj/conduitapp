@@ -33,6 +33,7 @@ export class LoginStore extends ComponentStore<LoginState> {
             Cookies.set('user', JSON.stringify(user), {
               expires: new Date(user.expiresAt),
               secure: true,
+              sameSite: 'none',
             });
             this.authStore.authenticate();
           },

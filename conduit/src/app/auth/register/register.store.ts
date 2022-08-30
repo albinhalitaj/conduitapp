@@ -24,7 +24,7 @@ export class RegisterStore extends ComponentStore<RegisterState> {
       return this.authService.register(registerForm).pipe(
         tapResponse(
           () => {
-            void this.router.navigate(['/auth/login']);
+            void this.router.navigate(['/login']);
           },
           ({ error }: HttpErrorResponse) => {
             const { title } = error;

@@ -19,40 +19,48 @@ import { RouterLinkWithHref } from '@angular/router';
 
       <div class="container page">
         <div class="row">
-          <ng-container *ngIf="articles$ | async as articles">
-            <div class="col-md-9">
-              <div class="feed-toggle">
-                <ul class="nav nav-pills outline-active">
-                  <li class="nav-item">
-                    <a class="nav-link disabled" href="">Your Feed</a>
-                  </li>
-                  <li class="nav-item">
-                    <a class="nav-link active" href="">Global Feed</a>
-                  </li>
-                </ul>
-              </div>
-
-              <div *ngFor="let article of articles" class="article-preview">
-                <div class="article-meta">
-                  <a [routerLink]="['/profile', article.author.username]"
-                    ><img [src]="article.author.image" alt="Avatar"
-                  /></a>
-                  <div class="info">
-                    <a href="" class="author">{{ article.author.username }}</a>
-                    <span class="date">{{ article.createdAt }}</span>
-                  </div>
-                  <button class="btn btn-outline-primary btn-sm pull-xs-right">
-                    <i class="ion-heart"></i> {{ article.favoritesCount }}
-                  </button>
-                </div>
-                <a href="" class="preview-link">
-                  <h1>{{ article.title }}</h1>
-                  <p>{{ article.description }}</p>
-                  <span>Read more...</span>
-                </a>
-              </div>
+          <div class="col-md-9">
+            <div class="feed-toggle">
+              <ul class="nav nav-pills outline-active">
+                <li class="nav-item">
+                  <a class="nav-link disabled" href="">Your Feed</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link active" href="">Global Feed</a>
+                </li>
+              </ul>
             </div>
-          </ng-container>
+            <ng-container *ngIf="articles$ | async as articles">
+              <ng-container *ngIf="articles.length > 0; else noArticles">
+                <div *ngFor="let article of articles" class="article-preview">
+                  <div class="article-meta">
+                    <a [routerLink]="['/profile', article.author.username]"
+                      ><img [src]="article.author.image" alt="Avatar"
+                    /></a>
+                    <div class="info">
+                      <a href="" class="author">{{
+                        article.author.username
+                      }}</a>
+                      <span class="date">{{ article.createdAt }}</span>
+                    </div>
+                    <button
+                      class="btn btn-outline-primary btn-sm pull-xs-right"
+                    >
+                      <i class="ion-heart"></i> {{ article.favoritesCount }}
+                    </button>
+                  </div>
+                  <a href="" class="preview-link">
+                    <h1>{{ article.title }}</h1>
+                    <p>{{ article.description }}</p>
+                    <span>Read more...</span>
+                  </a>
+                </div>
+              </ng-container>
+            </ng-container>
+            <ng-template #noArticles>
+              <div class="article-preview">Loading...</div>
+            </ng-template>
+          </div>
 
           <div class="col-md-3">
             <div class="sidebar">
@@ -77,10 +85,10 @@ import { RouterLinkWithHref } from '@angular/router';
   imports: [NgIf, AsyncPipe, NgForOf, RouterLinkWithHref],
 })
 export class HomeComponent {
-  constructor(private store: HomeStore) {}
-
   readonly articles$: Observable<Article[]> = this.store.articles$;
   readonly tags$: Observable<string[]> = this.store.tags$;
+
+  constructor(private store: HomeStore) {}
 
   getArticleByTag(tag: string) {
     this.store.getArticleByTags(tag);
