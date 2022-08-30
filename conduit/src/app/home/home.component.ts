@@ -38,9 +38,11 @@ import { RouterLinkWithHref } from '@angular/router';
                       ><img [src]="article.author.image" alt="Avatar"
                     /></a>
                     <div class="info">
-                      <a href="" class="author">{{
-                        article.author.username
-                      }}</a>
+                      <a
+                        [routerLink]="['/profile', article.author.username]"
+                        class="author"
+                        >{{ article.author.username }}</a
+                      >
                       <span class="date">{{
                         article.createdAt | date: 'medium'
                       }}</span>

@@ -13,10 +13,7 @@ import { AsyncPipe, NgIf } from '@angular/common';
       <ul class="nav navbar-nav pull-xs-right">
         <ng-container *ngIf="isAuthenticated$ | async; else notAuthenticated">
           <li class="nav-item">
-            <a
-              class="nav-link"
-              [routerLinkActive]="'active'"
-              [routerLink]="['/']"
+            <a class="nav-link" routerLinkActive="active" [routerLink]="['/']"
               >Home</a
             >
           </li>
@@ -40,12 +37,9 @@ import { AsyncPipe, NgIf } from '@angular/common';
           </li>
           <ng-container *ngIf="user$ | async as user">
             <li class="nav-item">
-              <a class="nav-link" *ngIf="user$ | async as user">
+              <a class="nav-link" style="user-select: none;">
                 {{ user.username }}
               </a>
-            </li>
-            <li class="nav-item">
-              <a (click)="signOut()" class="nav-link"> Sign out </a>
             </li>
           </ng-container>
         </ng-container>
@@ -68,8 +62,4 @@ export class HeaderComponent {
   readonly user$: Observable<User | null> = this.store.user$;
 
   constructor(private store: AuthStore) {}
-
-  signOut() {
-    this.store.signOut();
-  }
 }

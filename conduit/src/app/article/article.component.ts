@@ -3,7 +3,13 @@ import { provideComponentStore } from '@ngrx/component-store';
 import { ArticleStore } from './article.store';
 import { map, Observable } from 'rxjs';
 import { Article } from '../home/home.store';
-import { AsyncPipe, NgForOf, NgIf, NgOptimizedImage } from '@angular/common';
+import {
+  AsyncPipe,
+  DatePipe,
+  NgForOf,
+  NgIf,
+  NgOptimizedImage,
+} from '@angular/common';
 import { RouterLinkWithHref } from '@angular/router';
 import { Comment } from './article.service';
 import { AuthStore } from '../auth/auth.store';
@@ -26,7 +32,9 @@ import { AuthStore } from '../auth/auth.store';
                   class="author"
                   >{{ article.author.username }}</a
                 >
-                <span class="date">{{ article.createdAt }}</span>
+                <span class="date">{{
+                  article.createdAt | date: 'medium'
+                }}</span>
               </div>
               <button class="btn btn-sm btn-outline-secondary">
                 <i class="ion-plus-round"></i>
@@ -50,6 +58,14 @@ import { AuthStore } from '../auth/auth.store';
             </div>
           </div>
 
+          <ul class="tag-list">
+            <li
+              *ngFor="let tag of article.tags"
+              class="tag-default tag-pill tag-outline ng-binding ng-scope"
+            >
+              {{ tag }}
+            </li>
+          </ul>
           <hr />
 
           <div class="article-actions">
@@ -63,7 +79,9 @@ import { AuthStore } from '../auth/auth.store';
                   class="author"
                   >{{ article.author.username }}</a
                 >
-                <span class="date">{{ article.createdAt }}</span>
+                <span class="date">{{
+                  article.createdAt | date: 'medium'
+                }}</span>
               </div>
 
               <button class="btn btn-sm btn-outline-secondary">
@@ -119,7 +137,9 @@ import { AuthStore } from '../auth/auth.store';
                       <a href="" class="comment-author">{{
                         comment.author.username
                       }}</a>
-                      <span class="date-posted">{{ comment.createdAt }}</span>
+                      <span class="date-posted">{{
+                        comment.createdAt | date: 'medium'
+                      }}</span>
                       <span
                         *ngIf="user.username == comment.author.username"
                         class="mod-options"
@@ -139,7 +159,14 @@ import { AuthStore } from '../auth/auth.store';
   `,
   providers: [provideComponentStore(ArticleStore)],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [NgIf, AsyncPipe, NgOptimizedImage, RouterLinkWithHref, NgForOf],
+  imports: [
+    NgIf,
+    AsyncPipe,
+    NgOptimizedImage,
+    RouterLinkWithHref,
+    NgForOf,
+    DatePipe,
+  ],
 })
 export class ArticleComponent {
   readonly article$: Observable<Article | null> = this.store.article$;

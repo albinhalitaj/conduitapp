@@ -64,6 +64,9 @@ import { AsyncPipe, NgIf } from '@angular/common';
                 <button class="btn btn-lg btn-primary pull-xs-right">
                   Update Settings
                 </button>
+                <button class="btn btn-sm btn-primary" (click)="signOut()">
+                  Sign Out
+                </button>
               </fieldset>
             </form>
           </div>
@@ -75,6 +78,8 @@ import { AsyncPipe, NgIf } from '@angular/common';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SettingsComponent {
+  profile: FormGroup = this.fb.nonNullable.group({});
+  private isInitialized = false;
   readonly user$: Observable<User | null> = this.authStore.user$.pipe(
     tap((user) => {
       if (user && !this.isInitialized) {
@@ -84,9 +89,10 @@ export class SettingsComponent {
   );
 
   constructor(private fb: FormBuilder, private authStore: AuthStore) {}
-  profile: FormGroup = this.fb.nonNullable.group({});
 
-  private isInitialized = false;
+  signOut() {
+    this.authStore.signOut();
+  }
 
   private initForm(currentUser: User) {
     this.profile.addControl('image', this.fb.control(currentUser.image || ''));
