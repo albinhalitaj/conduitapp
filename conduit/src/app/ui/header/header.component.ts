@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { RouterLinkActive, RouterLinkWithHref } from '@angular/router';
 import { Observable } from 'rxjs';
-import { AuthStore } from '../../auth/auth.store';
+import { AuthStore, User } from '../../auth/auth.store';
 import { AsyncPipe, NgIf } from '@angular/common';
 
 @Component({
@@ -38,13 +38,18 @@ import { AsyncPipe, NgIf } from '@angular/common';
               <i class="ion-gear-a"></i>&nbsp;Settings
             </a>
           </li>
+          <li class="nav-item">
+            <a class="nav-link" *ngIf="user$ | async as user">
+              {{ user.username }}
+            </a>
+          </li>
         </ng-container>
         <ng-template #notAuthenticated>
           <li class="nav-item">
-            <a class="nav-link" [routerLink]="['/auth/login']">Sign in</a>
+            <a class="nav-link" [routerLink]="['/login']">Sign in</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" [routerLink]="['/auth/register']">Sign up</a>
+            <a class="nav-link" [routerLink]="['/register']">Sign up</a>
           </li>
         </ng-template>
       </ul>
@@ -56,6 +61,7 @@ import { AsyncPipe, NgIf } from '@angular/common';
 export class HeaderComponent {
   readonly isAuthenticated$: Observable<boolean> =
     this.authStore.isAuthenticated$;
+  readonly user$: Observable<User | null> = this.authStore.user$;
 
   constructor(private authStore: AuthStore) {}
 }

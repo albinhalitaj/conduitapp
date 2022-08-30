@@ -10,6 +10,8 @@ export interface User {
   email: string;
   role: string;
   expiresAt: string;
+  bio: string;
+  image: string;
 }
 
 export interface AuthState {
@@ -40,8 +42,9 @@ export class AuthStore extends ComponentStore<AuthState> {
         tap((user: User | null) => {
           if (user) {
             this.setState({ isAuthenticated: true, user });
+          } else {
+            this.setState({ isAuthenticated: false, user: null });
           }
-          this.setState({ isAuthenticated: false, user: null });
         }),
         catchError(() => {
           this.setState({ user: null, isAuthenticated: false });

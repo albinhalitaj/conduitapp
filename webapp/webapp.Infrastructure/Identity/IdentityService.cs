@@ -86,7 +86,7 @@ public class IdentityService : IIdentityService
             {
                 var roles = await _userManager.GetRolesAsync(userAccount);
                 var token = await GenerateToken(userAccount);
-                _httpContextAccessor.HttpContext?.Response.Cookies.Append("token", token, new CookieOptions
+                _httpContextAccessor.HttpContext!.Response.Cookies.Append("token", token, new CookieOptions
                 {
                     HttpOnly = true,
                     Secure = true,
@@ -94,7 +94,7 @@ public class IdentityService : IIdentityService
                     Expires = DateTimeOffset.UtcNow.AddHours(1)
                 });
                 response.Value = new User(userAccount.Id, userAccount.UserName, userAccount.Email, roles[0],
-                    DateTimeOffset.UtcNow.AddHours(1));
+                    DateTimeOffset.UtcNow.AddHours(1),userAccount.Bio,userAccount.Image);
                 return response;
             }
 

@@ -13,7 +13,7 @@ export const routes: Routes = [
       ),
   },
   {
-    path: 'auth',
+    path: '',
     loadComponent: () =>
       import('../app/layouts/auth-layout/auth-layout.component').then(
         (c) => c.AuthLayoutComponent

@@ -26,17 +26,16 @@ export class RegisterStore extends ComponentStore<RegisterState> {
           () => {
             void this.router.navigate(['/auth/login']);
           },
-          (error: HttpErrorResponse) => {
-            console.log(error);
-            //const { title } = error;
+          ({ error }: HttpErrorResponse) => {
+            const { title } = error;
             const errors = new Array<string>();
-            // if (title.startsWith('One or more')) {
-            //   Object.values(error.errors).forEach((error: any) => {
-            //     errors.push(error as string);
-            //   });
-            // } else {
-            //   errors.push(title);
-            // }
+            if (title.startsWith('One or more')) {
+              Object.values(error.errors).forEach((error: any) => {
+                errors.push(error as string);
+              });
+            } else {
+              errors.push(title);
+            }
             this.setState({ errors: errors });
           }
         )

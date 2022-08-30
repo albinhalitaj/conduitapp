@@ -48,7 +48,9 @@ export class AuthService {
   }
 
   login(form: LoginForm): Observable<LoginResponse> {
-    return this.http.post<LoginResponse>(`${this.apiBase}/user/login`, form);
+    return this.http.post<LoginResponse>(`${this.apiBase}/user/login`, form, {
+      withCredentials: true,
+    });
   }
 
   getCurrentUser(): Observable<User> {

@@ -18,7 +18,7 @@ import { Observable } from 'rxjs';
         <div class="col-md-6 offset-md-3 col-xs-12">
           <h1 class="text-xs-center">Sign In</h1>
           <p class="text-xs-center">
-            <a [routerLink]="['/auth/register']">Don't have an account?</a>
+            <a [routerLink]="['/register']">Don't have an account?</a>
           </p>
 
           <ng-template [ngIf]="loginSuccess$ | async">
