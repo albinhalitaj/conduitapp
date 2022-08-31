@@ -8,7 +8,6 @@ namespace webapp.API.Controllers.V1;
 [ApiVersion("1.0")]
 [ApiController]
 [Route("api/v{version:apiVersion}/[controller]")]
-[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 public class ApiController : ControllerBase
 {
     protected IActionResult Problem(IEnumerable<ErrorDto> errors)

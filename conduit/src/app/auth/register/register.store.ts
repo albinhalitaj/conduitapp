@@ -36,7 +36,7 @@ export class RegisterStore extends ComponentStore<RegisterState> {
             } else {
               errors.push(title);
             }
-            this.setState({ errors: errors });
+            this.setState({ errors });
           }
         )
       );

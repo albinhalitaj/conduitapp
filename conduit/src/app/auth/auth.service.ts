@@ -59,7 +59,7 @@ export class AuthService {
     });
   }
 
-  signOut() {
+  signOut(): Observable<Object> {
     return this.http.delete(`${this.apiBase}/user`, { withCredentials: true });
   }
 }

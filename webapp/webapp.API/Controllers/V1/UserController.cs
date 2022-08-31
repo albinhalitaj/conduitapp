@@ -6,10 +6,7 @@ using webapp.Contracts.Users;
 
 namespace webapp.API.Controllers.V1;
 
-[ApiController]
-[ApiVersion("1.0")]
-[Route("api/v{version:apiVersion}/[controller]")]
-public class UserController : ControllerBase
+public class UserController : ApiController
 {
     private readonly ICurrentUserService _currentUserService;
     private readonly IIdentityService _identityService;
@@ -84,7 +81,7 @@ public class UserController : ControllerBase
         return Ok();
     }
 
-    [HttpPut, Authorize]
+    [HttpPut, Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public async Task<IActionResult> UpdateUser(UpdateUserRequest request)
     {
         var response = await _identityService.UpdateUser(request);

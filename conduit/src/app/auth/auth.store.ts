@@ -13,7 +13,6 @@ import {
 import { Router } from '@angular/router';
 import Cookies from 'js-cookie';
 import { AuthService } from './auth.service';
-import { HttpResponse } from '@angular/common/http';
 
 export interface User {
   id: string;

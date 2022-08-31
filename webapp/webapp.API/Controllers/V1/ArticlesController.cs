@@ -1,3 +1,5 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using webapp.Application.Interfaces;
 using webapp.Contracts.Articles;
@@ -42,7 +44,7 @@ public class ArticlesController : ApiController
             : Problem(result.Errors);
     }
 
-    [HttpGet("feed")]
+    [HttpGet("feed"),Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public async Task<IActionResult> Feed([FromQuery] QueryParams queryParams)
     {
         var result = await _articleService.Feed(queryParams);
@@ -81,7 +83,7 @@ public class ArticlesController : ApiController
             });
     }
 
-    [HttpPost]
+    [HttpPost,Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public async Task<IActionResult> CreateArticle(CreateArticleRequest request)
     {
         var result = await _articleService.CreateArticleAsync(request);
@@ -93,7 +95,7 @@ public class ArticlesController : ApiController
             : Problem(result.Errors);
     }
 
-    [HttpPut("{slug}")]
+    [HttpPut("{slug}"),Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public async Task<IActionResult> UpdateArticle(string slug, UpdateArticleRequest request)
     {
         var response = await _articleService.UpdateArticleAsync(slug, request);
@@ -105,7 +107,7 @@ public class ArticlesController : ApiController
             : Problem(response.Errors);
     }
 
-    [HttpPost("{slug}/favorite")]
+    [HttpPost("{slug}/favorite"),Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public async Task<IActionResult> FavoriteArticle(string slug)
     {
         var result = await _articleService.FavoriteArticle(slug);
@@ -117,7 +119,7 @@ public class ArticlesController : ApiController
             : Problem(result.Errors);
     }
 
-    [HttpDelete("{slug}/favorite")]
+    [HttpDelete("{slug}/favorite"),Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public async Task<IActionResult> UnFavoriteArticle(string slug)
     {
         var result = await _articleService.UnFavoriteArticle(slug);
@@ -129,7 +131,7 @@ public class ArticlesController : ApiController
             : Problem(result.Errors);
     }
 
-    [HttpGet("byFavorite")]
+    [HttpGet("byFavorite"),Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public async Task<IActionResult> GetArticleByFavorite([FromQuery] string author)
     {
         var result = await _articleService.GetArticleByFavorites(author);
@@ -144,7 +146,7 @@ public class ArticlesController : ApiController
             });
     }
 
-    [HttpPost("{slug}/comments")]
+    [HttpPost("{slug}/comments"),Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public async Task<IActionResult> CreateComment(string slug, CreateCommentRequest request)
     {
         var result = await _commentService.CreateComment(slug, request);
@@ -168,14 +170,14 @@ public class ArticlesController : ApiController
             });
     }
 
-    [HttpDelete("{slug}/comments/{id}")]
+    [HttpDelete("{slug}/comments/{id}"),Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public async Task<IActionResult> DeleteComment(string slug, string id)
     {
         var result = await _commentService.DeleteCommentAsync(slug, id);
         return result.Success ? NoContent() : Problem(result.Errors);
     }
 
-    [HttpDelete("{slug}")]
+    [HttpDelete("{slug}"),Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public async Task<IActionResult> DeleteArticle(string slug)
     {
         var result = await _articleService.DeleteArticleAsync(slug);

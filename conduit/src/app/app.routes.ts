@@ -12,15 +12,4 @@ export const routes: Routes = [
         (r) => r.routes
       ),
   },
-  {
-    path: '',
-    loadComponent: () =>
-      import('../app/layouts/auth-layout/auth-layout.component').then(
-        (c) => c.AuthLayoutComponent
-      ),
-    loadChildren: () =>
-      import('../app/layouts/auth-layout/auth-layout.routes').then(
-        (r) => r.routes
-      ),
-  },
 ];

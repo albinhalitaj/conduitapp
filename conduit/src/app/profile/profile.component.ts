@@ -1,4 +1,7 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ActivatedRoute, ParamMap } from '@angular/router';
+import { map, Observable } from 'rxjs';
+import { AsyncPipe, NgIf } from '@angular/common';
 
 @Component({
   selector: 'app-profile',
@@ -7,13 +10,16 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
     <div class="user-info">
       <div class="container">
         <div class="row">
-          <div class="col-xs-12 col-md-10 offset-md-1">
+          <div
+            *ngIf="username$ | async as username"
+            class="col-xs-12 col-md-10 offset-md-1"
+          >
             <img
               src="http://i.imgur.com/Qr71crq.jpg"
               class="user-img"
               alt="Avatar"
             />
-            <h4>Eric Simons</h4>
+            <h4>{{ username }}</h4>
             <p>
               Cofounder @GoThinkster, lived in Aol's HQ for a few months, kinda
               looks like Peeta from the Hunger Games
@@ -88,5 +94,14 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
     </div>
   </div>`,
   changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [NgIf, AsyncPipe],
 })
-export class ProfileComponent {}
+export class ProfileComponent {
+  username$: Observable<string | null>;
+
+  constructor(private activatedRoute: ActivatedRoute) {
+    this.username$ = this.activatedRoute.paramMap.pipe(
+      map((params: ParamMap) => params.get('username'))
+    );
+  }
+}

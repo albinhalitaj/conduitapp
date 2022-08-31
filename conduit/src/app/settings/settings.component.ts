@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { AuthStore, User } from '../auth/auth.store';
 import { Observable, tap } from 'rxjs';
 import {
@@ -57,18 +57,23 @@ import { AsyncPipe, NgIf } from '@angular/common';
                   <input
                     class="form-control form-control-lg"
                     type="password"
-                    placeholder="Password"
+                    placeholder="New Password"
                     formControlName="password"
                   />
                 </fieldset>
                 <button class="btn btn-lg btn-primary pull-xs-right">
                   Update Settings
                 </button>
-                <button class="btn btn-sm btn-primary" (click)="signOut()">
-                  Sign Out
-                </button>
               </fieldset>
             </form>
+            <hr />
+            <button
+              (click)="signOut()"
+              type="button"
+              class="btn btn-outline-danger"
+            >
+              Or click here to logout.
+            </button>
           </div>
         </div>
       </div>

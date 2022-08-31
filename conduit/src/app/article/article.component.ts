@@ -33,7 +33,7 @@ import { AuthStore } from '../auth/auth.store';
                   >{{ article.author.username }}</a
                 >
                 <span class="date">{{
-                  article.createdAt | date: 'medium'
+                  article.createdAt | date: 'longDate'
                 }}</span>
               </div>
               <button class="btn btn-sm btn-outline-secondary">
@@ -80,7 +80,7 @@ import { AuthStore } from '../auth/auth.store';
                   >{{ article.author.username }}</a
                 >
                 <span class="date">{{
-                  article.createdAt | date: 'medium'
+                  article.createdAt | date: 'longDate'
                 }}</span>
               </div>
 
@@ -138,7 +138,7 @@ import { AuthStore } from '../auth/auth.store';
                         comment.author.username
                       }}</a>
                       <span class="date-posted">{{
-                        comment.createdAt | date: 'medium'
+                        comment.createdAt | date: 'longDate'
                       }}</span>
                       <span
                         *ngIf="user.username == comment.author.username"

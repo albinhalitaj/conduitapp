@@ -1,3 +1,5 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using webapp.Application.Interfaces;
 
@@ -21,7 +23,7 @@ public class ProfilesController : ApiController
             : Problem(response.Errors);
     }
 
-    [HttpPost("follow")]
+    [HttpPost("follow"),Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public async Task<IActionResult> FollowUser(string username)
     {
         var response = await _profileService.FollowUser(username);
@@ -33,7 +35,7 @@ public class ProfilesController : ApiController
             : Problem(response.Errors);
     }
 
-    [HttpDelete("follow")]
+    [HttpDelete("follow"),Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public async Task<IActionResult> UnfollowUser(string username)
     {
         var response = await _profileService.UnFollowUser(username);

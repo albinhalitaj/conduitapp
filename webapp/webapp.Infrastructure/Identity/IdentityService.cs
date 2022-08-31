@@ -99,7 +99,7 @@ public class IdentityService : IIdentityService
             }
             
             response.Errors = new List<ErrorDto>
-                { new() { Message = "Username or Email is incorrect", ErrorCode = "InvalidCredentials" } };
+                { new() { Message = "Username or Password is incorrect", ErrorCode = "InvalidCredentials" } };
         }
         else
         {

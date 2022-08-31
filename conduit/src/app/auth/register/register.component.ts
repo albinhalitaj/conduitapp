@@ -137,7 +137,7 @@ export class RegisterComponent {
     firstName: ['', Validators.required],
     lastName: ['', Validators.required],
     username: ['', Validators.required],
-    email: ['', Validators.required],
+    email: ['', Validators.required, Validators.email],
     password: ['', Validators.required],
   });
 
@@ -165,7 +165,7 @@ export class RegisterComponent {
     return this.registerForm.get('password');
   }
 
-  register() {
+  register(): void {
     if (this.registerForm.invalid) {
       this.registerForm.markAllAsTouched();
     } else {
