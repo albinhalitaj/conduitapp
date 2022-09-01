@@ -6,7 +6,7 @@ import {
 } from '@ngrx/component-store';
 import { Article } from '../home/home.store';
 import { ActivatedRoute, Params } from '@angular/router';
-import { map, Observable, pipe, switchMap } from 'rxjs';
+import { defer, exhaustMap, map, Observable, of, pipe, switchMap } from 'rxjs';
 import { ProfileService } from './profile.service';
 import { AuthStore } from '../auth/auth.store';
 
@@ -20,7 +20,7 @@ export interface Profile {
   username: string;
   bio: string;
   image: string;
-  isFollowing: boolean;
+  following: boolean;
 }
 
 const initialState: ProfileState = {
@@ -41,16 +41,17 @@ export class ProfileStore
   getProfile = this.effect<Params>(
     pipe(
       map((params: Params) => params['username']),
-      switchMap((username: string) => {
-        return this.profileService.getProfile(username).pipe(
+      switchMap((username: string) =>
+        this.profileService.getProfile(username).pipe(
           tapResponse(
             (profile: Profile) => {
+              console.log(profile);
               this.patchState({ profile: profile });
             },
             (error) => console.log(error)
           )
-        );
-      })
+        )
+      )
     )
   );
 
@@ -67,6 +68,22 @@ export class ProfileStore
           )
         );
       })
+    )
+  );
+
+  followUser = this.effect<Profile>(
+    exhaustMap((profile: Profile) =>
+      defer(() => {
+        if (profile.following) {
+          return this.profileService.unFollowUser(profile.username);
+        }
+        return this.profileService.followUser(profile.username);
+      }).pipe(
+        tapResponse(
+          (profile: Profile) => this.patchState({ profile }),
+          (error) => console.log(error)
+        )
+      )
     )
   );
 

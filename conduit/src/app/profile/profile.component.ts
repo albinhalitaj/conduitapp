@@ -1,8 +1,8 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { RouterLinkWithHref } from '@angular/router';
-import { Observable } from 'rxjs';
+import { Router, RouterLinkWithHref } from '@angular/router';
+import { map, Observable, tap } from 'rxjs';
 import { AsyncPipe, DatePipe, NgForOf, NgIf } from '@angular/common';
-import { ProfileStore, ProfileVm } from './profile.store';
+import { Profile, ProfileStore, ProfileVm } from './profile.store';
 import { provideComponentStore } from '@ngrx/component-store';
 
 @Component({
@@ -16,7 +16,7 @@ import { provideComponentStore } from '@ngrx/component-store';
             <div class="col-xs-12 col-md-10 offset-md-1">
               <img
                 [src]="
-                  vm.profile.image == ''
+                  !vm.profile.image
                     ? 'https://api.realworld.io/images/smiley-cyrus.jpeg'
                     : vm.profile.image
                 "
@@ -29,10 +29,13 @@ import { provideComponentStore } from '@ngrx/component-store';
               </p>
               <button
                 *ngIf="vm.user != vm.profile.username; else currentUser"
+                (click)="followUser(vm.profile)"
                 class="btn btn-sm btn-outline-secondary action-btn"
               >
                 <i class="ion-plus-round"></i>
-                &nbsp; Follow {{ vm.profile.username }}
+                &nbsp;
+                {{ vm.profile.following ? 'Unfollow' : 'Follow' }}
+                {{ vm.profile.username }}
               </button>
               <ng-template #currentUser>
                 <a
@@ -103,4 +106,8 @@ export class ProfileComponent {
   vm$: Observable<ProfileVm> = this.store.vm$;
 
   constructor(private store: ProfileStore) {}
+
+  followUser(profile: Profile) {
+    this.store.followUser(profile);
+  }
 }

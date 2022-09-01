@@ -11,7 +11,7 @@ public class ProfilesController : ApiController
     private readonly IProfileService _profileService;
     public ProfilesController(IProfileService profileService) => _profileService = profileService;
 
-    [HttpGet("")]
+    [HttpGet(""),Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public async Task<IActionResult> GetUser(string username)
     {
         var response = await _profileService.GetUser(username);

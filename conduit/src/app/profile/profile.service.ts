@@ -2,7 +2,7 @@ import { Inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Profile } from './profile.store';
 import { API_URL } from '../app.component';
-import { map } from 'rxjs';
+import { map, Observable } from 'rxjs';
 import { Article } from '../home/home.store';
 
 @Injectable({ providedIn: 'root' })
@@ -17,7 +17,12 @@ export class ProfileService {
       .get<Profile>(`${this.apiBase}/profiles/${username}`, {
         withCredentials: true,
       })
-      .pipe(map((response: any) => response.profile));
+      .pipe(
+        map((response: any) => {
+          console.log(response.profile);
+          return response.profile;
+        })
+      );
   }
 
   getArticles(username: string) {
@@ -26,5 +31,23 @@ export class ProfileService {
         withCredentials: true,
       })
       .pipe(map((response: any) => response.articles));
+  }
+
+  followUser(username: string): Observable<Profile> {
+    return this.http
+      .post<Profile>(
+        `${this.apiBase}/profiles/${username}/follow`,
+        {},
+        { withCredentials: true }
+      )
+      .pipe(map((response: any) => response.profile));
+  }
+
+  unFollowUser(username: string): Observable<Profile> {
+    return this.http
+      .delete<Profile>(`${this.apiBase}/profiles/${username}/follow`, {
+        withCredentials: true,
+      })
+      .pipe(map((response: any) => response.profile));
   }
 }
