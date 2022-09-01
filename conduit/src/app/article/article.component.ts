@@ -110,7 +110,11 @@ import { AuthStore } from '../auth/auth.store';
                   </div>
                   <div class="card-footer">
                     <img
-                      [src]="user.image"
+                      [src]="
+                        user.image == ''
+                          ? 'https://api.realworld.io/images/smiley-cyrus.jpeg'
+                          : user.image
+                      "
                       alt="Avatar"
                       class="comment-author-img"
                     />

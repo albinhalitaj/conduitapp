@@ -1,5 +1,4 @@
 import { Routes, UrlSegment } from '@angular/router';
-import { ProfileComponent } from '../../profile/profile.component';
 
 export const routes: Routes = [
   {

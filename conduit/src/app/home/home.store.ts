@@ -4,8 +4,9 @@ import {
   OnStateInit,
   tapResponse,
 } from '@ngrx/component-store';
-import { delay, exhaustMap, Observable, switchMap } from 'rxjs';
+import { exhaustMap, Observable, pipe, switchMap, tap } from 'rxjs';
 import { HomeService } from './home.service';
+import { AuthStore } from '../auth/auth.store';
 
 export interface Author {
   username: string;
@@ -26,7 +27,7 @@ export interface Article {
   author: Author;
 }
 
-export interface HomeState {
+interface HomeState {
   articles: Article[];
   tags: string[];
   isLoading: boolean;
@@ -35,7 +36,11 @@ export interface HomeState {
 const initialState: HomeState = {
   articles: [],
   tags: [],
-  isLoading: true,
+  isLoading: false,
+};
+
+export type HomeVm = HomeState & {
+  isAuthenticated: boolean;
 };
 
 @Injectable()
@@ -43,57 +48,69 @@ export class HomeStore
   extends ComponentStore<HomeState>
   implements OnStateInit
 {
-  readonly articles$: Observable<Article[]> = this.select((s) => s.articles);
-  readonly tags$: Observable<string[]> = this.select((s) => s.tags);
-  readonly isLoading$: Observable<boolean> = this.select((s) => s.isLoading);
+  readonly articles$: Observable<Article[]> = this.select(
+    (s: HomeState) => s.articles
+  );
+  readonly tags$: Observable<string[]> = this.select((s: HomeState) => s.tags);
+  readonly isLoading$: Observable<boolean> = this.select(
+    (s: HomeState) => s.isLoading
+  );
 
-  readonly vm$: Observable<HomeState> = this.select(
+  readonly vm$: Observable<HomeVm> = this.select(
     this.articles$,
     this.tags$,
-    this.select((s) => s.isLoading),
-    (articles, tags, isLoading) => ({ articles, tags, isLoading }),
+    this.isLoading$,
+    this.authStore.isAuthenticated$,
+    (articles, tags, isLoading, isAuthenticated) => ({
+      articles,
+      tags,
+      isLoading,
+      isAuthenticated,
+    }),
     { debounce: true }
   );
 
   readonly getArticles = this.effect<void>(
-    switchMap(() => {
-      this.patchState({ isLoading: true });
-      return this.homeService.getArticles().pipe(
-        delay(2000),
-        tapResponse(
-          (articles: Article[]) => {
-            this.patchState({ articles, isLoading: false });
-          },
-          (error) => console.log(error)
+    pipe(
+      tap(() => {
+        this.patchState({ isLoading: true });
+      }),
+      switchMap(() =>
+        this.homeService.getArticles().pipe(
+          tapResponse(
+            (articles: Article[]) => {
+              this.patchState({ articles, isLoading: false });
+            },
+            (error) => console.log('Error while fetching articles', error)
+          )
         )
-      );
-    })
+      )
+    )
   );
+
   readonly getTags = this.effect<void>(
-    switchMap(() => {
-      this.patchState({ isLoading: true });
-      return this.homeService.getTags().pipe(
+    switchMap(() =>
+      this.homeService.getTags().pipe(
         tapResponse(
           (tags: string[]) => {
-            this.patchState({ tags, isLoading: false });
+            this.patchState({ tags });
           },
           (error) => console.log(error)
         )
-      );
-    })
+      )
+    )
   );
   readonly getArticleByTags = this.effect(
-    exhaustMap((tag: string) => {
-      this.patchState({ isLoading: true });
-      return this.homeService.getArticlesByTag(tag).pipe(
+    exhaustMap((tag: string) =>
+      this.homeService.getArticlesByTag(tag).pipe(
         tapResponse(
           (articles: Article[]) => {
-            this.patchState({ articles, isLoading: false });
+            this.patchState({ articles });
           },
           (error) => console.log(error)
         )
-      );
-    })
+      )
+    )
   );
   readonly getFeed = this.effect<void>(
     exhaustMap(() => {
@@ -109,7 +126,7 @@ export class HomeStore
     })
   );
 
-  constructor(private homeService: HomeService) {
+  constructor(private homeService: HomeService, private authStore: AuthStore) {
     super(initialState);
   }
 

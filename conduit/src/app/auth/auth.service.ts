@@ -53,12 +53,6 @@ export class AuthService {
     });
   }
 
-  getCurrentUser(): Observable<User> {
-    return this.http.get<User>(`${this.apiBase}/user`, {
-      withCredentials: true,
-    });
-  }
-
   signOut(): Observable<Object> {
     return this.http.delete(`${this.apiBase}/user`, { withCredentials: true });
   }

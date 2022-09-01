@@ -1,10 +1,9 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { HomeState, HomeStore } from './home.store';
+import { HomeStore, HomeVm } from './home.store';
 import { provideComponentStore } from '@ngrx/component-store';
 import { Observable } from 'rxjs';
 import { AsyncPipe, DatePipe, NgForOf, NgIf } from '@angular/common';
 import { RouterLinkWithHref } from '@angular/router';
-import { AuthStore } from '../auth/auth.store';
 
 @Component({
   selector: 'app-home',
@@ -24,7 +23,7 @@ import { AuthStore } from '../auth/auth.store';
             <div class="col-md-9">
               <div class="feed-toggle">
                 <ul class="nav nav-pills outline-active">
-                  <li class="nav-item" *ngIf="isAuthenticated$ | async">
+                  <li class="nav-item" *ngIf="vm.isAuthenticated">
                     <a
                       class="nav-link"
                       [class.active]="isFeedActive"
@@ -43,7 +42,6 @@ import { AuthStore } from '../auth/auth.store';
                 </ul>
               </div>
               <ng-container *ngIf="!vm.isLoading; else loading">
-                <p>{{ vm.isLoading }}</p>
                 <ng-container *ngIf="vm.articles.length; else noArticles">
                   <div
                     *ngFor="let article of vm.articles"
@@ -139,14 +137,12 @@ import { AuthStore } from '../auth/auth.store';
   ],
 })
 export class HomeComponent {
-  readonly vm$: Observable<HomeState> = this.store.vm$;
-  readonly isAuthenticated$: Observable<boolean> =
-    this.authStore.isAuthenticated$;
+  readonly vm$: Observable<HomeVm> = this.store.vm$;
   selectedTag: string = '';
   isGlobalActive: boolean = true;
   isFeedActive: boolean = false;
 
-  constructor(private store: HomeStore, private authStore: AuthStore) {}
+  constructor(private store: HomeStore) {}
 
   getArticleByTag(tag: string) {
     this.selectedTag = tag;
