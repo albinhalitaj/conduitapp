@@ -9,6 +9,7 @@ import { ActivatedRoute, Params } from '@angular/router';
 import { forkJoin, map, Observable, pipe, switchMap, tap } from 'rxjs';
 import { ArticleService, Comment } from './article.service';
 import { HttpErrorResponse } from '@angular/common/http';
+import { AuthStore } from '../auth/auth.store';
 
 export interface ArticleState {
   article: Article | null;
@@ -24,16 +25,33 @@ const initialState: ArticleState = {
   loading: false,
 };
 
+export type ArticleVm = ArticleState & {
+  isOwner: boolean;
+};
+
 @Injectable()
 export class ArticleStore
   extends ComponentStore<ArticleState>
   implements OnStateInit
 {
-  readonly article$: Observable<Article | null> = this.select(
-    (s: ArticleState) => s.article
+  readonly vm$: Observable<ArticleVm> = this.select(
+    this.select((s) => s.article),
+    this.select((s) => s.comments),
+    this.select((s) => s.loading),
+    this.select((s) => s.error),
+    this.authStore.user$.pipe(
+      map((user) => {
+        return user?.username;
+      })
+    ),
+    (article, comments, loading, error, username) => ({
+      article,
+      comments,
+      loading,
+      error,
+      isOwner: article?.author.username == username,
+    })
   );
-
-  readonly comments$: Observable<Comment[]> = this.select((s) => s.comments);
 
   readonly getArticle = this.effect<Params>(
     pipe(
@@ -55,23 +73,10 @@ export class ArticleStore
     )
   );
 
-  /*readonly comments = this.effect(
-    switchMap((articleId: string) => {
-      return this.articleService.comments(articleId).pipe(
-        tapResponse(
-          (comments: Comment[]) => {
-            this.patchState({ comments });
-          },
-          ({ error }: HttpErrorResponse) =>
-            this.patchState({ error: error.title })
-        )
-      );
-    })
-  );*/
-
   constructor(
     private articleService: ArticleService,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private authStore: AuthStore
   ) {
     super(initialState);
   }
