@@ -1,10 +1,10 @@
 import { Injectable } from '@angular/core';
 import { ComponentStore, tapResponse } from '@ngrx/component-store';
-import { AuthService, LoginForm, LoginResponse } from '../auth.service';
 import { exhaustMap, Observable } from 'rxjs';
 import { AuthStore } from '../auth.store';
 import { HttpErrorResponse } from '@angular/common/http';
 import Cookies from 'js-cookie';
+import { ApiService, LoginForm, LoginResponse } from '../../api.service';
 
 interface LoginState {
   error: string;
@@ -26,7 +26,7 @@ export class LoginStore extends ComponentStore<LoginState> {
   login = this.effect<LoginForm>(
     exhaustMap((loginForm: LoginForm) => {
       this.patchState({ error: '' });
-      return this.authService.login(loginForm).pipe(
+      return this.apiService.login(loginForm).pipe(
         tapResponse(
           ({ user }: LoginResponse) => {
             this.patchState({ loginSuccess: true });
@@ -45,7 +45,7 @@ export class LoginStore extends ComponentStore<LoginState> {
     })
   );
 
-  constructor(private authStore: AuthStore, private authService: AuthService) {
+  constructor(private authStore: AuthStore, private apiService: ApiService) {
     super(initialState);
   }
 }

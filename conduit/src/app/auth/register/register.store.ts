@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
 import { ComponentStore, tapResponse } from '@ngrx/component-store';
-import { AuthService, RegisterForm } from '../auth.service';
 import { exhaustMap, Observable } from 'rxjs';
 import { Router } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
+import { ApiService, RegisterForm } from '../../api.service';
 
 interface RegisterState {
   errors: Array<string> | null;
@@ -21,7 +21,7 @@ export class RegisterStore extends ComponentStore<RegisterState> {
 
   register = this.effect<RegisterForm>(
     exhaustMap((registerForm: RegisterForm) => {
-      return this.authService.register(registerForm).pipe(
+      return this.apiService.register(registerForm).pipe(
         tapResponse(
           () => {
             void this.router.navigate(['/login']);
@@ -43,7 +43,7 @@ export class RegisterStore extends ComponentStore<RegisterState> {
     })
   );
 
-  constructor(private authService: AuthService, private router: Router) {
+  constructor(private apiService: ApiService, private router: Router) {
     super(initialState);
   }
 }

@@ -9,8 +9,8 @@ import {
 } from '@angular/forms';
 import { AsyncPipe, NgIf } from '@angular/common';
 import { SettingsStore } from './settings.store';
-import { UpdatedUser } from './settings.service';
 import { provideComponentStore } from '@ngrx/component-store';
+import { UpdatedUser } from '../api.service';
 
 @Component({
   selector: 'app-settings',
