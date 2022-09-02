@@ -22,7 +22,13 @@ import { UserActionsComponent } from '../ui/user-actions/user-actions.component'
 
               <div class="article-meta">
                 <a [routerLink]="['/', '@' + vm.article.author.username]"
-                  ><img [src]="vm.article.author.image" alt="Avatar"
+                  ><img
+                    [src]="
+                      vm.article.author.image
+                        ? vm.article.author.image
+                        : 'https://api.realworld.io/images/smiley-cyrus.jpeg'
+                    "
+                    alt="Avatar"
                 /></a>
                 <div class="info">
                   <a
@@ -67,7 +73,13 @@ import { UserActionsComponent } from '../ui/user-actions/user-actions.component'
             <div class="article-actions">
               <div class="article-meta">
                 <a [routerLink]="['/', '@' + vm.article.author.username]"
-                  ><img [src]="vm.article.author.image" alt="Avatar"
+                  ><img
+                    [src]="
+                      vm.article.author.image
+                        ? vm.article.author.image
+                        : 'https://api.realworld.io/images/smiley-cyrus.jpeg'
+                    "
+                    alt="Avatar"
                 /></a>
                 <div class="info">
                   <a

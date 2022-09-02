@@ -71,7 +71,13 @@ import Cookies from 'js-cookie';
             <div *ngFor="let article of vm.articles" class="article-preview">
               <div class="article-meta">
                 <a [routerLink]="['/', '@' + article.author.username]"
-                  ><img [src]="article.author.image" alt="Avatar"
+                  ><img
+                    [src]="
+                      article.author.image
+                        ? article.author.image
+                        : 'https://api.realworld.io/images/smiley-cyrus.jpeg'
+                    "
+                    alt="Avatar"
                 /></a>
                 <div class="info">
                   <a

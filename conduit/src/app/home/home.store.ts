@@ -4,9 +4,10 @@ import {
   OnStateInit,
   tapResponse,
 } from '@ngrx/component-store';
-import { exhaustMap, Observable, pipe, switchMap, tap } from 'rxjs';
+import { exhaustMap, map, Observable, pipe, switchMap, tap } from 'rxjs';
 import { AuthStore } from '../auth/auth.store';
 import { ApiService } from '../api.service';
+import Cookies from 'js-cookie';
 
 export interface Author {
   username: string;
@@ -100,6 +101,7 @@ export class HomeStore
       )
     )
   );
+
   readonly getArticleByTags = this.effect(
     exhaustMap((tag: string) =>
       this.apiService.getArticlesByTag(tag).pipe(
@@ -131,7 +133,12 @@ export class HomeStore
   }
 
   ngrxOnStateInit(): void {
-    this.getArticles();
+    const user = Cookies.get('user');
+    if (user) {
+      this.getFeed();
+    } else {
+      this.getArticles();
+    }
     this.getTags();
   }
 }

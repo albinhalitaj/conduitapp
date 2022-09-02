@@ -37,7 +37,12 @@ import Cookies from 'js-cookie';
                       class="nav-link"
                       (click)="getGlobal()"
                       [class.active]="isGlobalActive"
-                      >{{ selectedTag ? '# ' + selectedTag : 'Global Feed' }}</a
+                      >Global Feed</a
+                    >
+                  </li>
+                  <li class="nav-item" *ngIf="getByTags">
+                    <a class="nav-link" [class.active]="getByTags"
+                      ># {{ selectedTag }}</a
                     >
                   </li>
                 </ul>
@@ -50,7 +55,13 @@ import Cookies from 'js-cookie';
                   >
                     <div class="article-meta">
                       <a [routerLink]="['/', '@' + article.author.username]"
-                        ><img [src]="article.author.image" alt="Avatar"
+                        ><img
+                          [src]="
+                            article.author.image
+                              ? article.author.image
+                              : 'https://api.realworld.io/images/smiley-cyrus.jpeg'
+                          "
+                          alt="Avatar"
                       /></a>
                       <div class="info">
                         <a
@@ -104,7 +115,7 @@ import Cookies from 'js-cookie';
                     <a
                       *ngFor="let tag of vm.tags"
                       (click)="getArticleByTag(tag)"
-                      class="tag tag-pill tag-default"
+                      class="tag-default tag-pill"
                       >{{ tag }}</a
                     >
                   </ng-container>
@@ -127,8 +138,9 @@ import Cookies from 'js-cookie';
   imports: [NgIf, AsyncPipe, NgForOf, RouterLinkWithHref, DatePipe],
   styles: [
     `
-      .tag:hover {
+      .tag-default:hover {
         cursor: pointer;
+        background-color: #687077;
       }
 
       .nav-link {
@@ -142,6 +154,7 @@ export class HomeComponent {
   selectedTag: string = '';
   isGlobalActive: boolean = false;
   isFeedActive: boolean = false;
+  getByTags: boolean = false;
 
   constructor(private store: HomeStore) {
     const user = Cookies.get('user');
@@ -154,18 +167,23 @@ export class HomeComponent {
 
   getArticleByTag(tag: string) {
     this.selectedTag = tag;
+    this.getByTags = true;
+    this.isGlobalActive = false;
+    this.isFeedActive = false;
     this.store.getArticleByTags(tag);
   }
 
   getFeed() {
     this.isFeedActive = true;
     this.isGlobalActive = false;
+    this.getByTags = false;
     this.store.getFeed();
   }
 
   getGlobal() {
     this.isFeedActive = false;
     this.isGlobalActive = true;
+    this.getByTags = false;
     this.store.getArticles();
   }
 }

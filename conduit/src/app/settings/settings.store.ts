@@ -7,6 +7,7 @@ import {
 import { Observable, switchMap } from 'rxjs';
 import { AuthStore } from '../auth/auth.store';
 import { ApiService, UpdatedUser, UpdateUserForm } from '../api.service';
+import { Router } from '@angular/router';
 
 export interface SettingsState {
   profile: UpdatedUser | null;
@@ -31,6 +32,7 @@ export class SettingsStore
         tapResponse(
           (updatedUser: UpdatedUser) => {
             this.setState({ profile: updatedUser });
+            void this.router.navigate([`/@${updatedUser.username}`]);
           },
           (error) => console.log(error)
         )
@@ -57,7 +59,11 @@ export class SettingsStore
     })
   );
 
-  constructor(private authStore: AuthStore, private apiService: ApiService) {
+  constructor(
+    private authStore: AuthStore,
+    private apiService: ApiService,
+    private router: Router
+  ) {
     super(initialState);
   }
 
