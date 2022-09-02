@@ -66,7 +66,7 @@ import { UserActionsComponent } from '../ui/user-actions/user-actions.component'
 
             <div class="article-actions">
               <div class="article-meta">
-                <a [routerLink]="['/profile/', vm.article.author.username]"
+                <a [routerLink]="['/', '@' + vm.article.author.username]"
                   ><img [src]="vm.article.author.image" alt="Avatar"
                 /></a>
                 <div class="info">

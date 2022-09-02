@@ -4,6 +4,7 @@ import { provideComponentStore } from '@ngrx/component-store';
 import { Observable } from 'rxjs';
 import { AsyncPipe, DatePipe, NgForOf, NgIf } from '@angular/common';
 import { RouterLinkWithHref } from '@angular/router';
+import Cookies from 'js-cookie';
 
 @Component({
   selector: 'app-home',
@@ -139,10 +140,17 @@ import { RouterLinkWithHref } from '@angular/router';
 export class HomeComponent {
   readonly vm$: Observable<HomeVm> = this.store.vm$;
   selectedTag: string = '';
-  isGlobalActive: boolean = true;
+  isGlobalActive: boolean = false;
   isFeedActive: boolean = false;
 
-  constructor(private store: HomeStore) {}
+  constructor(private store: HomeStore) {
+    const user = Cookies.get('user');
+    if (!user) {
+      this.isGlobalActive = true;
+    } else {
+      this.isFeedActive = true;
+    }
+  }
 
   getArticleByTag(tag: string) {
     this.selectedTag = tag;

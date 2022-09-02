@@ -1,9 +1,10 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { Router, RouterLinkWithHref } from '@angular/router';
-import { map, Observable, tap } from 'rxjs';
+import { Observable } from 'rxjs';
 import { AsyncPipe, DatePipe, NgForOf, NgIf } from '@angular/common';
 import { Profile, ProfileStore, ProfileVm } from './profile.store';
 import { provideComponentStore } from '@ngrx/component-store';
+import Cookies from 'js-cookie';
 
 @Component({
   selector: 'app-profile',
@@ -43,7 +44,7 @@ import { provideComponentStore } from '@ngrx/component-store';
                   class="btn btn-sm btn-outline-secondary action-btn"
                 >
                   <i class="ion-gear-a"></i>
-                  &nbsp; Settings
+                  &nbsp; Edit Profile Settings
                 </a>
               </ng-template>
             </div>
@@ -69,7 +70,9 @@ import { provideComponentStore } from '@ngrx/component-store';
           <ng-container *ngIf="vm.articles.length > 0; else noArticles">
             <div *ngFor="let article of vm.articles" class="article-preview">
               <div class="article-meta">
-                <a href=""><img [src]="article.author.image" alt="Avatar" /></a>
+                <a [routerLink]="['/', '@' + article.author.username]"
+                  ><img [src]="article.author.image" alt="Avatar"
+                /></a>
                 <div class="info">
                   <a
                     [routerLink]="['/', '@' + article.author.username]"
@@ -84,7 +87,7 @@ import { provideComponentStore } from '@ngrx/component-store';
                   <i class="ion-heart"></i> {{ article.favoritesCount }}
                 </button>
               </div>
-              <a href="" class="preview-link">
+              <a [routerLink]="['/article', article.slug]" class="preview-link">
                 <h1>{{ article.title }}</h1>
                 <p>{{ article.description }}</p>
                 <span>Read more...</span>
@@ -105,9 +108,14 @@ import { provideComponentStore } from '@ngrx/component-store';
 export class ProfileComponent {
   vm$: Observable<ProfileVm> = this.store.vm$;
 
-  constructor(private store: ProfileStore) {}
+  constructor(private router: Router, private store: ProfileStore) {}
 
   followUser(profile: Profile) {
-    this.store.followUser(profile);
+    const user = Cookies.get('user');
+    if (!user) {
+      void this.router.navigate(['/login']);
+    } else {
+      this.store.followUser(profile);
+    }
   }
 }
