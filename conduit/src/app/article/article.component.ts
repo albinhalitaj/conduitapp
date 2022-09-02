@@ -9,8 +9,8 @@ import {
   NgIf,
   NgOptimizedImage,
 } from '@angular/common';
-import { RouterLinkWithHref } from '@angular/router';
-import { AuthStore, User } from '../auth/auth.store';
+import { Router, RouterLinkWithHref } from '@angular/router';
+import Cookies from 'js-cookie';
 
 @Component({
   selector: 'app-article',
@@ -24,12 +24,12 @@ import { AuthStore, User } from '../auth/auth.store';
               <h1>{{ vm.article.title }}</h1>
 
               <div class="article-meta">
-                <a href=""
+                <a [routerLink]="['/', '@' + vm.article.author.username]"
                   ><img [src]="vm.article.author.image" alt="Avatar"
                 /></a>
                 <div class="info">
                   <a
-                    [routerLink]="['/profile/', vm.article.author.username]"
+                    [routerLink]="['/', '@' + vm.article.author.username]"
                     class="author"
                     >{{ vm.article.author.username }}</a
                   >
@@ -38,13 +38,21 @@ import { AuthStore, User } from '../auth/auth.store';
                   }}</span>
                 </div>
                 <ng-container *ngIf="!vm.isOwner">
-                  <button class="btn btn-sm btn-outline-secondary">
+                  <button
+                    (click)="followUser(vm.article.author.username)"
+                    class="btn btn-sm btn-outline-secondary"
+                  >
                     <i class="ion-plus-round"></i>
-                    &nbsp; Follow {{ vm.article.author.username }}
+                    &nbsp;
+                    {{ vm.article.author.following ? 'Unfollow' : 'Follow' }}
+                    {{ vm.article.author.username }}
                     <span class="counter">(10)</span>
                   </button>
                   &nbsp;&nbsp;
-                  <button class="btn btn-sm btn-outline-primary">
+                  <button
+                    (click)="favoriteArticle(vm.article.slug)"
+                    class="btn btn-sm btn-outline-primary"
+                  >
                     <i class="ion-heart"></i>
                     &nbsp; Favorite Post
                     <span class="counter"
@@ -90,12 +98,20 @@ import { AuthStore, User } from '../auth/auth.store';
                 </div>
 
                 <ng-container *ngIf="!vm.isOwner">
-                  <button class="btn btn-sm btn-outline-secondary">
+                  <button
+                    (click)="followUser(vm.article.author.username)"
+                    class="btn btn-sm btn-outline-secondary"
+                  >
                     <i class="ion-plus-round"></i>
-                    &nbsp; Follow {{ vm.article.author.username }}
+                    &nbsp;
+                    {{ vm.article.author.following ? 'Unfollow' : 'Follow' }}
+                    {{ vm.article.author.username }}
                   </button>
                   &nbsp;
-                  <button class="btn btn-sm btn-outline-primary">
+                  <button
+                    (click)="favoriteArticle(vm.article.slug)"
+                    class="btn btn-sm btn-outline-primary"
+                  >
                     <i class="ion-heart"></i>
                     &nbsp; Favorite Post
                     <span class="counter"
@@ -106,7 +122,7 @@ import { AuthStore, User } from '../auth/auth.store';
               </div>
             </div>
 
-            <ng-container *ngIf="user$ | async as user">
+            <ng-container *ngIf="vm.user as user">
               <div class="row">
                 <div class="col-xs-12 col-md-8 offset-md-2">
                   <form class="card comment-form">
@@ -120,7 +136,7 @@ import { AuthStore, User } from '../auth/auth.store';
                     <div class="card-footer">
                       <img
                         [src]="
-                          user.image == ''
+                          !user.image
                             ? 'https://api.realworld.io/images/smiley-cyrus.jpeg'
                             : user.image
                         "
@@ -186,7 +202,26 @@ import { AuthStore, User } from '../auth/auth.store';
 })
 export class ArticleComponent {
   readonly vm$: Observable<ArticleVm> = this.store.vm$;
-  readonly user$: Observable<User | null> = this.authStore.user$;
+  isAuthenticated: boolean;
 
-  constructor(private store: ArticleStore, private authStore: AuthStore) {}
+  constructor(private router: Router, private store: ArticleStore) {
+    const user = Cookies.get('user');
+    this.isAuthenticated = !!user;
+  }
+
+  followUser(username: string) {
+    if (!this.isAuthenticated) {
+      void this.router.navigate(['/login']);
+    } else {
+      console.log('Following ', username);
+    }
+  }
+
+  favoriteArticle(slug: string) {
+    if (!this.isAuthenticated) {
+      void this.router.navigate(['/login']);
+    } else {
+      console.log('Favorite ', slug);
+    }
+  }
 }

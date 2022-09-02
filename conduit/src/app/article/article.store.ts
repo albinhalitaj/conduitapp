@@ -8,7 +8,7 @@ import { Article } from '../home/home.store';
 import { ActivatedRoute, Params } from '@angular/router';
 import { forkJoin, map, Observable, pipe, switchMap, tap } from 'rxjs';
 import { HttpErrorResponse } from '@angular/common/http';
-import { AuthStore } from '../auth/auth.store';
+import { AuthStore, User } from '../auth/auth.store';
 import { ApiService, Comment } from '../api.service';
 
 export interface ArticleState {
@@ -27,6 +27,7 @@ const initialState: ArticleState = {
 
 export type ArticleVm = ArticleState & {
   isOwner: boolean;
+  user: User | null;
 };
 
 @Injectable()
@@ -39,17 +40,14 @@ export class ArticleStore
     this.select((s) => s.comments),
     this.select((s) => s.loading),
     this.select((s) => s.error),
-    this.authStore.user$.pipe(
-      map((user) => {
-        return user?.username;
-      })
-    ),
-    (article, comments, loading, error, username) => ({
+    this.authStore.user$,
+    (article, comments, loading, error, user) => ({
       article,
       comments,
       loading,
       error,
-      isOwner: article?.author.username == username,
+      isOwner: article?.author.username == user?.username,
+      user,
     })
   );
 
@@ -63,12 +61,13 @@ export class ArticleStore
           this.apiService.comments(slug),
         ]).pipe(
           tapResponse(
-            ([article, comments]) =>
+            ([article, comments]) => {
               this.patchState({
                 article,
                 comments,
                 loading: false,
-              }),
+              });
+            },
             ({ error }: HttpErrorResponse) =>
               this.patchState({ error: error.title, loading: false })
           )
