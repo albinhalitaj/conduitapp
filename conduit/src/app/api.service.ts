@@ -151,6 +151,14 @@ export class ApiService {
       .pipe(map((response: any) => response.comments as Comment[]));
   }
 
+  addComment(slug: string, body: string) {
+    return this.http
+      .post(`${this.apiBase}/articles/${slug}/comments`, body, {
+        withCredentials: true,
+      })
+      .pipe(map((response: any) => response.comment));
+  }
+
   getProfile(username: string) {
     return this.http
       .get<Profile>(`${this.apiBase}/profiles/${username}`, {

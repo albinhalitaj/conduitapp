@@ -2,15 +2,12 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { provideComponentStore } from '@ngrx/component-store';
 import { ArticleStore, ArticleVm } from './article.store';
 import { Observable } from 'rxjs';
-import {
-  AsyncPipe,
-  DatePipe,
-  NgForOf,
-  NgIf,
-  NgOptimizedImage,
-} from '@angular/common';
+import { AsyncPipe, DatePipe, NgForOf, NgIf } from '@angular/common';
 import { Router, RouterLinkWithHref } from '@angular/router';
 import Cookies from 'js-cookie';
+import { CommentComponent } from '../ui/comment/comment.component';
+import { CommentFormComponent } from '../ui/comment/comment-form.component';
+import { UserActionsComponent } from '../ui/user-actions/user-actions.component';
 
 @Component({
   selector: 'app-article',
@@ -37,29 +34,15 @@ import Cookies from 'js-cookie';
                     vm.article.createdAt | date: 'longDate'
                   }}</span>
                 </div>
-                <ng-container *ngIf="!vm.isOwner">
-                  <button
-                    (click)="followUser(vm.article.author.username)"
-                    class="btn btn-sm btn-outline-secondary"
-                  >
-                    <i class="ion-plus-round"></i>
-                    &nbsp;
-                    {{ vm.article.author.following ? 'Unfollow' : 'Follow' }}
-                    {{ vm.article.author.username }}
-                    <span class="counter">(10)</span>
-                  </button>
-                  &nbsp;&nbsp;
-                  <button
-                    (click)="favoriteArticle(vm.article.slug)"
-                    class="btn btn-sm btn-outline-primary"
-                  >
-                    <i class="ion-heart"></i>
-                    &nbsp; Favorite Post
-                    <span class="counter"
-                      >({{ vm.article.favoritesCount }})</span
-                    >
-                  </button>
-                </ng-container>
+                <app-user-actions
+                  *ngIf="!vm.isOwner"
+                  [favoritesCount]="vm.article.favoritesCount"
+                  [author]="vm.article.author"
+                  [articleSlug]="vm.article.slug"
+                  (followUser)="followUser($event)"
+                  (favoriteArticle)="favoriteArticle($event)"
+                >
+                </app-user-actions>
               </div>
             </div>
           </div>
@@ -97,93 +80,33 @@ import Cookies from 'js-cookie';
                   }}</span>
                 </div>
 
-                <ng-container *ngIf="!vm.isOwner">
-                  <button
-                    (click)="followUser(vm.article.author.username)"
-                    class="btn btn-sm btn-outline-secondary"
-                  >
-                    <i class="ion-plus-round"></i>
-                    &nbsp;
-                    {{ vm.article.author.following ? 'Unfollow' : 'Follow' }}
-                    {{ vm.article.author.username }}
-                  </button>
-                  &nbsp;
-                  <button
-                    (click)="favoriteArticle(vm.article.slug)"
-                    class="btn btn-sm btn-outline-primary"
-                  >
-                    <i class="ion-heart"></i>
-                    &nbsp; Favorite Post
-                    <span class="counter"
-                      >({{ vm.article.favoritesCount }})</span
-                    >
-                  </button>
-                </ng-container>
+                <app-user-actions
+                  *ngIf="!vm.isOwner"
+                  [favoritesCount]="vm.article.favoritesCount"
+                  [author]="vm.article.author"
+                  [articleSlug]="vm.article.slug"
+                  (followUser)="followUser($event)"
+                  (favoriteArticle)="favoriteArticle($event)"
+                >
+                </app-user-actions>
               </div>
             </div>
 
-            <ng-container *ngIf="vm.user as user">
-              <div class="row">
-                <div class="col-xs-12 col-md-8 offset-md-2">
-                  <form class="card comment-form">
-                    <div class="card-block">
-                      <textarea
-                        class="form-control"
-                        placeholder="Write a comment..."
-                        rows="3"
-                      ></textarea>
-                    </div>
-                    <div class="card-footer">
-                      <img
-                        [src]="
-                          !user.image
-                            ? 'https://api.realworld.io/images/smiley-cyrus.jpeg'
-                            : user.image
-                        "
-                        alt="Avatar"
-                        class="comment-author-img"
-                      />
-                      <button class="btn btn-sm btn-primary">
-                        Post Comment
-                      </button>
-                    </div>
-                  </form>
+            <div class="row">
+              <div class="col-xs-12 col-md-8 offset-md-2">
+                <app-comment-form
+                  *ngIf="vm.user"
+                  (postComment)="postComment($event)"
+                  [image]="vm.user.image"
+                >
+                </app-comment-form>
 
-                  <ng-container *ngIf="vm.comments as comments">
-                    <div *ngFor="let comment of comments" class="card">
-                      <div class="card-block">
-                        <p class="card-text">
-                          {{ comment.body }}
-                        </p>
-                      </div>
-                      <div class="card-footer">
-                        <a class="comment-author">
-                          <img
-                            [src]="comment.author.image"
-                            alt="Avatar"
-                            class="comment-author-img"
-                          />
-                        </a>
-                        &nbsp;
-                        <a href="" class="comment-author">{{
-                          comment.author.username
-                        }}</a>
-                        <span class="date-posted">{{
-                          comment.createdAt | date: 'longDate'
-                        }}</span>
-                        <span
-                          *ngIf="user.username == comment.author.username"
-                          class="mod-options"
-                        >
-                          <i class="ion-edit"></i>
-                          <i class="ion-trash-a"></i>
-                        </span>
-                      </div>
-                    </div>
-                  </ng-container>
-                </div>
+                <app-comment
+                  [comments]="vm.comments"
+                  [username]="vm.user?.username"
+                ></app-comment>
               </div>
-            </ng-container>
+            </div>
           </div>
         </div>
       </ng-container>
@@ -194,10 +117,12 @@ import Cookies from 'js-cookie';
   imports: [
     NgIf,
     AsyncPipe,
-    NgOptimizedImage,
     RouterLinkWithHref,
     NgForOf,
     DatePipe,
+    CommentComponent,
+    CommentFormComponent,
+    UserActionsComponent,
   ],
 })
 export class ArticleComponent {
@@ -223,5 +148,9 @@ export class ArticleComponent {
     } else {
       console.log('Favorite ', slug);
     }
+  }
+
+  postComment(body: string) {
+    this.store.postComment(body);
   }
 }

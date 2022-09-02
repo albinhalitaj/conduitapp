@@ -76,6 +76,24 @@ export class ArticleStore
     )
   );
 
+  postComment = this.effect(
+    switchMap((body: string) =>
+      this.route.params.pipe(
+        map((params: Params) => params['slug']),
+        switchMap((slug: string) =>
+          this.apiService.addComment(slug, body).pipe(
+            tapResponse(
+              (comment) => {
+                this.patchState({ comments: Array.from(comment) });
+              },
+              (error) => console.log(error)
+            )
+          )
+        )
+      )
+    )
+  );
+
   constructor(
     private apiService: ApiService,
     private route: ActivatedRoute,
