@@ -46,7 +46,8 @@ export class AuthStore extends ComponentStore<AuthState> {
         tapResponse(
           () => {
             Cookies.remove('user');
-            void this.router.navigate(['/login']);
+            this.setState({ user: null, isAuthenticated: false });
+            void this.router.navigate(['/']);
           },
           (error) => console.log(error)
         )
