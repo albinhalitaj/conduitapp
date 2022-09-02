@@ -6,7 +6,7 @@ import {
 } from '@ngrx/component-store';
 import { Article } from '../home/home.store';
 import { ActivatedRoute, Params } from '@angular/router';
-import { defer, exhaustMap, map, Observable, of, pipe, switchMap } from 'rxjs';
+import { defer, exhaustMap, map, Observable, pipe, switchMap } from 'rxjs';
 import { ProfileService } from './profile.service';
 import { AuthStore } from '../auth/auth.store';
 
@@ -45,7 +45,6 @@ export class ProfileStore
         this.profileService.getProfile(username).pipe(
           tapResponse(
             (profile: Profile) => {
-              console.log(profile);
               this.patchState({ profile: profile });
             },
             (error) => console.log(error)

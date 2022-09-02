@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { AuthStore, User } from '../auth/auth.store';
+import { AuthStore } from '../auth/auth.store';
 import { Observable, tap } from 'rxjs';
 import {
   FormBuilder,
@@ -8,18 +8,21 @@ import {
   Validators,
 } from '@angular/forms';
 import { AsyncPipe, NgIf } from '@angular/common';
+import { SettingsStore } from './settings.store';
+import { UpdatedUser } from './settings.service';
+import { provideComponentStore } from '@ngrx/component-store';
 
 @Component({
   selector: 'app-settings',
   standalone: true,
   template: `
-    <div class="settings-page" *ngIf="user$ | async as user">
+    <div class="settings-page" *ngIf="profile$ | async as user">
       <div class="container page">
         <div class="row">
           <div class="col-md-6 offset-md-3 col-xs-12">
             <h1 class="text-xs-center">Your Settings</h1>
 
-            <form [formGroup]="profile">
+            <form [formGroup]="profile" (ngSubmit)="updateUser()">
               <fieldset>
                 <fieldset class="form-group">
                   <input
@@ -53,15 +56,10 @@ import { AsyncPipe, NgIf } from '@angular/common';
                     formControlName="email"
                   />
                 </fieldset>
-                <fieldset class="form-group">
-                  <input
-                    class="form-control form-control-lg"
-                    type="password"
-                    placeholder="New Password"
-                    formControlName="password"
-                  />
-                </fieldset>
-                <button class="btn btn-lg btn-primary pull-xs-right">
+                <button
+                  type="submit"
+                  class="btn btn-lg btn-primary pull-xs-right"
+                >
                   Update Settings
                 </button>
               </fieldset>
@@ -80,26 +78,36 @@ import { AsyncPipe, NgIf } from '@angular/common';
     </div>
   `,
   imports: [ReactiveFormsModule, NgIf, AsyncPipe],
+  providers: [provideComponentStore(SettingsStore)],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SettingsComponent {
   profile: FormGroup = this.fb.nonNullable.group({});
   private isInitialized = false;
-  readonly user$: Observable<User | null> = this.authStore.user$.pipe(
-    tap((user) => {
-      if (user && !this.isInitialized) {
-        this.initForm(user);
+
+  readonly profile$: Observable<UpdatedUser | null> = this.store.profile$.pipe(
+    tap((profile: UpdatedUser | null) => {
+      if (profile && !this.isInitialized) {
+        this.initForm(profile);
       }
     })
   );
 
-  constructor(private fb: FormBuilder, private authStore: AuthStore) {}
+  constructor(
+    private store: SettingsStore,
+    private fb: FormBuilder,
+    private authStore: AuthStore
+  ) {}
 
   signOut() {
     this.authStore.signOut();
   }
 
-  private initForm(currentUser: User) {
+  updateUser() {
+    this.store.updateUser(this.profile.getRawValue());
+  }
+
+  private initForm(currentUser: UpdatedUser) {
     this.profile.addControl('image', this.fb.control(currentUser.image || ''));
     this.profile.addControl(
       'username',
@@ -113,7 +121,6 @@ export class SettingsComponent {
         Validators.email,
       ])
     );
-    this.profile.addControl('password', this.fb.control(''));
     this.isInitialized = true;
   }
 }

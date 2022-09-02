@@ -17,12 +17,7 @@ export class ProfileService {
       .get<Profile>(`${this.apiBase}/profiles/${username}`, {
         withCredentials: true,
       })
-      .pipe(
-        map((response: any) => {
-          console.log(response.profile);
-          return response.profile;
-        })
-      );
+      .pipe(map((response: any) => response.profile));
   }
 
   getArticles(username: string) {
