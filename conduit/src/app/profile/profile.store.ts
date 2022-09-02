@@ -7,8 +7,8 @@ import {
 import { Article } from '../home/home.store';
 import { ActivatedRoute, Params } from '@angular/router';
 import { defer, exhaustMap, map, Observable, pipe, switchMap } from 'rxjs';
-import { ProfileService } from './profile.service';
 import { AuthStore } from '../auth/auth.store';
+import { ApiService } from '../api.service';
 
 interface ProfileState {
   profile: Profile | null;
@@ -42,7 +42,7 @@ export class ProfileStore
     pipe(
       map((params: Params) => params['username']),
       switchMap((username: string) =>
-        this.profileService.getProfile(username).pipe(
+        this.apiService.getProfile(username).pipe(
           tapResponse(
             (profile: Profile) => {
               this.patchState({ profile: profile });
@@ -58,7 +58,7 @@ export class ProfileStore
     pipe(
       map((params: Params) => params['username']),
       switchMap((username: string) => {
-        return this.profileService.getArticles(username).pipe(
+        return this.apiService.getArticlesByAuthor(username).pipe(
           tapResponse(
             (articles: Article[]) => {
               this.patchState({ articles: articles });
@@ -74,9 +74,9 @@ export class ProfileStore
     exhaustMap((profile: Profile) =>
       defer(() => {
         if (profile.following) {
-          return this.profileService.unFollowUser(profile.username);
+          return this.apiService.unFollowUser(profile.username);
         }
-        return this.profileService.followUser(profile.username);
+        return this.apiService.followUser(profile.username);
       }).pipe(
         tapResponse(
           (profile: Profile) => this.patchState({ profile }),
@@ -108,7 +108,7 @@ export class ProfileStore
 
   constructor(
     private activatedRoute: ActivatedRoute,
-    private profileService: ProfileService,
+    private apiService: ApiService,
     private authStore: AuthStore
   ) {
     super(initialState);

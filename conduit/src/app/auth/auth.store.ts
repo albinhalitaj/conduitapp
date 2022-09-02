@@ -12,7 +12,7 @@ import {
 } from 'rxjs';
 import { Router } from '@angular/router';
 import Cookies from 'js-cookie';
-import { AuthService } from './auth.service';
+import { ApiService } from '../api.service';
 
 export interface User {
   id: string;
@@ -42,7 +42,7 @@ export class AuthStore extends ComponentStore<AuthState> {
   user$: Observable<User | null> = this.select((s: AuthState) => s.user);
   signOut = this.effect<void>(
     exhaustMap(() =>
-      this.authService.signOut().pipe(
+      this.apiService.signOut().pipe(
         tapResponse(
           () => {
             Cookies.remove('user');
@@ -77,7 +77,7 @@ export class AuthStore extends ComponentStore<AuthState> {
     )
   );
 
-  constructor(private router: Router, private authService: AuthService) {
+  constructor(private router: Router, private apiService: ApiService) {
     super(initialState);
   }
 

@@ -5,8 +5,8 @@ import {
   tapResponse,
 } from '@ngrx/component-store';
 import { exhaustMap, Observable, pipe, switchMap, tap } from 'rxjs';
-import { HomeService } from './home.service';
 import { AuthStore } from '../auth/auth.store';
+import { ApiService } from '../api.service';
 
 export interface Author {
   username: string;
@@ -76,7 +76,7 @@ export class HomeStore
         this.patchState({ isLoading: true });
       }),
       switchMap(() =>
-        this.homeService.getArticles().pipe(
+        this.apiService.getArticles().pipe(
           tapResponse(
             (articles: Article[]) => {
               this.patchState({ articles, isLoading: false });
@@ -90,7 +90,7 @@ export class HomeStore
 
   readonly getTags = this.effect<void>(
     switchMap(() =>
-      this.homeService.getTags().pipe(
+      this.apiService.getTags().pipe(
         tapResponse(
           (tags: string[]) => {
             this.patchState({ tags });
@@ -102,7 +102,7 @@ export class HomeStore
   );
   readonly getArticleByTags = this.effect(
     exhaustMap((tag: string) =>
-      this.homeService.getArticlesByTag(tag).pipe(
+      this.apiService.getArticlesByTag(tag).pipe(
         tapResponse(
           (articles: Article[]) => {
             this.patchState({ articles });
@@ -115,7 +115,7 @@ export class HomeStore
   readonly getFeed = this.effect<void>(
     exhaustMap(() => {
       this.patchState({ isLoading: true });
-      return this.homeService.getFeed().pipe(
+      return this.apiService.getFeed().pipe(
         tapResponse(
           (articles: Article[]) => {
             this.patchState({ articles, isLoading: false });
@@ -126,7 +126,7 @@ export class HomeStore
     })
   );
 
-  constructor(private homeService: HomeService, private authStore: AuthStore) {
+  constructor(private apiService: ApiService, private authStore: AuthStore) {
     super(initialState);
   }
 

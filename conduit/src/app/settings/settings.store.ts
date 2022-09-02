@@ -4,13 +4,9 @@ import {
   OnStateInit,
   tapResponse,
 } from '@ngrx/component-store';
-import {
-  SettingsService,
-  UpdatedUser,
-  UpdateUserForm,
-} from './settings.service';
 import { Observable, switchMap } from 'rxjs';
 import { AuthStore } from '../auth/auth.store';
+import { ApiService, UpdatedUser, UpdateUserForm } from '../api.service';
 
 export interface SettingsState {
   profile: UpdatedUser | null;
@@ -31,7 +27,7 @@ export class SettingsStore
 
   updateUser = this.effect<UpdateUserForm>(
     switchMap((user: UpdateUserForm) => {
-      return this.settingsService.updateUser(user).pipe(
+      return this.apiService.updateUser(user).pipe(
         tapResponse(
           (updatedUser: UpdatedUser) => {
             this.setState({ profile: updatedUser });
@@ -44,7 +40,7 @@ export class SettingsStore
 
   getUser = this.effect<void>(
     switchMap(() => {
-      return this.settingsService.get().pipe(
+      return this.apiService.get().pipe(
         tapResponse(
           (user) => {
             const userSettings: UpdatedUser = {
@@ -61,10 +57,7 @@ export class SettingsStore
     })
   );
 
-  constructor(
-    private authStore: AuthStore,
-    private settingsService: SettingsService
-  ) {
+  constructor(private authStore: AuthStore, private apiService: ApiService) {
     super(initialState);
   }
 

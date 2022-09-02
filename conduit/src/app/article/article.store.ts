@@ -7,13 +7,13 @@ import {
 import { Article } from '../home/home.store';
 import { ActivatedRoute, Params } from '@angular/router';
 import { forkJoin, map, Observable, pipe, switchMap, tap } from 'rxjs';
-import { ArticleService, Comment } from './article.service';
 import { HttpErrorResponse } from '@angular/common/http';
 import { AuthStore } from '../auth/auth.store';
+import { ApiService, Comment } from '../api.service';
 
 export interface ArticleState {
   article: Article | null;
-  comments: Comment[] | [];
+  comments: Comment[];
   error: '';
   loading: boolean;
 }
@@ -59,12 +59,16 @@ export class ArticleStore
       tap(() => this.patchState({ loading: true })),
       switchMap((slug: string) =>
         forkJoin([
-          this.articleService.getArticle(slug),
-          this.articleService.comments(slug),
+          this.apiService.getArticle(slug),
+          this.apiService.comments(slug),
         ]).pipe(
           tapResponse(
             ([article, comments]) =>
-              this.patchState({ article, comments, loading: false }),
+              this.patchState({
+                article,
+                comments,
+                loading: false,
+              }),
             ({ error }: HttpErrorResponse) =>
               this.patchState({ error: error.title, loading: false })
           )
@@ -74,7 +78,7 @@ export class ArticleStore
   );
 
   constructor(
-    private articleService: ArticleService,
+    private apiService: ApiService,
     private route: ActivatedRoute,
     private authStore: AuthStore
   ) {
