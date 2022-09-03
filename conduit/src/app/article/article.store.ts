@@ -36,10 +36,10 @@ export class ArticleStore
   implements OnStateInit
 {
   readonly vm$: Observable<ArticleVm> = this.select(
-    this.select((s) => s.article),
-    this.select((s) => s.comments),
-    this.select((s) => s.loading),
-    this.select((s) => s.error),
+    this.select((s: ArticleState) => s.article),
+    this.select((s: ArticleState) => s.comments),
+    this.select((s: ArticleState) => s.loading),
+    this.select((s: ArticleState) => s.error),
     this.authStore.user$,
     (article, comments, loading, error, user) => ({
       article,

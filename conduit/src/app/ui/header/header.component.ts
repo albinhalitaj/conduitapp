@@ -39,7 +39,7 @@ import { AsyncPipe, NgIf } from '@angular/common';
             <li class="nav-item">
               <a
                 class="nav-link"
-                [routerLink]="['/', '@' + user.username]"
+                [routerLink]="['/', user.username]"
                 style="user-select: none;"
               >
                 {{ user.username }}

@@ -1,4 +1,14 @@
 import { Routes, UrlSegment } from '@angular/router';
+import { InjectionToken, Provider } from '@angular/core';
+
+export const articleType = new InjectionToken<string>('Article Type');
+
+export function provideArticleType(type: string): Provider {
+  return {
+    provide: articleType,
+    useValue: type,
+  };
+}
 
 export const routes: Routes = [
   {
@@ -19,19 +29,40 @@ export const routes: Routes = [
       ),
   },
   {
-    matcher: (url: UrlSegment[]) => {
-      if (url.length >= 1 && url[0].path[0] == '@') {
-        return {
-          consumed: url,
-          posParams: {
-            username: new UrlSegment(url[0].path.substring(1), {}),
-          },
-        };
-      }
-      return null;
-    },
+    /*
+        matcher: (url: UrlSegment[]) => {
+          if (url.length >= 1 && url[0].path[0] == '@') {
+            return {
+              consumed: url,
+              posParams: {
+                username: new UrlSegment(url[0].path.substring(1), {}),
+              },
+            };
+          }
+          return null;
+        },
+    */
+    path: ':username',
     loadComponent: () =>
       import('../../profile/profile.component').then((r) => r.ProfileComponent),
+    children: [
+      {
+        path: '',
+        providers: [provideArticleType('articles')],
+        loadComponent: () =>
+          import('../../ui/article-list/article-list.component').then(
+            (a) => a.ArticleListComponent
+          ),
+      },
+      {
+        path: 'favorites',
+        providers: [provideArticleType('favorites')],
+        loadComponent: () =>
+          import('../../ui/article-list/article-list.component').then(
+            (a) => a.ArticleListComponent
+          ),
+      },
+    ],
   },
   {
     path: 'settings',

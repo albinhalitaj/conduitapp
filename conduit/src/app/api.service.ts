@@ -135,6 +135,21 @@ export class ApiService {
       );
   }
 
+  getFavorited(username: string): Observable<Article[]> {
+    return this.http
+      .get<Article[]>(
+        `${this.apiBase}/articles/byFavorite?author=${username}`,
+        {
+          withCredentials: true,
+        }
+      )
+      .pipe(
+        map((response: any) => {
+          return response.articles;
+        })
+      );
+  }
+
   getFeed(): Observable<Article[]> {
     return this.http
       .get<Article[]>(`${this.apiBase}/articles/feed`, {

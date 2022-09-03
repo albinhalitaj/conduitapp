@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Inject, Injectable } from '@angular/core';
 import {
   ComponentStore,
   OnStateInit,
@@ -9,6 +9,7 @@ import { ActivatedRoute, Params } from '@angular/router';
 import { defer, exhaustMap, map, Observable, pipe, switchMap } from 'rxjs';
 import { AuthStore } from '../auth/auth.store';
 import { ApiService } from '../api.service';
+import { articleType } from '../layouts/app-layout/app-layout.routes';
 
 interface ProfileState {
   profile: Profile | null;
@@ -45,7 +46,7 @@ export class ProfileStore
         this.apiService.getProfile(username).pipe(
           tapResponse(
             (profile: Profile) => {
-              this.patchState({ profile: profile });
+              this.patchState({ profile });
             },
             (error) => console.log(error)
           )

@@ -21,7 +21,7 @@ import { UserActionsComponent } from '../ui/user-actions/user-actions.component'
               <h1>{{ vm.article.title }}</h1>
 
               <div class="article-meta">
-                <a [routerLink]="['/', '@' + vm.article.author.username]"
+                <a [routerLink]="['/', vm.article.author.username]"
                   ><img
                     [src]="
                       vm.article.author.image
@@ -32,7 +32,7 @@ import { UserActionsComponent } from '../ui/user-actions/user-actions.component'
                 /></a>
                 <div class="info">
                   <a
-                    [routerLink]="['/', '@' + vm.article.author.username]"
+                    [routerLink]="['/', vm.article.author.username]"
                     class="author"
                     >{{ vm.article.author.username }}</a
                   >
@@ -72,7 +72,7 @@ import { UserActionsComponent } from '../ui/user-actions/user-actions.component'
 
             <div class="article-actions">
               <div class="article-meta">
-                <a [routerLink]="['/', '@' + vm.article.author.username]"
+                <a [routerLink]="['/', vm.article.author.username]"
                   ><img
                     [src]="
                       vm.article.author.image
@@ -83,7 +83,7 @@ import { UserActionsComponent } from '../ui/user-actions/user-actions.component'
                 /></a>
                 <div class="info">
                   <a
-                    [routerLink]="['/', '@' + vm.article.author.username]"
+                    [routerLink]="['/', vm.article.author.username]"
                     class="author"
                     >{{ vm.article.author.username }}</a
                   >
