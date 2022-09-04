@@ -54,7 +54,7 @@ import Cookies from 'js-cookie';
                     class="article-preview"
                   >
                     <div class="article-meta">
-                      <a [routerLink]="['/', article.author.username]"
+                      <a [routerLink]="['/profile', article.author.username]"
                         ><img
                           [src]="
                             article.author.image
@@ -65,7 +65,7 @@ import Cookies from 'js-cookie';
                       /></a>
                       <div class="info">
                         <a
-                          [routerLink]="['/', article.author.username]"
+                          [routerLink]="['/profile', article.author.username]"
                           class="author"
                           >{{ article.author.username }}</a
                         >

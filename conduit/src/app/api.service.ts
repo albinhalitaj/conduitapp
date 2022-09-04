@@ -93,6 +93,10 @@ export class ApiService {
     return this.http.put(`${this.apiBase}/articles/${slug}`, articleData);
   }
 
+  favoriteArticle(slug: string) {
+    return this.http.post(`${this.apiBase}/articles/${slug}/favorite`, {});
+  }
+
   getArticle(id: string): Observable<Article> {
     return this.http
       .get<Article>(`${this.apiBase}/articles/${id}`)

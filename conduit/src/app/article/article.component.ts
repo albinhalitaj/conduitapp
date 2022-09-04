@@ -22,7 +22,7 @@ import { SanitizerPipe } from '../pipes/sanitizer.pipe';
               <h1>{{ vm.article.title }}</h1>
 
               <div class="article-meta">
-                <a [routerLink]="['/', vm.article.author.username]"
+                <a [routerLink]="['/profile', vm.article.author.username]"
                   ><img
                     [src]="
                       vm.article.author.image
@@ -33,7 +33,7 @@ import { SanitizerPipe } from '../pipes/sanitizer.pipe';
                 /></a>
                 <div class="info">
                   <a
-                    [routerLink]="['/', vm.article.author.username]"
+                    [routerLink]="['/profile', vm.article.author.username]"
                     class="author"
                     >{{ vm.article.author.username }}</a
                   >
@@ -45,9 +45,8 @@ import { SanitizerPipe } from '../pipes/sanitizer.pipe';
                   *ngIf="!vm.isOwner"
                   [favoritesCount]="vm.article.favoritesCount"
                   [author]="vm.article.author"
-                  [articleSlug]="vm.article.slug"
                   (followUser)="followUser($event)"
-                  (favoriteArticle)="favoriteArticle($event)"
+                  (favoriteArticle)="favoriteArticle(vm.article.slug)"
                 >
                 </app-user-actions>
               </div>
@@ -73,7 +72,7 @@ import { SanitizerPipe } from '../pipes/sanitizer.pipe';
 
             <div class="article-actions">
               <div class="article-meta">
-                <a [routerLink]="['/', vm.article.author.username]"
+                <a [routerLink]="['/profile', vm.article.author.username]"
                   ><img
                     [src]="
                       vm.article.author.image
@@ -84,7 +83,7 @@ import { SanitizerPipe } from '../pipes/sanitizer.pipe';
                 /></a>
                 <div class="info">
                   <a
-                    [routerLink]="['/', vm.article.author.username]"
+                    [routerLink]="['/profile', vm.article.author.username]"
                     class="author"
                     >{{ vm.article.author.username }}</a
                   >
@@ -97,9 +96,8 @@ import { SanitizerPipe } from '../pipes/sanitizer.pipe';
                   *ngIf="!vm.isOwner"
                   [favoritesCount]="vm.article.favoritesCount"
                   [author]="vm.article.author"
-                  [articleSlug]="vm.article.slug"
                   (followUser)="followUser($event)"
-                  (favoriteArticle)="favoriteArticle($event)"
+                  (favoriteArticle)="favoriteArticle(vm.article.slug)"
                 >
                 </app-user-actions>
               </div>

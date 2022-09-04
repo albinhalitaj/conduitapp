@@ -22,7 +22,7 @@ import { Author } from '../../home/home.store';
     </button>
     &nbsp;
     <button
-      (click)="favoriteArticle.emit(articleSlug)"
+      (click)="favoriteArticle.emit()"
       class="btn btn-sm btn-outline-primary"
     >
       <i class="ion-heart"></i>
@@ -34,9 +34,8 @@ import { Author } from '../../home/home.store';
 })
 export class UserActionsComponent {
   @Input() favoritesCount!: number;
-  @Input() articleSlug!: string;
   @Input() author!: Author;
 
-  @Output() favoriteArticle = new EventEmitter<string>();
+  @Output() favoriteArticle = new EventEmitter();
   @Output() followUser = new EventEmitter<string>();
 }

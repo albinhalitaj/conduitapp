@@ -67,7 +67,7 @@ import Cookies from 'js-cookie';
                 <a
                   class="nav-link"
                   routerLinkActive="active"
-                  [routerLink]="['/', vm.profile?.username]"
+                  [routerLink]="['/profile', vm.profile?.username]"
                   [routerLinkActiveOptions]="{ exact: true }"
                   >My Articles</a
                 >
@@ -76,7 +76,7 @@ import Cookies from 'js-cookie';
                 <a
                   class="nav-link"
                   routerLinkActive="active"
-                  [routerLink]="['/', vm.profile?.username, 'favorites']"
+                  [routerLink]="['/profile', vm.profile?.username, 'favorites']"
                   [routerLinkActiveOptions]="{ exact: true }"
                   >Favorited Articles</a
                 >

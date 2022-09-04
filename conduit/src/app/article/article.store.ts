@@ -6,10 +6,20 @@ import {
 } from '@ngrx/component-store';
 import { Article } from '../home/home.store';
 import { ActivatedRoute, Params } from '@angular/router';
-import { forkJoin, map, Observable, pipe, switchMap, tap } from 'rxjs';
+import {
+  defer,
+  exhaustMap,
+  forkJoin,
+  map,
+  Observable,
+  pipe,
+  switchMap,
+  tap,
+} from 'rxjs';
 import { HttpErrorResponse } from '@angular/common/http';
 import { AuthStore, User } from '../auth/auth.store';
 import { ApiService, Comment } from '../api.service';
+import { Profile } from '../profile/profile.store';
 
 export interface ArticleState {
   article: Article | null;
@@ -92,6 +102,20 @@ export class ArticleStore
         )
       )
     )
+  );
+
+  favoriteArticle = this.effect<string>(
+    exhaustMap((slug: string) => {
+      return this.apiService.favoriteArticle(slug).pipe(
+        tapResponse(
+          (response: any) => {
+            this.patchState({ article: response.article });
+          },
+          ({ error }: HttpErrorResponse) =>
+            this.patchState({ error: error.title })
+        )
+      );
+    })
   );
 
   constructor(

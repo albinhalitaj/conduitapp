@@ -13,7 +13,7 @@ import { Article } from '../../home/home.store';
     <ng-container *ngIf="articles$ | async as articles; else noArticles">
       <div *ngFor="let article of articles" class="article-preview">
         <div class="article-meta">
-          <a [routerLink]="['/', article.author.username]"
+          <a [routerLink]="['/profile', article.author.username]"
             ><img
               [src]="
                 article.author.image
@@ -23,9 +23,11 @@ import { Article } from '../../home/home.store';
               alt="Avatar"
           /></a>
           <div class="info">
-            <a [routerLink]="['/', article.author.username]" class="author">{{
-              article.author.username
-            }}</a>
+            <a
+              [routerLink]="['/profile', article.author.username]"
+              class="author"
+              >{{ article.author.username }}</a
+            >
             <span class="date">{{ article.createdAt | date: 'longDate' }}</span>
           </div>
           <button class="btn btn-outline-primary btn-sm pull-xs-right">

@@ -131,7 +131,7 @@ public class ArticlesController : ApiController
             : Problem(result.Errors);
     }
 
-    [HttpGet("byFavorite"),Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    [HttpGet("byFavorite")]
     public async Task<IActionResult> GetArticleByFavorite([FromQuery] string author)
     {
         var result = await _articleService.GetArticleByFavorites(author);

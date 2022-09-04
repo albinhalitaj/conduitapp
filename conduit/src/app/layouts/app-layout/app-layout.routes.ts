@@ -63,27 +63,11 @@ export const routes: Routes = [
       import('../../editor/editor.component').then((a) => a.EditorComponent),
   },
   {
-    path: ':username',
+    path: 'profile/:username',
     loadComponent: () =>
       import('../../profile/profile.component').then((r) => r.ProfileComponent),
-    children: [
-      {
-        path: '',
-        providers: [provideArticleType('articles')],
-        loadComponent: () =>
-          import('../../ui/article-list/article-list.component').then(
-            (a) => a.ArticleListComponent
-          ),
-      },
-      {
-        path: 'favorites',
-        providers: [provideArticleType('favorites')],
-        loadComponent: () =>
-          import('../../ui/article-list/article-list.component').then(
-            (a) => a.ArticleListComponent
-          ),
-      },
-    ],
+    loadChildren: () =>
+      import('../../profile/profile.routes').then((r) => r.routes),
   },
   {
     path: '**',
