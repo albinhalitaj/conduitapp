@@ -8,6 +8,7 @@ import Cookies from 'js-cookie';
 import { CommentComponent } from '../ui/comment/comment.component';
 import { CommentFormComponent } from '../ui/comment/comment-form.component';
 import { UserActionsComponent } from '../ui/user-actions/user-actions.component';
+import { SanitizerPipe } from '../pipes/sanitizer.pipe';
 
 @Component({
   selector: 'app-article',
@@ -56,7 +57,7 @@ import { UserActionsComponent } from '../ui/user-actions/user-actions.component'
           <div class="container page">
             <div class="row article-content">
               <div class="col-md-12">
-                <div [innerHTML]="vm.article.body"></div>
+                <div [innerHTML]="vm.article.body | sanitizeHtml"></div>
               </div>
             </div>
 
@@ -135,6 +136,7 @@ import { UserActionsComponent } from '../ui/user-actions/user-actions.component'
     CommentComponent,
     CommentFormComponent,
     UserActionsComponent,
+    SanitizerPipe,
   ],
 })
 export class ArticleComponent {

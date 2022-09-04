@@ -12,7 +12,11 @@ import { AsyncPipe, NgIf } from '@angular/common';
       <a class="navbar-brand" [routerLink]="['/']">conduit</a>
       <ul class="nav navbar-nav pull-xs-right">
         <li class="nav-item">
-          <a [routerLink]="['/']" [routerLinkActive]="'active'" class="nav-link"
+          <a
+            [routerLink]="['/']"
+            [routerLinkActiveOptions]="{ exact: true }"
+            [routerLinkActive]="'active'"
+            class="nav-link"
             >Home</a
           >
         </li>

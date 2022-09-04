@@ -78,56 +78,46 @@ export class ApiService {
   }
 
   login(form: LoginForm): Observable<LoginResponse> {
-    return this.http.post<LoginResponse>(`${this.apiBase}/user/login`, form, {
-      withCredentials: true,
-    });
+    return this.http.post<LoginResponse>(`${this.apiBase}/user/login`, form);
   }
 
   signOut(): Observable<Object> {
-    return this.http.delete(`${this.apiBase}/user`, { withCredentials: true });
+    return this.http.delete(`${this.apiBase}/user`);
   }
 
   addArticle(articleData: ArticleData) {
-    return this.http.post(`${this.apiBase}/articles`, articleData, {
-      withCredentials: true,
-    });
+    return this.http.post(`${this.apiBase}/articles`, articleData);
+  }
+
+  updateArticle(slug: string, articleData: ArticleData) {
+    return this.http.put(`${this.apiBase}/articles/${slug}`, articleData);
   }
 
   getArticle(id: string): Observable<Article> {
     return this.http
-      .get<Article>(`${this.apiBase}/articles/${id}`, { withCredentials: true })
+      .get<Article>(`${this.apiBase}/articles/${id}`)
       .pipe(map((response: any) => response.article));
   }
 
   getArticles(): Observable<Article[]> {
-    return this.http
-      .get(`${this.apiBase}/articles`, {
-        withCredentials: true,
+    return this.http.get(`${this.apiBase}/articles`).pipe(
+      map((response: any) => {
+        return response.articles;
       })
-      .pipe(
-        map((response: any) => {
-          return response.articles;
-        })
-      );
+    );
   }
 
   getTags(): Observable<string[]> {
-    return this.http
-      .get<string[]>(`${this.apiBase}/tags`, {
-        withCredentials: true,
+    return this.http.get<string[]>(`${this.apiBase}/tags`).pipe(
+      map((response: any) => {
+        return response.tags;
       })
-      .pipe(
-        map((response: any) => {
-          return response.tags;
-        })
-      );
+    );
   }
 
   getArticlesByTag(tag: string): Observable<Article[]> {
     return this.http
-      .get<Article[]>(`${this.apiBase}/articles/byTag?tag=${tag}`, {
-        withCredentials: true,
-      })
+      .get<Article[]>(`${this.apiBase}/articles/byTag?tag=${tag}`)
       .pipe(
         map((response: any) => {
           return response.articles;
@@ -137,12 +127,7 @@ export class ApiService {
 
   getFavorited(username: string): Observable<Article[]> {
     return this.http
-      .get<Article[]>(
-        `${this.apiBase}/articles/byFavorite?author=${username}`,
-        {
-          withCredentials: true,
-        }
-      )
+      .get<Article[]>(`${this.apiBase}/articles/byFavorite?author=${username}`)
       .pipe(
         map((response: any) => {
           return response.articles;
@@ -152,73 +137,55 @@ export class ApiService {
 
   getFeed(): Observable<Article[]> {
     return this.http
-      .get<Article[]>(`${this.apiBase}/articles/feed`, {
-        withCredentials: true,
-      })
+      .get<Article[]>(`${this.apiBase}/articles/feed`)
       .pipe(map((response: any) => response.articles));
   }
 
   comments(articleId: string): Observable<Comment[]> {
     return this.http
-      .get<Comment[]>(`${this.apiBase}/articles/${articleId}/comments`, {
-        withCredentials: true,
-      })
+      .get<Comment[]>(`${this.apiBase}/articles/${articleId}/comments`)
       .pipe(map((response: any) => response.comments as Comment[]));
   }
 
   addComment(slug: string, body: string) {
     return this.http
-      .post(`${this.apiBase}/articles/${slug}/comments`, body, {
-        withCredentials: true,
-      })
+      .post(`${this.apiBase}/articles/${slug}/comments`, body)
       .pipe(map((response: any) => response.comment));
   }
 
   getProfile(username: string) {
     return this.http
-      .get<Profile>(`${this.apiBase}/profiles/${username}`, {
-        withCredentials: true,
-      })
+      .get<Profile>(`${this.apiBase}/profiles/${username}`)
       .pipe(map((response: any) => response.profile));
   }
 
   getArticlesByAuthor(username: string) {
     return this.http
-      .get<Article[]>(`${this.apiBase}/articles/byAuthor?author=${username}`, {
-        withCredentials: true,
-      })
+      .get<Article[]>(`${this.apiBase}/articles/byAuthor?author=${username}`)
       .pipe(map((response: any) => response.articles));
   }
 
   followUser(username: string): Observable<Profile> {
     return this.http
-      .post<Profile>(
-        `${this.apiBase}/profiles/${username}/follow`,
-        {},
-        { withCredentials: true }
-      )
+      .post<Profile>(`${this.apiBase}/profiles/${username}/follow`, {})
       .pipe(map((response: any) => response.profile));
   }
 
   unFollowUser(username: string): Observable<Profile> {
     return this.http
-      .delete<Profile>(`${this.apiBase}/profiles/${username}/follow`, {
-        withCredentials: true,
-      })
+      .delete<Profile>(`${this.apiBase}/profiles/${username}/follow`)
       .pipe(map((response: any) => response.profile));
   }
 
   updateUser(user: UpdateUserForm): Observable<UpdatedUser> {
     return this.http
-      .put(`${this.apiBase}/user`, user, {
-        withCredentials: true,
-      })
+      .put(`${this.apiBase}/user`, user)
       .pipe(map((response: any) => response.user));
   }
 
   get(): Observable<User> {
     return this.http
-      .get(`${this.apiBase}/user`, { withCredentials: true })
+      .get(`${this.apiBase}/user`)
       .pipe(map((response: any) => response.user));
   }
 }

@@ -1,5 +1,7 @@
-import { Routes, UrlSegment } from '@angular/router';
+import { Routes } from '@angular/router';
 import { InjectionToken, Provider } from '@angular/core';
+import { AuthGuard } from '../../guards/auth.guard';
+import { NonAuthGuard } from '../../guards/nonauth.guard';
 
 export const articleType = new InjectionToken<string>('Article Type');
 
@@ -18,30 +20,49 @@ export const routes: Routes = [
   },
   {
     path: 'login',
+    canLoad: [NonAuthGuard],
+    canActivate: [NonAuthGuard],
     loadComponent: () =>
       import('../../auth/login/login.component').then((l) => l.LoginComponent),
   },
   {
     path: 'register',
+    canLoad: [NonAuthGuard],
+    canActivate: [NonAuthGuard],
     loadComponent: () =>
       import('../../auth/register/register.component').then(
         (r) => r.RegisterComponent
       ),
   },
   {
-    /*
-        matcher: (url: UrlSegment[]) => {
-          if (url.length >= 1 && url[0].path[0] == '@') {
-            return {
-              consumed: url,
-              posParams: {
-                username: new UrlSegment(url[0].path.substring(1), {}),
-              },
-            };
-          }
-          return null;
-        },
-    */
+    path: 'settings',
+    canLoad: [AuthGuard],
+    canActivate: [AuthGuard],
+    loadComponent: () =>
+      import('../../settings/settings.component').then(
+        (r) => r.SettingsComponent
+      ),
+  },
+  {
+    path: 'article/:slug',
+    loadComponent: () =>
+      import('../../article/article.component').then((a) => a.ArticleComponent),
+  },
+  {
+    path: 'editor',
+    canLoad: [AuthGuard],
+    canActivate: [AuthGuard],
+    loadComponent: () =>
+      import('../../editor/editor.component').then((a) => a.EditorComponent),
+  },
+  {
+    path: 'editor/:slug',
+    canLoad: [AuthGuard],
+    canActivate: [AuthGuard],
+    loadComponent: () =>
+      import('../../editor/editor.component').then((a) => a.EditorComponent),
+  },
+  {
     path: ':username',
     loadComponent: () =>
       import('../../profile/profile.component').then((r) => r.ProfileComponent),
@@ -65,20 +86,8 @@ export const routes: Routes = [
     ],
   },
   {
-    path: 'settings',
-    loadComponent: () =>
-      import('../../settings/settings.component').then(
-        (r) => r.SettingsComponent
-      ),
-  },
-  {
-    path: 'article/:slug',
-    loadComponent: () =>
-      import('../../article/article.component').then((a) => a.ArticleComponent),
-  },
-  {
-    path: 'editor',
-    loadComponent: () =>
-      import('../../editor/editor.component').then((a) => a.EditorComponent),
+    path: '**',
+    redirectTo: '',
+    pathMatch: 'full',
   },
 ];
