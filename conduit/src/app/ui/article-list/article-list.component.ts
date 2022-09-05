@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { RouterLinkWithHref } from '@angular/router';
-import { AsyncPipe, DatePipe, NgForOf, NgIf } from '@angular/common';
+import { AsyncPipe, DatePipe, NgClass, NgForOf, NgIf } from '@angular/common';
 import { Observable } from 'rxjs';
 import { provideComponentStore } from '@ngrx/component-store';
 import { ArticleListStore } from './article-list.store';
@@ -30,7 +30,13 @@ import { Article } from '../../home/home.store';
             >
             <span class="date">{{ article.createdAt | date: 'longDate' }}</span>
           </div>
-          <button class="btn btn-outline-primary btn-sm pull-xs-right">
+          <button
+            [ngClass]="{
+              'btn-outline-primary': !article.isFavorited,
+              'btn-primary': article.isFavorited
+            }"
+            class="btn btn-sm pull-xs-right"
+          >
             <i class="ion-heart"></i> {{ article.favoritesCount }}
           </button>
         </div>
@@ -48,7 +54,7 @@ import { Article } from '../../home/home.store';
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [provideComponentStore(ArticleListStore)],
-  imports: [RouterLinkWithHref, NgForOf, DatePipe, NgIf, AsyncPipe],
+  imports: [RouterLinkWithHref, NgForOf, DatePipe, NgIf, AsyncPipe, NgClass],
 })
 export class ArticleListComponent {
   articles$: Observable<Article[]> = this.store.articles$;

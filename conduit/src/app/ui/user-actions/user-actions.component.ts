@@ -6,6 +6,7 @@ import {
   Output,
 } from '@angular/core';
 import { Author } from '../../home/home.store';
+import { NgClass } from '@angular/common';
 
 @Component({
   selector: 'app-user-actions',
@@ -13,7 +14,11 @@ import { Author } from '../../home/home.store';
   template: `
     <button
       (click)="followUser.emit(author.username)"
-      class="btn btn-sm btn-outline-secondary"
+      [ngClass]="{
+        'btn-outline-secondary': !author.following,
+        'btn-secondary': author.following
+      }"
+      class="btn btn-sm"
     >
       <i class="ion-plus-round"></i>
       &nbsp;
@@ -23,17 +28,23 @@ import { Author } from '../../home/home.store';
     &nbsp;
     <button
       (click)="favoriteArticle.emit()"
-      class="btn btn-sm btn-outline-primary"
+      [ngClass]="{
+        'btn-outline-primary': !isFavorited,
+        'btn-primary': isFavorited
+      }"
+      class="btn btn-sm"
     >
       <i class="ion-heart"></i>
-      &nbsp; Favorite Post
+      &nbsp; {{ isFavorited ? 'Unfavorite article' : 'Favorite article' }}
       <span class="counter">({{ favoritesCount }})</span>
     </button>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [NgClass],
 })
 export class UserActionsComponent {
   @Input() favoritesCount!: number;
+  @Input() isFavorited!: boolean;
   @Input() author!: Author;
 
   @Output() favoriteArticle = new EventEmitter();

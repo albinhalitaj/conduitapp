@@ -4,7 +4,7 @@ import {
   OnStateInit,
   tapResponse,
 } from '@ngrx/component-store';
-import { exhaustMap, map, Observable, pipe, switchMap, tap } from 'rxjs';
+import { exhaustMap, Observable, pipe, switchMap, tap } from 'rxjs';
 import { AuthStore } from '../auth/auth.store';
 import { ApiService } from '../api.service';
 import Cookies from 'js-cookie';
@@ -23,6 +23,7 @@ export interface Article {
   body: string;
   createdAt: string;
   updatedAt: string;
+  isFavorited: boolean;
   favoritesCount: number;
   tags: string[];
   author: Author;

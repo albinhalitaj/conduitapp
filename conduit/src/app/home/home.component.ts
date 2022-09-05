@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { HomeStore, HomeVm } from './home.store';
 import { provideComponentStore } from '@ngrx/component-store';
 import { Observable } from 'rxjs';
-import { AsyncPipe, DatePipe, NgForOf, NgIf } from '@angular/common';
+import { AsyncPipe, DatePipe, NgClass, NgForOf, NgIf } from '@angular/common';
 import { RouterLinkWithHref } from '@angular/router';
 import Cookies from 'js-cookie';
 
@@ -74,7 +74,11 @@ import Cookies from 'js-cookie';
                         }}</span>
                       </div>
                       <button
-                        class="btn btn-outline-primary btn-sm pull-xs-right"
+                        [ngClass]="{
+                          'btn-primary': article.isFavorited,
+                          'btn-outline-primary': !article.isFavorited
+                        }"
+                        class="btn btn-sm pull-xs-right"
                       >
                         <i class="ion-heart"></i> {{ article.favoritesCount }}
                       </button>
@@ -135,7 +139,7 @@ import Cookies from 'js-cookie';
   `,
   providers: [provideComponentStore(HomeStore)],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [NgIf, AsyncPipe, NgForOf, RouterLinkWithHref, DatePipe],
+  imports: [NgIf, AsyncPipe, NgForOf, RouterLinkWithHref, DatePipe, NgClass],
   styles: [
     `
       .tag-default:hover {

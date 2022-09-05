@@ -104,11 +104,7 @@ export class ApiService {
   }
 
   getArticles(): Observable<Article[]> {
-    return this.http.get(`${this.apiBase}/articles`).pipe(
-      map((response: any) => {
-        return response.articles;
-      })
-    );
+    return this.http.get<Article[]>(`${this.apiBase}/articles`);
   }
 
   getTags(): Observable<string[]> {
@@ -132,11 +128,7 @@ export class ApiService {
   getFavorited(username: string): Observable<Article[]> {
     return this.http
       .get<Article[]>(`${this.apiBase}/articles/byFavorite?author=${username}`)
-      .pipe(
-        map((response: any) => {
-          return response.articles;
-        })
-      );
+      .pipe(map((response: any) => response.articles));
   }
 
   getFeed(): Observable<Article[]> {

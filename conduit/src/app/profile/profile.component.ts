@@ -83,7 +83,6 @@ import Cookies from 'js-cookie';
               </li>
             </ul>
           </div>
-
           <router-outlet></router-outlet>
         </div>
       </div>

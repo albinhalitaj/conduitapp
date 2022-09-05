@@ -8,7 +8,7 @@ import { articleType } from '../../layouts/app-layout/app-layout.routes';
 import { Article } from '../../home/home.store';
 import { defer, map, switchMap } from 'rxjs';
 import { ApiService } from '../../api.service';
-import { ActivatedRoute, Params } from '@angular/router';
+import { ActivatedRoute, Data, ParamMap, Params } from '@angular/router';
 
 interface ArticleListState {
   articles: Article[];
@@ -31,7 +31,7 @@ export class ArticleListStore
         map((param: Params) => param['username']),
         switchMap((username: string) =>
           defer(() => {
-            if (type == 'articles') {
+            if (type === 'articles') {
               return this.apiService.getArticlesByAuthor(username);
             }
             return this.apiService.getFavorited(username);

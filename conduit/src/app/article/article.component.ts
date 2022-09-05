@@ -44,6 +44,7 @@ import { SanitizerPipe } from '../pipes/sanitizer.pipe';
                 <app-user-actions
                   *ngIf="!vm.isOwner"
                   [favoritesCount]="vm.article.favoritesCount"
+                  [isFavorited]="vm.article.isFavorited"
                   [author]="vm.article.author"
                   (followUser)="followUser($event)"
                   (favoriteArticle)="favoriteArticle(vm.article.slug)"
@@ -95,6 +96,7 @@ import { SanitizerPipe } from '../pipes/sanitizer.pipe';
                 <app-user-actions
                   *ngIf="!vm.isOwner"
                   [favoritesCount]="vm.article.favoritesCount"
+                  [isFavorited]="vm.article.isFavorited"
                   [author]="vm.article.author"
                   (followUser)="followUser($event)"
                   (favoriteArticle)="favoriteArticle(vm.article.slug)"

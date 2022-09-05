@@ -27,7 +27,10 @@ export class App implements OnInit {
     bootstrapApplication(this, {
       providers: [
         importProvidersFrom(
-          RouterModule.forRoot(routes, { useHash: true }),
+          RouterModule.forRoot(routes, {
+            useHash: true,
+            paramsInheritanceStrategy: 'always',
+          }),
           HttpClientModule
         ),
         {

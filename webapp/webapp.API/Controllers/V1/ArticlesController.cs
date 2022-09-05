@@ -23,13 +23,7 @@ public class ArticlesController : ApiController
     public async Task<IActionResult> GetArticles([FromQuery] QueryParams queryParams)
     {
         var result = await _articleService.GetAllArticlesAsync(queryParams);
-        return !result.Success
-            ? Problem(result.Errors)
-            : Ok(new
-            {
-                Articles = result.Value,
-                ArticlesCount = result.Value!.Any() ? result.Value!.Count : 0
-            });
+        return !result.Success ? Problem(result.Errors) : Ok(result.Value);
     }
 
     [HttpGet("{slug}")]
@@ -135,14 +129,12 @@ public class ArticlesController : ApiController
     public async Task<IActionResult> GetArticleByFavorite([FromQuery] string author)
     {
         var result = await _articleService.GetArticleByFavorites(author);
-        return !result.Success ? Problem(result.Errors) :
-            result.Value!.Count > 1 ? Ok(new
+        return !result.Success
+            ? Problem(result.Errors)
+            : Ok(new
             {
                 Articles = result.Value,
                 ArticlesCount = result.Value!.Count
-            }) : Ok(new
-            {
-                Article = result.Value.FirstOrDefault()
             });
     }
 

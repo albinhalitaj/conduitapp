@@ -19,8 +19,8 @@ public class CurrentUserService : ICurrentUserService
                 return _httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.Name);
             }
 
-            var token = _httpContextAccessor.HttpContext?.Request.Cookies["token"] ?? "";
-            return DecodeJwt(token);
+            var token = _httpContextAccessor.HttpContext?.Request.Cookies["token"];
+            return token is null ? null : DecodeJwt(token);
         }
     }
 
