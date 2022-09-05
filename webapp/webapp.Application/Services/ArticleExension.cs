@@ -7,17 +7,24 @@ public static class ArticleExtension
 {
     public static IEnumerable<Article> MapIsFollowing(this List<Article> source, IAppDbContext db, string userId)
     {
-        var isUserFollowing = db.UserFollowers.Where(x =>
+        var userFollowers = db.UserFollowers.Where(x =>
             x.FollowerId == userId).Select(x => x.UserId).ToList();
+        
+        var userFavorites = db.UserFavorites.Where(x => x.UserId == userId).ToList();
 
-        foreach (var follower in isUserFollowing)
+        foreach (var article in source)
         {
-            foreach (var article in source)
+            foreach (var userFollower in userFollowers)
             {
-                article.IsFollowing = follower == article.AuthorId;
+                article.IsFollowing = userFollower == article.AuthorId;
+            }
+
+            foreach (var userFavorite in userFavorites)
+            {
+                article.IsFavorited = userFavorite.ArticleId == article.ArticleId;
             }
         }
-
+        
         return source;
     }
 }

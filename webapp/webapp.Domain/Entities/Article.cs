@@ -21,6 +21,7 @@ public class Article
     public DateTimeOffset UpdatedAt { get; set; }
     public int FavoritesCount { get; set; }
     [NotMapped] public bool IsFollowing { get; set; }
+    [NotMapped] public bool IsFavorited { get; set; }
     [NotMapped] public string?[]? TagsArray { get; set; }
     public ICollection<Comment>? Comments { get; set; }
     public string? AuthorId { get; set; }

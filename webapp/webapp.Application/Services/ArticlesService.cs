@@ -223,8 +223,8 @@ public class ArticlesService : IArticleService
                         article.IsFollowing)
                 })
                 .Select(t => new ArticleResponse(t.article.Slug, t.article.Title, t.article.Description,
-                    Markdown.ToHtml(t.article.Body ?? "",pipeline), t.article.CreatedAt, t.article.UpdatedAt, t.article.FavoritesCount,
-                    t.article.TagsArray, t.author)).ToList();
+                    Markdown.ToHtml(t.article.Body ?? "",pipeline), t.article.CreatedAt, t.article.UpdatedAt, t.article.IsFavorited,
+                    t.article.FavoritesCount, t.article.TagsArray, t.author)).ToList();
     }
 
     private async Task<List<Article>> GetArticlesByAuthorOrSlug(ArticleType type, string value,

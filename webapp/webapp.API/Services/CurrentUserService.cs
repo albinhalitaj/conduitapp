@@ -1,7 +1,6 @@
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using Newtonsoft.Json;
 using webapp.Application.Interfaces;
-using webapp.Contracts.Users;
 
 namespace webapp.API.Services;
 
@@ -9,6 +8,7 @@ public class CurrentUserService : ICurrentUserService
 {
     private readonly IHttpContextAccessor _httpContextAccessor;
     public CurrentUserService(IHttpContextAccessor httpContextAccessor) => _httpContextAccessor = httpContextAccessor;
+
     public string? UserId
     {
         get
@@ -18,9 +18,19 @@ public class CurrentUserService : ICurrentUserService
             {
                 return _httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.Name);
             }
-            var userCookie = _httpContextAccessor.HttpContext?.Request.Cookies["user"];
-            var user = JsonConvert.DeserializeObject<User>(userCookie ?? "");
-            return user?.Id;
+
+            var token = _httpContextAccessor.HttpContext?.Request.Cookies["token"] ?? "";
+            return DecodeJwt(token);
         }
     }
+
+    private static string DecodeJwt(string jwt)
+    {
+        var handler = new JwtSecurityTokenHandler();
+
+        var jwtSecurityToken = handler.ReadJwtToken(jwt);
+        var claims = jwtSecurityToken.Claims.ToList();
+        return claims[1].Value;
+    }
+
 }
