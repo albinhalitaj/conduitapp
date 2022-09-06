@@ -7,6 +7,7 @@ import {
 } from '@angular/core';
 import { Comment } from '../../api.service';
 import { DatePipe, NgForOf, NgIf } from '@angular/common';
+import { RouterLinkWithHref } from '@angular/router';
 
 @Component({
   selector: 'app-comment',
@@ -19,7 +20,10 @@ import { DatePipe, NgForOf, NgIf } from '@angular/common';
         </p>
       </div>
       <div class="card-footer">
-        <a class="comment-author">
+        <a
+          class="comment-author"
+          [routerLink]="['/profile', comment.author.username]"
+        >
           <img
             [src]="
               !comment.author.image
@@ -31,7 +35,11 @@ import { DatePipe, NgForOf, NgIf } from '@angular/common';
           />
         </a>
         &nbsp;
-        <a href="" class="comment-author">{{ comment.author.username }}</a>
+        <a
+          [routerLink]="['/profile', comment.author.username]"
+          class="comment-author"
+          >{{ comment.author.username }}</a
+        >
         <span class="date-posted">{{
           comment.createdAt | date: 'longDate'
         }}</span>
@@ -43,7 +51,7 @@ import { DatePipe, NgForOf, NgIf } from '@angular/common';
     </div>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [NgForOf, NgIf, DatePipe],
+  imports: [NgForOf, NgIf, DatePipe, RouterLinkWithHref],
 })
 export class CommentComponent {
   @Input() comments!: Comment[];

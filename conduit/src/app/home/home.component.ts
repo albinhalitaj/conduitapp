@@ -1,10 +1,12 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { HomeStore, HomeVm } from './home.store';
+import { Article, HomeStore, HomeVm } from './home.store';
 import { provideComponentStore } from '@ngrx/component-store';
 import { Observable } from 'rxjs';
 import { AsyncPipe, DatePipe, NgClass, NgForOf, NgIf } from '@angular/common';
-import { RouterLinkWithHref } from '@angular/router';
+import { Router, RouterLinkWithHref } from '@angular/router';
 import Cookies from 'js-cookie';
+import { SingleArticleComponent } from '../ui/article-list/article/single-article.component';
+import { AuthStore } from '../auth/auth.store';
 
 @Component({
   selector: 'app-home',
@@ -48,63 +50,11 @@ import Cookies from 'js-cookie';
                 </ul>
               </div>
               <ng-container *ngIf="!vm.isLoading; else loading">
-                <ng-container *ngIf="vm.articles.length; else noArticles">
-                  <div
-                    *ngFor="let article of vm.articles"
-                    class="article-preview"
-                  >
-                    <div class="article-meta">
-                      <a [routerLink]="['/profile', article.author.username]"
-                        ><img
-                          [src]="
-                            article.author.image
-                              ? article.author.image
-                              : 'https://api.realworld.io/images/smiley-cyrus.jpeg'
-                          "
-                          alt="Avatar"
-                      /></a>
-                      <div class="info">
-                        <a
-                          [routerLink]="['/profile', article.author.username]"
-                          class="author"
-                          >{{ article.author.username }}</a
-                        >
-                        <span class="date">{{
-                          article.createdAt | date: 'longDate'
-                        }}</span>
-                      </div>
-                      <button
-                        [ngClass]="{
-                          'btn-primary': article.isFavorited,
-                          'btn-outline-primary': !article.isFavorited
-                        }"
-                        class="btn btn-sm pull-xs-right"
-                      >
-                        <i class="ion-heart"></i> {{ article.favoritesCount }}
-                      </button>
-                    </div>
-                    <a
-                      [routerLink]="['/article/', article.slug]"
-                      class="preview-link"
-                    >
-                      <h1>{{ article.title }}</h1>
-                      <p>{{ article.description }}</p>
-                      <span>Read more...</span>
-                      <ul *ngIf="article.tags.length > 0" class="tag-list">
-                        <li
-                          *ngFor="let tag of article.tags"
-                          class="tag-default tag-pill tag-outline"
-                        >
-                          {{ tag }}
-                        </li>
-                      </ul>
-                    </a>
-                  </div>
-                </ng-container>
+                <app-article
+                  [articles]="vm.articles"
+                  (toggleFavorite)="toggleFavorite($event)"
+                ></app-article>
               </ng-container>
-              <ng-template #noArticles>
-                <div class="article-preview">No articles are here... yet.</div>
-              </ng-template>
               <ng-template #loading>
                 <div class="article-preview">Loading...</div>
               </ng-template>
@@ -139,7 +89,15 @@ import Cookies from 'js-cookie';
   `,
   providers: [provideComponentStore(HomeStore)],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [NgIf, AsyncPipe, NgForOf, RouterLinkWithHref, DatePipe, NgClass],
+  imports: [
+    NgIf,
+    AsyncPipe,
+    NgForOf,
+    RouterLinkWithHref,
+    DatePipe,
+    NgClass,
+    SingleArticleComponent,
+  ],
   styles: [
     `
       .tag-default:hover {
@@ -160,7 +118,11 @@ export class HomeComponent {
   isFeedActive: boolean = false;
   getByTags: boolean = false;
 
-  constructor(private store: HomeStore) {
+  constructor(
+    private store: HomeStore,
+    private authStore: AuthStore,
+    private router: Router
+  ) {
     const user = Cookies.get('user');
     if (!user) {
       this.isGlobalActive = true;
@@ -189,5 +151,13 @@ export class HomeComponent {
     this.isGlobalActive = true;
     this.getByTags = false;
     this.store.getArticles();
+  }
+
+  toggleFavorite(article: Article) {
+    if (!this.authStore.isAuthenticated) {
+      void this.router.navigate(['/login']);
+    } else {
+      console.log('favorite', article.slug);
+    }
   }
 }

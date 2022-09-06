@@ -4,11 +4,11 @@ import { ArticleStore, ArticleVm } from './article.store';
 import { Observable } from 'rxjs';
 import { AsyncPipe, DatePipe, NgForOf, NgIf } from '@angular/common';
 import { Router, RouterLinkWithHref } from '@angular/router';
-import Cookies from 'js-cookie';
 import { CommentComponent } from '../ui/comment/comment.component';
 import { CommentFormComponent } from '../ui/comment/comment-form.component';
 import { UserActionsComponent } from '../ui/user-actions/user-actions.component';
 import { SanitizerPipe } from '../pipes/sanitizer.pipe';
+import { AuthStore } from '../auth/auth.store';
 
 @Component({
   selector: 'app-article',
@@ -142,15 +142,15 @@ import { SanitizerPipe } from '../pipes/sanitizer.pipe';
 })
 export class ArticleComponent {
   readonly vm$: Observable<ArticleVm> = this.store.vm$;
-  isAuthenticated: boolean;
 
-  constructor(private router: Router, private store: ArticleStore) {
-    const user = Cookies.get('user');
-    this.isAuthenticated = !!user;
-  }
+  constructor(
+    private authStore: AuthStore,
+    private router: Router,
+    private store: ArticleStore
+  ) {}
 
   followUser(username: string) {
-    if (!this.isAuthenticated) {
+    if (!this.authStore.isAuthenticated) {
       void this.router.navigate(['/login']);
     } else {
       console.log('Following ', username);
@@ -158,7 +158,7 @@ export class ArticleComponent {
   }
 
   favoriteArticle(slug: string) {
-    if (!this.isAuthenticated) {
+    if (!this.authStore.isAuthenticated) {
       void this.router.navigate(['/login']);
     } else {
       console.log('Favorite ', slug);

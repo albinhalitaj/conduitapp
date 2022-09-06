@@ -76,7 +76,9 @@ export class ArticleListStore
               return {
                 ...state,
                 loading: false,
-                articles: [...articles, updatedArticle],
+                articles: updatedArticle.isFavorited
+                  ? [...articles, updatedArticle]
+                  : articles.filter((s) => s.slug !== updatedArticle.slug),
               };
             });
           },
