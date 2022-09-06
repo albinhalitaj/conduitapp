@@ -6,16 +6,18 @@ import {
 } from '@ngrx/component-store';
 import { articleType } from '../../layouts/app-layout/app-layout.routes';
 import { Article } from '../../home/home.store';
-import { defer, map, switchMap } from 'rxjs';
+import { defer, exhaustMap, map, Observable, switchMap, tap } from 'rxjs';
 import { ApiService } from '../../api.service';
-import { ActivatedRoute, Data, ParamMap, Params } from '@angular/router';
+import { ActivatedRoute, Params } from '@angular/router';
 
-interface ArticleListState {
+export interface ArticleListState {
   articles: Article[];
+  loading: boolean;
 }
 
 const initialState: ArticleListState = {
   articles: [],
+  loading: false,
 };
 
 @Injectable()
@@ -24,11 +26,20 @@ export class ArticleListStore
   implements OnStateInit
 {
   articles$ = this.select((s) => s.articles);
+  loading$ = this.select((s) => s.loading);
+
+  vm$: Observable<ArticleListState> = this.select(
+    this.articles$,
+    this.loading$,
+    (articles, loading) => ({ articles, loading }),
+    { debounce: true }
+  );
 
   getArticles = this.effect<string>(
     switchMap((type: string) =>
       this.activatedRoute.params.pipe(
         map((param: Params) => param['username']),
+        tap(() => this.patchState({ loading: true })),
         switchMap((username: string) =>
           defer(() => {
             if (type === 'articles') {
@@ -38,11 +49,38 @@ export class ArticleListStore
           }).pipe(
             tapResponse(
               (articles: Article[]) => {
-                this.setState({ articles });
+                this.setState({ articles, loading: false });
               },
               (error) => console.log(error)
             )
           )
+        )
+      )
+    )
+  );
+
+  toggleFavorite = this.effect<Article>(
+    exhaustMap((article: Article) =>
+      defer(() => {
+        if (article.isFavorited) {
+          return this.apiService.unFavoriteArticle(article.slug);
+        }
+        return this.apiService.favoriteArticle(article.slug);
+      }).pipe(
+        tapResponse(
+          (updatedArticle: Article) => {
+            this.setState((state: ArticleListState) => {
+              const articles = state.articles.filter(
+                (s) => s.slug !== article.slug
+              );
+              return {
+                ...state,
+                loading: false,
+                articles: [...articles, updatedArticle],
+              };
+            });
+          },
+          (error) => console.log(error)
         )
       )
     )

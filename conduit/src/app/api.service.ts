@@ -46,7 +46,7 @@ export interface ArticleData {
 }
 
 export interface Comment {
-  commentId: string;
+  id: string;
   createdAt: string;
   updatedAt: string;
   body: string;
@@ -94,7 +94,15 @@ export class ApiService {
   }
 
   favoriteArticle(slug: string) {
-    return this.http.post(`${this.apiBase}/articles/${slug}/favorite`, {});
+    return this.http
+      .post(`${this.apiBase}/articles/${slug}/favorite`, {})
+      .pipe(map((response: any) => response.article));
+  }
+
+  unFavoriteArticle(slug: string) {
+    return this.http
+      .delete(`${this.apiBase}/articles/${slug}/favorite`, {})
+      .pipe(map((response: any) => response.article));
   }
 
   getArticle(id: string): Observable<Article> {
@@ -147,6 +155,12 @@ export class ApiService {
     return this.http
       .post(`${this.apiBase}/articles/${slug}/comments`, body)
       .pipe(map((response: any) => response.comment));
+  }
+
+  deleteComment(commentId: string, slug: string) {
+    return this.http.delete(
+      `${this.apiBase}/articles/${slug}/comments/${commentId}`
+    );
   }
 
   getProfile(username: string) {

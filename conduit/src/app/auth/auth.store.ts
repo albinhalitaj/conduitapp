@@ -39,6 +39,9 @@ export class AuthStore extends ComponentStore<AuthState> {
   isAuthenticated$: Observable<boolean> = this.select(
     (s: AuthState) => s.isAuthenticated
   );
+
+  isAuthenticated!: boolean;
+
   user$: Observable<User | null> = this.select((s: AuthState) => s.user);
   signOut = this.effect<void>(
     exhaustMap(() =>
@@ -80,6 +83,11 @@ export class AuthStore extends ComponentStore<AuthState> {
 
   constructor(private router: Router, private apiService: ApiService) {
     super(initialState);
+    const user = Cookies.get('user');
+    if (!user) {
+      this.isAuthenticated = false;
+    }
+    this.isAuthenticated = true;
   }
 
   init() {

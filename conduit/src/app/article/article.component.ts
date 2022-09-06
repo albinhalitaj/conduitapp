@@ -117,6 +117,7 @@ import { SanitizerPipe } from '../pipes/sanitizer.pipe';
                 <app-comment
                   [comments]="vm.comments"
                   [username]="vm.user?.username"
+                  (deleteComment)="deleteComment($event, vm.article.slug)"
                 ></app-comment>
               </div>
             </div>
@@ -166,5 +167,9 @@ export class ArticleComponent {
 
   postComment(body: string) {
     this.store.postComment(body);
+  }
+
+  deleteComment(commentId: string, slug: string) {
+    this.store.deleteComment({ commentId, slug });
   }
 }

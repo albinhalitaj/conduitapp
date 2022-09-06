@@ -100,8 +100,8 @@ public class ArticlesService : IArticleService
                         ArticleId = article.ArticleId,
                         UserId = _currentUserService.UserId
                     };
-                    await _ctx.UserFavorites.AddAsync(userFavorite);
-                    article.FavoritesCount++;
+                    await _ctx.UserFavorites.AddAsync(userFavorite); 
+                    ++article.FavoritesCount;
                     var res = await _ctx.SaveChangesAsync();
                     if (res > 0)
                     {
@@ -140,7 +140,7 @@ public class ArticlesService : IArticleService
                 if (userFavoriteArticle != null)
                 {
                     _ctx.UserFavorites.Remove(userFavoriteArticle);
-                    article.FavoritesCount = article.FavoritesCount > 0 ? article.FavoritesCount-- : 0;
+                    article.FavoritesCount = article.FavoritesCount > 0 ? article.FavoritesCount - 1 : 0;
                     await _ctx.SaveChangesAsync();
                 }
                 else
@@ -159,6 +159,8 @@ public class ArticlesService : IArticleService
             result.Errors = new List<ErrorDto> { new() { Message = e.Message } };
         }
 
+        var updated = await GetArticleByTypeAsync(ArticleType.Slug, slug, null);
+        result.Value = updated.FirstOrDefault();
         return result;
     }
 
@@ -194,12 +196,13 @@ public class ArticlesService : IArticleService
         // ReSharper disable once InvertIf
         if (type == ArticleType.AuthorFavorites)
         {
-            var user = await _ctx.Users.AnyAsync(x => x.UserName == value);
-            if (user)
+            var user = await _ctx.Users.Where(x => x.UserName == value)
+                .Select(x => x.Id).FirstOrDefaultAsync();
+            if (user is not null)
             {
                 articles = await _ctx.UserFavorites
                     .AsSplitQuery()
-                    .Where(x => x.UserId == x.User!.Id)
+                    .Where(x => x.UserId == user)
                     .ProjectToType<Article>()
                     .OrderByDescending(x => x.CreatedAt)
                     .ToListAsync();

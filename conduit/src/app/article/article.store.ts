@@ -7,7 +7,6 @@ import {
 import { Article } from '../home/home.store';
 import { ActivatedRoute, Params } from '@angular/router';
 import {
-  defer,
   exhaustMap,
   forkJoin,
   map,
@@ -19,7 +18,6 @@ import {
 import { HttpErrorResponse } from '@angular/common/http';
 import { AuthStore, User } from '../auth/auth.store';
 import { ApiService, Comment } from '../api.service';
-import { Profile } from '../profile/profile.store';
 
 export interface ArticleState {
   article: Article | null;
@@ -94,7 +92,12 @@ export class ArticleStore
           this.apiService.addComment(slug, body).pipe(
             tapResponse(
               (comment) => {
-                this.patchState({ comments: Array.from(comment) });
+                this.patchState((state) => {
+                  return {
+                    ...state,
+                    comments: [...state.comments, comment],
+                  };
+                });
               },
               (error) => console.log(error)
             )
@@ -113,6 +116,24 @@ export class ArticleStore
           },
           ({ error }: HttpErrorResponse) =>
             this.patchState({ error: error.title })
+        )
+      );
+    })
+  );
+
+  deleteComment = this.effect<{ commentId: string; slug: string }>(
+    exhaustMap(({ commentId, slug }) => {
+      return this.apiService.deleteComment(commentId, slug).pipe(
+        tapResponse(
+          () => {
+            this.patchState((state) => {
+              return {
+                ...state,
+                comments: state.comments.filter((c) => c.id !== commentId),
+              };
+            });
+          },
+          (error) => console.log(error)
         )
       );
     })

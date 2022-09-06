@@ -1,4 +1,10 @@
-import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  EventEmitter,
+  Input,
+  Output,
+} from '@angular/core';
 import { Comment } from '../../api.service';
 import { DatePipe, NgForOf, NgIf } from '@angular/common';
 
@@ -30,8 +36,8 @@ import { DatePipe, NgForOf, NgIf } from '@angular/common';
           comment.createdAt | date: 'longDate'
         }}</span>
         <span *ngIf="username == comment.author.username" class="mod-options">
-          <i class="ion-edit"></i>
-          <i class="ion-trash-a"></i>
+          <i (click)="editComment.emit(comment.id)" class="ion-edit"></i>
+          <i (click)="deleteComment.emit(comment.id)" class="ion-trash-a"></i>
         </span>
       </div>
     </div>
@@ -42,4 +48,7 @@ import { DatePipe, NgForOf, NgIf } from '@angular/common';
 export class CommentComponent {
   @Input() comments!: Comment[];
   @Input() username!: string | undefined;
+
+  @Output() deleteComment = new EventEmitter<string>();
+  @Output() editComment = new EventEmitter<string>();
 }

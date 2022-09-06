@@ -52,5 +52,6 @@ export class CommentFormComponent {
 
   add() {
     this.postComment.emit(this.comment.getRawValue());
+    this.comment.get('body')?.setValue('');
   }
 }
