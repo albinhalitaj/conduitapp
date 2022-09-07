@@ -71,14 +71,18 @@ export class ArticleListStore
           (updatedArticle: Article) => {
             this.setState((state: ArticleListState) => {
               const articles = state.articles.filter(
-                (s) => s.slug !== article.slug
+                (s: Article) => s.slug !== article.slug
               );
               return {
                 ...state,
                 loading: false,
                 articles: updatedArticle.isFavorited
                   ? [...articles, updatedArticle]
-                  : articles.filter((s) => s.slug !== updatedArticle.slug),
+                  : this.type == 'favorites'
+                  ? articles.filter(
+                      (s: Article) => s.slug !== updatedArticle.slug
+                    )
+                  : [...articles, updatedArticle],
               };
             });
           },

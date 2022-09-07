@@ -157,7 +157,7 @@ export class HomeComponent {
     if (!this.authStore.isAuthenticated) {
       void this.router.navigate(['/login']);
     } else {
-      console.log('favorite', article.slug);
+      this.store.toggleFavorite(article);
     }
   }
 }

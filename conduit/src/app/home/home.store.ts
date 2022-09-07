@@ -4,7 +4,7 @@ import {
   OnStateInit,
   tapResponse,
 } from '@ngrx/component-store';
-import { exhaustMap, Observable, pipe, switchMap, tap } from 'rxjs';
+import { defer, exhaustMap, Observable, pipe, switchMap, tap } from 'rxjs';
 import { AuthStore } from '../auth/auth.store';
 import { ApiService } from '../api.service';
 import Cookies from 'js-cookie';
@@ -127,6 +127,32 @@ export class HomeStore
         )
       );
     })
+  );
+
+  toggleFavorite = this.effect<Article>(
+    exhaustMap((article: Article) =>
+      defer(() => {
+        if (article.isFavorited) {
+          return this.apiService.unFavoriteArticle(article.slug);
+        }
+        return this.apiService.favoriteArticle(article.slug);
+      }).pipe(
+        tapResponse(
+          (updatedArticle: Article) => {
+            this.setState((state: HomeState) => {
+              const articles = state.articles.filter(
+                (s: Article) => s.slug !== article.slug
+              );
+              return {
+                ...state,
+                articles: [...articles, updatedArticle],
+              };
+            });
+          },
+          (error) => console.log(error)
+        )
+      )
+    )
   );
 
   constructor(private apiService: ApiService, private authStore: AuthStore) {

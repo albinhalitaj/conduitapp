@@ -4,9 +4,10 @@ import {
   OnStateInit,
   tapResponse,
 } from '@ngrx/component-store';
-import { Article } from '../home/home.store';
+import { Article, Author } from '../home/home.store';
 import { ActivatedRoute, Params } from '@angular/router';
 import {
+  defer,
   exhaustMap,
   forkJoin,
   map,
@@ -18,6 +19,7 @@ import {
 import { HttpErrorResponse } from '@angular/common/http';
 import { AuthStore, User } from '../auth/auth.store';
 import { ApiService, Comment } from '../api.service';
+import { Profile } from '../profile/profile.store';
 
 export interface ArticleState {
   article: Article | null;
@@ -84,7 +86,25 @@ export class ArticleStore
     )
   );
 
-  postComment = this.effect(
+  readonly toggleFavorite = this.effect<Article>(
+    exhaustMap((article: Article) =>
+      defer(() => {
+        if (article.isFavorited) {
+          return this.apiService.unFavoriteArticle(article.slug);
+        }
+        return this.apiService.favoriteArticle(article.slug);
+      }).pipe(
+        tapResponse(
+          (updatedArticle: Article) => {
+            this.patchState({ article: updatedArticle });
+          },
+          (error) => console.log(error)
+        )
+      )
+    )
+  );
+
+  readonly postComment = this.effect(
     switchMap((body: string) =>
       this.route.params.pipe(
         map((params: Params) => params['slug']),
@@ -92,7 +112,7 @@ export class ArticleStore
           this.apiService.addComment(slug, body).pipe(
             tapResponse(
               (comment) => {
-                this.patchState((state) => {
+                this.patchState((state: ArticleState) => {
                   return {
                     ...state,
                     comments: [...state.comments, comment],
@@ -107,7 +127,7 @@ export class ArticleStore
     )
   );
 
-  favoriteArticle = this.effect<string>(
+  readonly favoriteArticle = this.effect<string>(
     exhaustMap((slug: string) => {
       return this.apiService.favoriteArticle(slug).pipe(
         tapResponse(
@@ -121,15 +141,43 @@ export class ArticleStore
     })
   );
 
-  deleteComment = this.effect<{ commentId: string; slug: string }>(
+  readonly followUser = this.effect<Author>(
+    exhaustMap((author: Author) =>
+      defer(() => {
+        if (author.following) {
+          return this.apiService.unFollowUser(author.username);
+        }
+        return this.apiService.followUser(author.username);
+      }).pipe(
+        tapResponse(
+          (profile: Profile) => {
+            this.patchState((state: ArticleState) => {
+              return {
+                ...state,
+                article: {
+                  ...state.article!,
+                  author: profile,
+                },
+              };
+            });
+          },
+          (error) => console.log(error)
+        )
+      )
+    )
+  );
+
+  readonly deleteComment = this.effect<{ commentId: string; slug: string }>(
     exhaustMap(({ commentId, slug }) => {
       return this.apiService.deleteComment(commentId, slug).pipe(
         tapResponse(
           () => {
-            this.patchState((state) => {
+            this.patchState((state: ArticleState) => {
               return {
                 ...state,
-                comments: state.comments.filter((c) => c.id !== commentId),
+                comments: state.comments.filter(
+                  (c: Comment) => c.id !== commentId
+                ),
               };
             });
           },

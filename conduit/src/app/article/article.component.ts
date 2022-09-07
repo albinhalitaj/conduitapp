@@ -9,6 +9,7 @@ import { CommentFormComponent } from '../ui/comment/comment-form.component';
 import { UserActionsComponent } from '../ui/user-actions/user-actions.component';
 import { SanitizerPipe } from '../pipes/sanitizer.pipe';
 import { AuthStore } from '../auth/auth.store';
+import { Article, Author } from '../home/home.store';
 
 @Component({
   selector: 'app-article',
@@ -47,7 +48,7 @@ import { AuthStore } from '../auth/auth.store';
                   [isFavorited]="vm.article.isFavorited"
                   [author]="vm.article.author"
                   (followUser)="followUser($event)"
-                  (favoriteArticle)="favoriteArticle(vm.article.slug)"
+                  (favoriteArticle)="favoriteArticle(vm.article)"
                 >
                 </app-user-actions>
               </div>
@@ -99,7 +100,7 @@ import { AuthStore } from '../auth/auth.store';
                   [isFavorited]="vm.article.isFavorited"
                   [author]="vm.article.author"
                   (followUser)="followUser($event)"
-                  (favoriteArticle)="favoriteArticle(vm.article.slug)"
+                  (favoriteArticle)="favoriteArticle(vm.article)"
                 >
                 </app-user-actions>
               </div>
@@ -149,27 +150,27 @@ export class ArticleComponent {
     private store: ArticleStore
   ) {}
 
-  followUser(username: string) {
+  followUser(author: Author): void {
     if (!this.authStore.isAuthenticated) {
       void this.router.navigate(['/login']);
     } else {
-      console.log('Following ', username);
+      this.store.followUser(author);
     }
   }
 
-  favoriteArticle(slug: string) {
+  favoriteArticle(article: Article): void {
     if (!this.authStore.isAuthenticated) {
       void this.router.navigate(['/login']);
     } else {
-      console.log('Favorite ', slug);
+      this.store.toggleFavorite(article);
     }
   }
 
-  postComment(body: string) {
+  postComment(body: string): void {
     this.store.postComment(body);
   }
 
-  deleteComment(commentId: string, slug: string) {
+  deleteComment(commentId: string, slug: string): void {
     this.store.deleteComment({ commentId, slug });
   }
 }

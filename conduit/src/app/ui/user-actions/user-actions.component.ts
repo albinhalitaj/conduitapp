@@ -13,7 +13,7 @@ import { NgClass } from '@angular/common';
   standalone: true,
   template: `
     <button
-      (click)="followUser.emit(author.username)"
+      (click)="followUser.emit(author)"
       [ngClass]="{
         'btn-outline-secondary': !author.following,
         'btn-secondary': author.following
@@ -48,5 +48,5 @@ export class UserActionsComponent {
   @Input() author!: Author;
 
   @Output() favoriteArticle = new EventEmitter();
-  @Output() followUser = new EventEmitter<string>();
+  @Output() followUser = new EventEmitter<Author>();
 }
