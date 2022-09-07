@@ -13,7 +13,7 @@ services:
     volumes:
       - db:/var/lib/mssqlql/data
   webapi:
-    build: .
+    build: ./webapp
     container_name: webapi
     depends_on:
       - db
@@ -30,6 +30,16 @@ services:
       webapp:
     volumes:
       - ~/.aspnet/https/aspnetapp.pfx:/https/aspnetapp.pfx:ro
+  web: 
+    build: ./conduit
+    container_name: web
+    depends_on:
+      - db
+      - webapi
+    ports:
+      - "5002:80"
+    networks:
+      webapp:
 volumes:
   db:
 networks:
