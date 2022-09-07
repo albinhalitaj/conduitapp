@@ -5,7 +5,7 @@ import {
   tapResponse,
 } from '@ngrx/component-store';
 import { Article, Author } from '../home/home.store';
-import { ActivatedRoute, Params } from '@angular/router';
+import { ActivatedRoute, Params, Router } from '@angular/router';
 import {
   defer,
   exhaustMap,
@@ -127,6 +127,19 @@ export class ArticleStore
     )
   );
 
+  readonly deleteArticle = this.effect<string>(
+    exhaustMap((slug: string) => {
+      return this.apiService.deleteArticle(slug).pipe(
+        tapResponse(
+          () => {
+            void this.router.navigate(['/']);
+          },
+          (error) => console.log(error)
+        )
+      );
+    })
+  );
+
   readonly favoriteArticle = this.effect<string>(
     exhaustMap((slug: string) => {
       return this.apiService.favoriteArticle(slug).pipe(
@@ -190,7 +203,8 @@ export class ArticleStore
   constructor(
     private apiService: ApiService,
     private route: ActivatedRoute,
-    private authStore: AuthStore
+    private authStore: AuthStore,
+    private router: Router
   ) {
     super(initialState);
   }

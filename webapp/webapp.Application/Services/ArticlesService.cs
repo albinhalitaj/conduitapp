@@ -1,6 +1,5 @@
 using Mapster;
 using MapsterMapper;
-using Markdig;
 using Microsoft.EntityFrameworkCore;
 using webapp.Application.Common;
 using webapp.Application.Interfaces;
@@ -213,8 +212,6 @@ public class ArticlesService : IArticleService
             }
         }
 
-        var pipeline = new MarkdownPipelineBuilder().UseAdvancedExtensions().Build();
-
         return !articles.Any()
             ? Enumerable.Empty<ArticleResponse>().ToList()
             : articles
@@ -226,7 +223,7 @@ public class ArticlesService : IArticleService
                         article.IsFollowing)
                 })
                 .Select(t => new ArticleResponse(t.article.Slug, t.article.Title, t.article.Description,
-                    Markdown.ToHtml(t.article.Body ?? "",pipeline), t.article.CreatedAt, t.article.UpdatedAt, t.article.IsFavorited,
+                    t.article.Body, t.article.CreatedAt, t.article.UpdatedAt, t.article.IsFavorited,
                     t.article.FavoritesCount, t.article.TagsArray, t.author)).ToList();
     }
 
@@ -319,13 +316,17 @@ public class ArticlesService : IArticleService
     public async Task<ResultDto<string>> DeleteArticleAsync(string slug)
     {
         var result = new ResultDto<string>();
-        var article = await _ctx.Articles.Where(x => x.Slug == slug).Select(a => a.ArticleId).FirstOrDefaultAsync();
+        var article = await _ctx.Articles.Where(x => x.Slug == slug).Select(a => new
+        {
+            articleId = a.ArticleId,
+            authorId = a.AuthorId
+        }).FirstOrDefaultAsync();
 
-        if (article is not null && article == _currentUserService.UserId)
+        if (article is not null && article.authorId == _currentUserService.UserId)
         {
             try
             {
-                _ctx.Articles.Remove(new Article { ArticleId = article});
+                _ctx.Articles.Remove(new Article { ArticleId = article.articleId});
                 var res = await _ctx.SaveChangesAsync();
                 if (res > 0) result.Value = $"Article {slug} was deleted successfully!";
             }

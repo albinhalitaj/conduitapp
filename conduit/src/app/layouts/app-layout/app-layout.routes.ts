@@ -60,7 +60,9 @@ export const routes: Routes = [
     canLoad: [AuthGuard],
     canActivate: [AuthGuard],
     loadComponent: () =>
-      import('../../editor/editor.component').then((a) => a.EditorComponent),
+      import('../../editor/edit-article/edit-article.component').then(
+        (a) => a.EditArticleComponent
+      ),
   },
   {
     path: 'profile/:username',

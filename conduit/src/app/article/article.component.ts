@@ -10,6 +10,8 @@ import { UserActionsComponent } from '../ui/user-actions/user-actions.component'
 import { SanitizerPipe } from '../pipes/sanitizer.pipe';
 import { AuthStore } from '../auth/auth.store';
 import { Article, Author } from '../home/home.store';
+import { MarkdownPipe } from '../pipes/markdown.pipe';
+import { OwnerActionsComponent } from '../ui/owner-actions/owner-actions.component';
 
 @Component({
   selector: 'app-article',
@@ -43,7 +45,7 @@ import { Article, Author } from '../home/home.store';
                   }}</span>
                 </div>
                 <app-user-actions
-                  *ngIf="!vm.isOwner"
+                  *ngIf="!vm.isOwner; else ownerActions"
                   [favoritesCount]="vm.article.favoritesCount"
                   [isFavorited]="vm.article.isFavorited"
                   [author]="vm.article.author"
@@ -58,7 +60,9 @@ import { Article, Author } from '../home/home.store';
           <div class="container page">
             <div class="row article-content">
               <div class="col-md-12">
-                <div [innerHTML]="vm.article.body | sanitizeHtml"></div>
+                <div
+                  [innerHTML]="vm.article.body | markdown | sanitizeHtml"
+                ></div>
               </div>
             </div>
 
@@ -95,7 +99,7 @@ import { Article, Author } from '../home/home.store';
                 </div>
 
                 <app-user-actions
-                  *ngIf="!vm.isOwner"
+                  *ngIf="!vm.isOwner; else ownerActions"
                   [favoritesCount]="vm.article.favoritesCount"
                   [isFavorited]="vm.article.isFavorited"
                   [author]="vm.article.author"
@@ -103,6 +107,14 @@ import { Article, Author } from '../home/home.store';
                   (favoriteArticle)="favoriteArticle(vm.article)"
                 >
                 </app-user-actions>
+
+                <ng-template #ownerActions>
+                  <app-owner-actions
+                    (editArticle)="editArticle(vm.article.slug)"
+                    (deleteArticle)="deleteArticle(vm.article.slug)"
+                  >
+                  </app-owner-actions>
+                </ng-template>
               </div>
             </div>
 
@@ -139,6 +151,8 @@ import { Article, Author } from '../home/home.store';
     CommentFormComponent,
     UserActionsComponent,
     SanitizerPipe,
+    MarkdownPipe,
+    OwnerActionsComponent,
   ],
 })
 export class ArticleComponent {
@@ -172,5 +186,13 @@ export class ArticleComponent {
 
   deleteComment(commentId: string, slug: string): void {
     this.store.deleteComment({ commentId, slug });
+  }
+
+  editArticle(slug: string) {
+    void this.router.navigate(['/editor', slug]);
+  }
+
+  deleteArticle(slug: string) {
+    this.store.deleteArticle(slug);
   }
 }

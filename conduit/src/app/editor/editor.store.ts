@@ -25,10 +25,7 @@ const initialState: EditorState = {
 };
 
 @Injectable()
-export class EditorStore
-  extends ComponentStore<EditorState>
-  implements OnStateInit
-{
+export class EditorStore extends ComponentStore<EditorState> {
   addArticle = this.effect(
     exhaustMap((article: ArticleData) => {
       this.patchState({ loading: true });
@@ -50,43 +47,7 @@ export class EditorStore
     })
   );
 
-  /*
-    editArticle = this.effect(
-      exhaustMap((article: ArticleData) => {
-        return this.apiService.updateArticle(,article).pipe(
-          tapResponse(() => {
-
-          },error => console.log(error))
-        );
-      })
-    );
-  */
-
-  getArticle = this.effect<Params>(
-    pipe(
-      map((params: Params) => params['slug']),
-      switchMap((slug: string) => {
-        return this.apiService.getArticle(slug).pipe(
-          tapResponse(
-            (article: Article) => {
-              this.patchState({ article });
-            },
-            (error) => console.log(error)
-          )
-        );
-      })
-    )
-  );
-
-  constructor(
-    private apiService: ApiService,
-    private router: Router,
-    private activatedRoute: ActivatedRoute
-  ) {
+  constructor(private apiService: ApiService, private router: Router) {
     super(initialState);
-  }
-
-  ngrxOnStateInit(): void {
-    this.getArticle(this.activatedRoute.params);
   }
 }

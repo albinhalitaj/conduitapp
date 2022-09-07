@@ -89,6 +89,10 @@ export class ApiService {
     return this.http.post(`${this.apiBase}/articles`, articleData);
   }
 
+  deleteArticle(slug: string) {
+    return this.http.delete(`${this.apiBase}/articles/${slug}`);
+  }
+
   updateArticle(slug: string, articleData: ArticleData) {
     return this.http.put(`${this.apiBase}/articles/${slug}`, articleData);
   }
