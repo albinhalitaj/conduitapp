@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { map, Observable } from 'rxjs';
+import { map, Observable, shareReplay, tap } from 'rxjs';
 import { Article, Author } from './home/home.store';
 import { API_URL } from './app.component';
 import { Profile } from './profile/profile.store';
@@ -81,8 +81,12 @@ export class ApiService {
     return this.http.post<LoginResponse>(`${this.apiBase}/user/login`, form);
   }
 
-  signOut(): Observable<Object> {
-    return this.http.delete(`${this.apiBase}/user`);
+  signOut(): Observable<any> {
+    return this.http.delete(`${this.apiBase}/user`).pipe(
+      tap((resp) => {
+        console.log(resp);
+      })
+    );
   }
 
   addArticle(articleData: ArticleData) {
@@ -123,7 +127,8 @@ export class ApiService {
     return this.http.get<string[]>(`${this.apiBase}/tags`).pipe(
       map((response: any) => {
         return response.tags;
-      })
+      }),
+      shareReplay(3)
     );
   }
 

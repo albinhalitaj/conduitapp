@@ -7,7 +7,7 @@ import {
 import { defer, exhaustMap, Observable, pipe, switchMap, tap } from 'rxjs';
 import { AuthStore } from '../auth/auth.store';
 import { ApiService } from '../api.service';
-import Cookies from 'js-cookie';
+import { Router } from '@angular/router';
 
 export interface Author {
   username: string;
@@ -32,13 +32,19 @@ export interface Article {
 interface HomeState {
   articles: Article[];
   tags: string[];
-  isLoading: boolean;
+  selectedTag: string;
+  type: 'global' | 'feed';
+  articlesLoading: boolean;
+  tagsLoading: boolean;
 }
 
 const initialState: HomeState = {
   articles: [],
   tags: [],
-  isLoading: false,
+  selectedTag: '',
+  type: 'global',
+  articlesLoading: false,
+  tagsLoading: false,
 };
 
 export type HomeVm = HomeState & {
@@ -50,23 +56,42 @@ export class HomeStore
   extends ComponentStore<HomeState>
   implements OnStateInit
 {
-  readonly articles$: Observable<Article[]> = this.select(
+  private readonly articles$: Observable<Article[]> = this.select(
     (s: HomeState) => s.articles
   );
-  readonly tags$: Observable<string[]> = this.select((s: HomeState) => s.tags);
-  readonly isLoading$: Observable<boolean> = this.select(
-    (s: HomeState) => s.isLoading
+  private readonly tags$: Observable<string[]> = this.select(
+    (s: HomeState) => s.tags
+  );
+  private readonly articlesLoading$: Observable<boolean> = this.select(
+    (s: HomeState) => s.articlesLoading
+  );
+  private readonly tagsLoading$: Observable<boolean> = this.select(
+    (s: HomeState) => s.tagsLoading
   );
 
   readonly vm$: Observable<HomeVm> = this.select(
     this.articles$,
     this.tags$,
-    this.isLoading$,
+    this.articlesLoading$,
+    this.tagsLoading$,
+    this.select((s: HomeState) => s.selectedTag),
+    this.select((s: HomeState) => s.type),
     this.authStore.isAuthenticated$,
-    (articles, tags, isLoading, isAuthenticated) => ({
+    (
       articles,
       tags,
-      isLoading,
+      articlesLoading,
+      tagsLoading,
+      selectedTag,
+      type,
+      isAuthenticated
+    ) => ({
+      articles,
+      tags,
+      articlesLoading,
+      tagsLoading,
+      selectedTag,
+      type,
       isAuthenticated,
     }),
     { debounce: true }
@@ -75,15 +100,22 @@ export class HomeStore
   readonly getArticles = this.effect<void>(
     pipe(
       tap(() => {
-        this.patchState({ isLoading: true });
+        this.patchState({
+          articlesLoading: true,
+          selectedTag: '',
+          type: 'global',
+        });
       }),
       switchMap(() =>
         this.apiService.getArticles().pipe(
           tapResponse(
             (articles: Article[]) => {
-              this.patchState({ articles, isLoading: false });
+              this.patchState({ articles, articlesLoading: false });
             },
-            (error) => console.log('Error while fetching articles', error)
+            (error) => {
+              this.patchState({ articlesLoading: false });
+              console.log('error while fetching articles', error);
+            }
           )
         )
       )
@@ -91,39 +123,52 @@ export class HomeStore
   );
 
   readonly getTags = this.effect<void>(
-    switchMap(() =>
-      this.apiService.getTags().pipe(
-        tapResponse(
-          (tags: string[]) => {
-            this.patchState({ tags });
-          },
-          (error) => console.log(error)
+    pipe(
+      tap(() => this.patchState({ tagsLoading: true })),
+      switchMap(() =>
+        this.apiService.getTags().pipe(
+          tapResponse(
+            (tags: string[]) => {
+              this.patchState({ tags, tagsLoading: false });
+            },
+            (error) => {
+              console.log('error while fetching tags', error);
+              this.patchState({ tagsLoading: false });
+            }
+          )
         )
       )
     )
   );
 
   readonly getArticleByTags = this.effect(
-    exhaustMap((tag: string) =>
-      this.apiService.getArticlesByTag(tag).pipe(
+    switchMap((selectedTag: string) => {
+      this.patchState({ articlesLoading: true, selectedTag });
+      return this.apiService.getArticlesByTag(selectedTag).pipe(
         tapResponse(
           (articles: Article[]) => {
-            this.patchState({ articles });
+            this.patchState({ articles, articlesLoading: false });
           },
-          (error) => console.log(error)
+          (error) => {
+            console.log('Error while fetching article with tags', error);
+            this.patchState({ articlesLoading: false });
+          }
         )
-      )
-    )
+      );
+    })
   );
   readonly getFeed = this.effect<void>(
-    exhaustMap(() => {
-      this.patchState({ isLoading: true });
+    switchMap(() => {
+      this.patchState({ articlesLoading: true, selectedTag: '', type: 'feed' });
       return this.apiService.getFeed().pipe(
         tapResponse(
           (articles: Article[]) => {
-            this.patchState({ articles, isLoading: false });
+            this.patchState({ articles, articlesLoading: false });
           },
-          (error) => console.log(error)
+          (error) => {
+            console.log('Error while fetching feed', error);
+            this.patchState({ articlesLoading: false });
+          }
         )
       );
     })
@@ -140,12 +185,14 @@ export class HomeStore
         tapResponse(
           (updatedArticle: Article) => {
             this.setState((state: HomeState) => {
-              const articles = state.articles.filter(
-                (s: Article) => s.slug !== article.slug
-              );
               return {
                 ...state,
-                articles: [...articles, updatedArticle],
+                articles: state.articles.map((article: Article) => {
+                  if (article.slug == updatedArticle.slug) {
+                    return updatedArticle;
+                  }
+                  return article;
+                }),
               };
             });
           },
@@ -160,12 +207,17 @@ export class HomeStore
   }
 
   ngrxOnStateInit(): void {
-    const user = Cookies.get('user');
-    if (user) {
-      this.getFeed();
-    } else {
-      this.getArticles();
-    }
-    this.getTags();
+    this.init();
   }
+
+  init = this.effect<void>(
+    switchMap(() => {
+      return this.authStore.isAuthenticated$.pipe(
+        tap((isAuthenticated: boolean) => {
+          isAuthenticated ? this.getFeed() : this.getArticles();
+          this.getTags();
+        })
+      );
+    })
+  );
 }

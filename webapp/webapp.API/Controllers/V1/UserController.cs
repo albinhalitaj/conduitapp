@@ -76,9 +76,14 @@ public class UserController : ApiController
     [HttpDelete, Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public IActionResult Logout()
     {
-        if (Request.Cookies.ContainsKey("token")) Response.Cookies.Delete("token");
+        if (Request.Cookies.ContainsKey("token")) Response.Cookies.Delete("token",new CookieOptions
+        {
+            HttpOnly = true,
+            Secure = true,
+            SameSite = SameSiteMode.None
+        });
 
-        return Ok();
+        return NoContent();
     }
 
     [HttpPut, Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]

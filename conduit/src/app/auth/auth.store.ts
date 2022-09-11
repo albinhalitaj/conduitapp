@@ -13,6 +13,7 @@ import {
 import { Router } from '@angular/router';
 import Cookies from 'js-cookie';
 import { ApiService } from '../api.service';
+import { HttpResponse } from '@angular/common/http';
 
 export interface User {
   id: string;
@@ -46,8 +47,10 @@ export class AuthStore extends ComponentStore<AuthState> {
   signOut = this.effect<void>(
     exhaustMap(() =>
       this.apiService.signOut().pipe(
+        tap((data) => console.log('data', data)),
         tapResponse(
-          () => {
+          (resp: any) => {
+            console.log(resp);
             Cookies.remove('user');
             this.setState({ user: null, isAuthenticated: false });
             void this.router.navigate(['/']);

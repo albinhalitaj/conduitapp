@@ -157,6 +157,7 @@ export class ArticleStore
   readonly followUser = this.effect<Author>(
     exhaustMap((author: Author) =>
       defer(() => {
+        console.log(author);
         if (author.following) {
           return this.apiService.unFollowUser(author.username);
         }

@@ -16,7 +16,11 @@ import {
   selector: 'app-comment-form',
   standalone: true,
   template: `
-    <form [formGroup]="comment" (ngSubmit)="add()" class="card comment-form">
+    <form
+      [formGroup]="commentForm"
+      (ngSubmit)="add()"
+      class="card comment-form"
+    >
       <div class="card-block">
         <textarea
           formControlName="body"
@@ -42,16 +46,21 @@ import {
 })
 export class CommentFormComponent {
   @Input() image!: string | undefined;
+  @Input() set comment(comment: string) {
+    this.commentForm.setValue({
+      body: comment,
+    });
+  }
 
   @Output() postComment = new EventEmitter<string>();
-  comment: FormGroup = this.fb.nonNullable.group({
+  commentForm: FormGroup = this.fb.nonNullable.group({
     body: ['', Validators.required],
   });
 
   constructor(private fb: FormBuilder) {}
 
   add() {
-    this.postComment.emit(this.comment.getRawValue());
-    this.comment.get('body')?.setValue('');
+    this.postComment.emit(this.commentForm.getRawValue());
+    this.commentForm.get('body')?.setValue('');
   }
 }

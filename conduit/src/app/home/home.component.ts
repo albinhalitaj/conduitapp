@@ -4,7 +4,6 @@ import { provideComponentStore } from '@ngrx/component-store';
 import { Observable } from 'rxjs';
 import { AsyncPipe, DatePipe, NgClass, NgForOf, NgIf } from '@angular/common';
 import { Router, RouterLinkWithHref } from '@angular/router';
-import Cookies from 'js-cookie';
 import { SingleArticleComponent } from '../ui/article-list/article/single-article.component';
 import { AuthStore } from '../auth/auth.store';
 
@@ -29,7 +28,7 @@ import { AuthStore } from '../auth/auth.store';
                   <li class="nav-item" *ngIf="vm.isAuthenticated">
                     <a
                       class="nav-link"
-                      [class.active]="isFeedActive"
+                      [class.active]="!vm.selectedTag && vm.type == 'feed'"
                       (click)="getFeed()"
                       >Your Feed</a
                     >
@@ -38,24 +37,22 @@ import { AuthStore } from '../auth/auth.store';
                     <a
                       class="nav-link"
                       (click)="getGlobal()"
-                      [class.active]="isGlobalActive"
+                      [class.active]="!vm.selectedTag && vm.type == 'global'"
                       >Global Feed</a
                     >
                   </li>
-                  <li class="nav-item" *ngIf="getByTags">
-                    <a class="nav-link" [class.active]="getByTags"
-                      ># {{ selectedTag }}</a
-                    >
+                  <li class="nav-item" *ngIf="vm.selectedTag">
+                    <a class="nav-link active"># {{ vm.selectedTag }}</a>
                   </li>
                 </ul>
               </div>
-              <ng-container *ngIf="!vm.isLoading; else loading">
+              <ng-container *ngIf="!vm.articlesLoading; else articlesLoading">
                 <app-article
                   [articles]="vm.articles"
                   (toggleFavorite)="toggleFavorite($event)"
                 ></app-article>
               </ng-container>
-              <ng-template #loading>
+              <ng-template #articlesLoading>
                 <div class="article-preview">Loading...</div>
               </ng-template>
             </div>
@@ -64,7 +61,7 @@ import { AuthStore } from '../auth/auth.store';
               <div class="sidebar">
                 <p>Popular Tags</p>
 
-                <div *ngIf="!vm.isLoading; else loading" class="tag-list">
+                <div *ngIf="!vm.tagsLoading; else tagsLoading" class="tag-list">
                   <ng-container *ngIf="vm.tags.length; else noTags">
                     <a
                       *ngFor="let tag of vm.tags"
@@ -76,10 +73,10 @@ import { AuthStore } from '../auth/auth.store';
                   <ng-template #noTags>
                     <p>No tags.</p>
                   </ng-template>
-                  <ng-template #loading>
-                    <p>Loading...</p>
-                  </ng-template>
                 </div>
+                <ng-template #tagsLoading>
+                  <p>Loading...</p>
+                </ng-template>
               </div>
             </div>
           </div>
@@ -113,43 +110,22 @@ import { AuthStore } from '../auth/auth.store';
 })
 export class HomeComponent {
   readonly vm$: Observable<HomeVm> = this.store.vm$;
-  selectedTag: string = '';
-  isGlobalActive: boolean = false;
-  isFeedActive: boolean = false;
-  getByTags: boolean = false;
 
   constructor(
     private store: HomeStore,
     private authStore: AuthStore,
     private router: Router
-  ) {
-    const user = Cookies.get('user');
-    if (!user) {
-      this.isGlobalActive = true;
-    } else {
-      this.isFeedActive = true;
-    }
-  }
+  ) {}
 
   getArticleByTag(tag: string) {
-    this.selectedTag = tag;
-    this.getByTags = true;
-    this.isGlobalActive = false;
-    this.isFeedActive = false;
     this.store.getArticleByTags(tag);
   }
 
   getFeed() {
-    this.isFeedActive = true;
-    this.isGlobalActive = false;
-    this.getByTags = false;
     this.store.getFeed();
   }
 
   getGlobal() {
-    this.isFeedActive = false;
-    this.isGlobalActive = true;
-    this.getByTags = false;
     this.store.getArticles();
   }
 

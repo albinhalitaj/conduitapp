@@ -32,7 +32,7 @@ export class SettingsStore
         tapResponse(
           (updatedUser: UpdatedUser) => {
             this.setState({ profile: updatedUser });
-            void this.router.navigate([`/@${updatedUser.username}`]);
+            void this.router.navigate(['/profile', updatedUser.username]);
           },
           (error) => console.log(error)
         )

@@ -44,7 +44,7 @@ import { RouterLinkWithHref } from '@angular/router';
           comment.createdAt | date: 'longDate'
         }}</span>
         <span *ngIf="username == comment.author.username" class="mod-options">
-          <i (click)="editComment.emit(comment.id)" class="ion-edit"></i>
+          <i (click)="editComment.emit(comment.body)" class="ion-edit"></i>
           <i (click)="deleteComment.emit(comment.id)" class="ion-trash-a"></i>
         </span>
       </div>
