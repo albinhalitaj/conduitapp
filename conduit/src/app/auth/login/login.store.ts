@@ -28,7 +28,7 @@ export class LoginStore extends ComponentStore<LoginState> {
       this.patchState({ error: '' });
       return this.apiService.login(loginForm).pipe(
         tapResponse(
-          ({ user }: LoginResponse) => {
+          (user: LoginResponse) => {
             this.patchState({ loginSuccess: true });
             Cookies.set('user', JSON.stringify(user), {
               expires: new Date(user.expiresAt),

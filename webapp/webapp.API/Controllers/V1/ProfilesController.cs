@@ -15,35 +15,20 @@ public class ProfilesController : ApiController
     public async Task<IActionResult> GetUser(string username)
     {
         var response = await _profileService.GetUser(username);
-        return response.Success
-            ? Ok(new
-            {
-                Profile = response.Value
-            })
-            : Problem(response.Errors);
+        return response.Success ? Ok(response.Value) : Problem(response.Errors);
     }
 
     [HttpPost("follow"),Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public async Task<IActionResult> FollowUser(string username)
     {
         var response = await _profileService.FollowUser(username);
-        return response.Success
-            ? Ok(new
-            {
-                Profile = response.Value
-            })
-            : Problem(response.Errors);
+        return response.Success ? Ok(response.Value) : Problem(response.Errors);
     }
 
     [HttpDelete("follow"),Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public async Task<IActionResult> UnfollowUser(string username)
     {
         var response = await _profileService.UnFollowUser(username);
-        return response.Success
-            ? Ok(new
-            {
-                Profile = response.Value
-            })
-            : Problem(response.Errors);
+        return response.Success ? Ok( response.Value ) : Problem(response.Errors);
     }
 }

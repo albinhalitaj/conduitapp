@@ -30,136 +30,77 @@ public class ArticlesController : ApiController
     public async Task<IActionResult> GetArticle(string slug)
     {
         var result = await _articleService.GetArticleAsync(slug);
-        return result.Success
-            ? Ok(new
-            {
-                Article = result.Value
-            })
-            : Problem(result.Errors);
+        return result.Success ? Ok(result.Value) : Problem(result.Errors);
     }
 
     [HttpGet("feed"),Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public async Task<IActionResult> Feed([FromQuery] QueryParams queryParams)
     {
         var result = await _articleService.Feed(queryParams);
-        return !result.Success
-            ? Problem(result.Errors)
-            : Ok(new
-            {
-                Articles = result.Value,
-                ArticlesCount = result.Value!.Any() ? result.Value!.Count : 0
-            });
+        return !result.Success ? Problem(result.Errors) : Ok(result.Value);
     }
 
     [HttpGet("byAuthor")]
     public async Task<IActionResult> GetArticleByAuthor([FromQuery] string author)
     {
         var result = await _articleService.GetArticleByAuthorAsync(author);
-        return !result.Success
-            ? Problem(result.Errors)
-            : Ok(new
-            {
-                Articles = result.Value,
-                ArticlesCount = result.Value!.Any() ? result.Value!.Count : 0
-            });
+        return !result.Success ? Problem(result.Errors) : Ok(result.Value);
     }
 
     [HttpGet("byTag")]
     public async Task<IActionResult> GetArticleByTag([FromQuery] string tag)
     {
         var result = await _articleService.GetArticleByTagAsync(tag);
-        return !result.Success
-            ? Problem(result.Errors)
-            : Ok(new
-            {
-                Articles = result.Value,
-                ArticlesCount = result.Value!.Count
-            });
+        return !result.Success ? Problem(result.Errors) : Ok(result.Value);
     }
 
     [HttpPost,Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public async Task<IActionResult> CreateArticle(CreateArticleRequest request)
     {
         var result = await _articleService.CreateArticleAsync(request);
-        return result.Success
-            ? Ok(new
-            {
-                Article = result.Value
-            })
-            : Problem(result.Errors);
+        return result.Success ? Ok(result.Value) : Problem(result.Errors);
     }
 
     [HttpPut("{slug}"),Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public async Task<IActionResult> UpdateArticle(string slug, UpdateArticleRequest request)
     {
         var response = await _articleService.UpdateArticleAsync(slug, request);
-        return response.Success
-            ? Ok(new
-            {
-                Article = response.Value
-            })
-            : Problem(response.Errors);
+        return response.Success ? Ok(response.Value) : Problem(response.Errors);
     }
 
     [HttpPost("{slug}/favorite"),Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public async Task<IActionResult> FavoriteArticle(string slug)
     {
         var result = await _articleService.FavoriteArticle(slug);
-        return result.Success
-            ? Ok(new
-            {
-                Article = result.Value
-            })
-            : Problem(result.Errors);
+        return result.Success ? Ok(result.Value) : Problem(result.Errors);
     }
 
     [HttpDelete("{slug}/favorite"),Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public async Task<IActionResult> UnFavoriteArticle(string slug)
     {
         var result = await _articleService.UnFavoriteArticle(slug);
-        return result.Success
-            ? Ok(new
-            {
-                Article = result.Value
-            })
-            : Problem(result.Errors);
+        return result.Success ? Ok(result.Value) : Problem(result.Errors);
     }
 
     [HttpGet("byFavorite")]
     public async Task<IActionResult> GetArticleByFavorite([FromQuery] string author)
     {
         var result = await _articleService.GetArticleByFavorites(author);
-        return !result.Success
-            ? Problem(result.Errors)
-            : Ok(new
-            {
-                Articles = result.Value,
-                ArticlesCount = result.Value!.Count
-            });
+        return !result.Success ? Problem(result.Errors) : Ok(result.Value);
     }
 
     [HttpPost("{slug}/comments"),Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public async Task<IActionResult> CreateComment(string slug, CreateCommentRequest request)
     {
         var result = await _commentService.CreateComment(slug, request);
-        return result.Success
-            ? Ok(new
-            {
-                Comment = result.Value
-            })
-            : Problem(result.Errors);
+        return result.Success ? Ok(result.Value) : Problem(result.Errors);
     }
 
     [HttpGet("{slug}/comments")]
     public async Task<IActionResult> ListComments(string slug)
     {
         var result = await _commentService.ListComments(slug);
-        return !result.Success
-            ? Problem(result.Errors)
-            : Ok(new
-            {
-                Comments = result.Value
-            });
+        return !result.Success ? Problem(result.Errors) : Ok(result.Value);
     }
 
     [HttpDelete("{slug}/comments/{id}"),Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]

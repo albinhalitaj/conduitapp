@@ -131,7 +131,6 @@ import { OwnerActionsComponent } from '../ui/owner-actions/owner-actions.compone
                   [comments]="vm.comments"
                   [username]="vm.user?.username"
                   (deleteComment)="deleteComment($event, vm.article.slug)"
-                  (editComment)="editComment($event)"
                 ></app-comment>
               </div>
             </div>
@@ -196,6 +195,4 @@ export class ArticleComponent {
   deleteArticle(slug: string) {
     this.store.deleteArticle(slug);
   }
-
-  editComment($event: string) {}
 }

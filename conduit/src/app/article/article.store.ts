@@ -111,7 +111,7 @@ export class ArticleStore
         switchMap((slug: string) =>
           this.apiService.addComment(slug, body).pipe(
             tapResponse(
-              (comment) => {
+              (comment: Comment) => {
                 this.patchState((state: ArticleState) => {
                   return {
                     ...state,
@@ -157,7 +157,6 @@ export class ArticleStore
   readonly followUser = this.effect<Author>(
     exhaustMap((author: Author) =>
       defer(() => {
-        console.log(author);
         if (author.following) {
           return this.apiService.unFollowUser(author.username);
         }
