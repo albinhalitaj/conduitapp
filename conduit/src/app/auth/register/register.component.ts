@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { ChangeDetectorRef, Component } from '@angular/core';
 import { RouterLinkWithHref } from '@angular/router';
 import {
   FormBuilder,
@@ -9,6 +9,11 @@ import {
 import { AsyncPipe, NgForOf, NgIf, NgStyle } from '@angular/common';
 import { RegisterStore } from './register.store';
 import { Observable } from 'rxjs';
+import {
+  emailExistsValidator,
+  emailValidator,
+} from '../../validators/app-validators';
+import { ApiService } from '../../api.service';
 
 @Component({
   standalone: true,
@@ -92,8 +97,20 @@ import { Observable } from 'rxjs';
                     : null
                 "
               />
-              <span style="color: red" *ngIf="email?.touched && email?.invalid"
+              <span
+                style="color: red"
+                *ngIf="email?.touched && email?.hasError('required')"
                 >Email is required</span
+              >
+              <span
+                style="color: red"
+                *ngIf="email?.touched && email?.hasError('invalidEmail')"
+                >Email is invalid</span
+              >
+              <span
+                [ngStyle]="{ color: 'red' }"
+                *ngIf="email?.dirty && email?.hasError('emailExists')"
+                >Email already exists</span
               >
             </fieldset>
             <fieldset class="form-group">
@@ -110,8 +127,13 @@ import { Observable } from 'rxjs';
               />
               <span
                 style="color: red"
-                *ngIf="password?.touched && password?.invalid"
+                *ngIf="password?.touched && password?.hasError('required')"
                 >Password is required</span
+              >
+              <span
+                style="color: red"
+                *ngIf="password?.touched && password?.hasError('minlength')"
+                >Password must be atleast 8 characters</span
               >
             </fieldset>
             <button class="btn btn-lg btn-primary pull-xs-right">
@@ -137,13 +159,22 @@ export class RegisterComponent {
     firstName: ['', Validators.required],
     lastName: ['', Validators.required],
     username: ['', Validators.required],
-    email: ['', Validators.required, Validators.email],
-    password: ['', Validators.required],
+    email: [
+      '',
+      [Validators.required, emailValidator()],
+      [emailExistsValidator(this.apiService, this.cdr)],
+    ],
+    password: ['', [Validators.required, Validators.minLength(8)]],
   });
 
   errors$: Observable<Array<string> | null> = this.store.errors$;
 
-  constructor(private fb: FormBuilder, private store: RegisterStore) {}
+  constructor(
+    private fb: FormBuilder,
+    private store: RegisterStore,
+    private apiService: ApiService,
+    private cdr: ChangeDetectorRef
+  ) {}
 
   get firstName() {
     return this.registerForm.get('firstName');

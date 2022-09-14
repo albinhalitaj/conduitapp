@@ -188,11 +188,11 @@ export class ArticleComponent {
     this.store.deleteComment({ commentId, slug });
   }
 
-  editArticle(slug: string) {
+  editArticle(slug: string): void {
     void this.router.navigate(['/editor', slug]);
   }
 
-  deleteArticle(slug: string) {
+  deleteArticle(slug: string): void {
     this.store.deleteArticle(slug);
   }
 }

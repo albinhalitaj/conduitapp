@@ -186,4 +186,10 @@ export class ApiService {
   get(): Observable<User> {
     return this.http.get<User>(`${this.apiBase}/user`);
   }
+
+  emailExists(email: string): Observable<boolean> {
+    return this.http.post<boolean>(`${this.apiBase}/user/emailexists`, {
+      email,
+    });
+  }
 }
