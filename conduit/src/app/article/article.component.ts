@@ -127,6 +127,12 @@ import { OwnerActionsComponent } from '../ui/owner-actions/owner-actions.compone
                 >
                 </app-comment-form>
 
+                <p style="display: inherit;" *ngIf="!vm.user">
+                  <a [routerLink]="['/login']">Sign in</a> or
+                  <a [routerLink]="['/register']">sign up</a> to add comments on
+                  this article.
+                </p>
+
                 <app-comment
                   [comments]="vm.comments"
                   [username]="vm.user?.username"

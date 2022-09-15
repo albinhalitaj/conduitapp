@@ -40,7 +40,7 @@ export type ArticleVm = ArticleState & {
   user: User | null;
 };
 
-@Injectable()
+@Injectable({ providedIn: 'root' })
 export class ArticleStore
   extends ComponentStore<ArticleState>
   implements OnStateInit
@@ -59,6 +59,10 @@ export class ArticleStore
       isOwner: article?.author.username == user?.username,
       user,
     })
+  );
+
+  readonly title$: Observable<string | undefined> = this.select(
+    (s) => s.article?.title
   );
 
   readonly getArticle = this.effect<Params>(

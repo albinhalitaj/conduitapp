@@ -91,10 +91,10 @@ public class IdentityService : IIdentityService
                     HttpOnly = true,
                     Secure = true,
                     SameSite = SameSiteMode.None,
-                    Expires = DateTimeOffset.UtcNow.AddHours(1)
+                    Expires = DateTimeOffset.UtcNow.AddMonths(1)
                 });
                 response.Value = new User(userAccount.Id, userAccount.UserName, userAccount.Email, roles[0],
-                    DateTimeOffset.UtcNow.AddHours(1),userAccount.Bio,userAccount.Image);
+                    DateTimeOffset.UtcNow.AddMonths(1),userAccount.Bio,userAccount.Image);
                 return response;
             }
             
@@ -168,7 +168,7 @@ public class IdentityService : IIdentityService
                 new Claim(ClaimTypes.Name, user.Id),
                 new Claim(ClaimTypes.Email, user.Email)
             }),
-            Expires = DateTime.UtcNow.AddHours(1),
+            Expires = DateTime.UtcNow.AddMonths(1),
             SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key),
                 SecurityAlgorithms.HmacSha256Signature),
             Issuer = "www.conduitapp.com/api",

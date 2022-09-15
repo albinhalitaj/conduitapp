@@ -1,5 +1,5 @@
-import { Routes } from '@angular/router';
-import { InjectionToken, Provider } from '@angular/core';
+import { ActivatedRouteSnapshot, Resolve, Routes } from '@angular/router';
+import { Injectable, InjectionToken, Provider } from '@angular/core';
 import { AuthGuard } from '../../guards/auth.guard';
 import { NonAuthGuard } from '../../guards/nonauth.guard';
 
@@ -12,14 +12,25 @@ export function provideArticleType(type: string): Provider {
   };
 }
 
+@Injectable({ providedIn: 'root' })
+class ProfileTitle implements Resolve<string> {
+  constructor() {}
+
+  resolve(route: ActivatedRouteSnapshot) {
+    return `@${route.params['username']}`;
+  }
+}
+
 export const routes: Routes = [
   {
     path: '',
+    title: 'Home',
     loadComponent: () =>
       import('../../home/home.component').then((l) => l.HomeComponent),
   },
   {
     path: 'login',
+    title: 'Sign in',
     canLoad: [NonAuthGuard],
     canActivate: [NonAuthGuard],
     loadComponent: () =>
@@ -27,6 +38,7 @@ export const routes: Routes = [
   },
   {
     path: 'register',
+    title: 'Register',
     canLoad: [NonAuthGuard],
     canActivate: [NonAuthGuard],
     loadComponent: () =>
@@ -36,6 +48,7 @@ export const routes: Routes = [
   },
   {
     path: 'settings',
+    title: 'Settings',
     canLoad: [AuthGuard],
     canActivate: [AuthGuard],
     loadComponent: () =>
@@ -50,6 +63,7 @@ export const routes: Routes = [
   },
   {
     path: 'editor',
+    title: 'Editor',
     canLoad: [AuthGuard],
     canActivate: [AuthGuard],
     loadComponent: () =>
@@ -66,6 +80,7 @@ export const routes: Routes = [
   },
   {
     path: 'profile/:username',
+    title: ProfileTitle,
     loadComponent: () =>
       import('../../profile/profile.component').then((r) => r.ProfileComponent),
     loadChildren: () =>

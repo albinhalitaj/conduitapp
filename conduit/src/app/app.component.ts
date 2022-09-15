@@ -5,12 +5,13 @@ import {
   OnInit,
 } from '@angular/core';
 import { bootstrapApplication } from '@angular/platform-browser';
-import { RouterModule } from '@angular/router';
+import { RouterModule, TitleStrategy } from '@angular/router';
 import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
 import { routes } from './app.routes';
 import { environment } from '../environments/environment';
 import { AuthStore } from './auth/auth.store';
 import { HttpCookieInterceptor } from './interceptors/http.interceptor';
+import { TemplatePageTitleStrategy } from './utils/templatepagetitle';
 
 export const API_URL = new InjectionToken('API_URL');
 
@@ -41,6 +42,10 @@ export class App implements OnInit {
           provide: HTTP_INTERCEPTORS,
           useClass: HttpCookieInterceptor,
           multi: true,
+        },
+        {
+          provide: TitleStrategy,
+          useClass: TemplatePageTitleStrategy,
         },
       ],
     }).catch((err) => console.log(err));
