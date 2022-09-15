@@ -1,15 +1,15 @@
-import { Inject, Injectable } from '@angular/core';
+import { Injectable } from '@angular/core';
 import {
   ComponentStore,
   OnStateInit,
   tapResponse,
 } from '@ngrx/component-store';
 import { Article } from '../home/home.store';
-import { ActivatedRoute, Params } from '@angular/router';
+import { ActivatedRoute, Params, Router } from '@angular/router';
 import { defer, exhaustMap, map, Observable, pipe, switchMap } from 'rxjs';
-import { AuthStore } from '../auth/auth.store';
+import { AuthStore, User } from '../auth/auth.store';
 import { ApiService } from '../api.service';
-import { articleType } from '../layouts/app-layout/app-layout.routes';
+import { HttpErrorResponse } from '@angular/common/http';
 
 interface ProfileState {
   profile: Profile | null;
@@ -39,7 +39,7 @@ export class ProfileStore
   extends ComponentStore<ProfileState>
   implements OnStateInit
 {
-  getProfile = this.effect<Params>(
+  readonly getProfile = this.effect<Params>(
     pipe(
       map((params: Params) => params['username']),
       switchMap((username: string) =>
@@ -48,14 +48,18 @@ export class ProfileStore
             (profile: Profile) => {
               this.patchState({ profile });
             },
-            (error) => console.log(error)
+            (errorResponse: HttpErrorResponse) => {
+              if (errorResponse.status == 404) {
+                void this.router.navigate(['/']);
+              }
+            }
           )
         )
       )
     )
   );
 
-  getProfileArticles = this.effect<Params>(
+  readonly getProfileArticles = this.effect<Params>(
     pipe(
       map((params: Params) => params['username']),
       switchMap((username: string) => {
@@ -71,7 +75,7 @@ export class ProfileStore
     )
   );
 
-  followUser = this.effect<Profile>(
+  readonly followUser = this.effect<Profile>(
     exhaustMap((profile: Profile) =>
       defer(() => {
         if (profile.following) {
@@ -88,11 +92,11 @@ export class ProfileStore
   );
 
   readonly vm$: Observable<ProfileVm> = this.select(
-    this.select((s) => s.profile),
-    this.select((s) => s.articles),
-    this.select((s) => s.favoritedArticles),
+    this.select((s: ProfileState) => s.profile),
+    this.select((s: ProfileState) => s.articles),
+    this.select((s: ProfileState) => s.favoritedArticles),
     this.authStore.user$.pipe(
-      map((user) => {
+      map((user: User | null) => {
         if (user) {
           return user.username;
         }
@@ -110,7 +114,8 @@ export class ProfileStore
   constructor(
     private activatedRoute: ActivatedRoute,
     private apiService: ApiService,
-    private authStore: AuthStore
+    private authStore: AuthStore,
+    private router: Router
   ) {
     super(initialState);
   }

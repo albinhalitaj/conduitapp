@@ -19,24 +19,32 @@ export class RegisterStore extends ComponentStore<RegisterState> {
     (s: RegisterState) => s.errors
   );
 
-  register = this.effect<RegisterForm>(
+  readonly register = this.effect<RegisterForm>(
     exhaustMap((registerForm: RegisterForm) => {
       return this.apiService.register(registerForm).pipe(
         tapResponse(
           () => {
             void this.router.navigate(['/login']);
           },
-          ({ error }: HttpErrorResponse) => {
-            const { title } = error;
-            const errors = new Array<string>();
-            if (title.startsWith('One or more')) {
-              Object.values(error.errors).forEach((error: any) => {
-                errors.push(error as string);
+          (errorResponse: HttpErrorResponse) => {
+            if (errorResponse.status == 0) {
+              this.setState({
+                errors: ['Unable to reach the server. Please try again!'],
               });
             } else {
-              errors.push(title);
+              const { title } = errorResponse.error;
+              const errors = new Array<string>();
+              if (title.startsWith('One or more')) {
+                Object.values(errorResponse.error.errors).forEach(
+                  (error: any) => {
+                    errors.push(error as string);
+                  }
+                );
+              } else {
+                errors.push(title);
+              }
+              this.setState({ errors });
             }
-            this.setState({ errors });
           }
         )
       );

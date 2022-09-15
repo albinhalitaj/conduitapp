@@ -78,8 +78,17 @@ export class ArticleStore
                 loading: false,
               });
             },
-            ({ error }: HttpErrorResponse) =>
-              this.patchState({ error: error.title, loading: false })
+            (errorResponse: HttpErrorResponse) => {
+              const { error, status } = errorResponse;
+              if (status == 404) {
+                void this.router.navigate(['/']);
+              } else {
+                this.patchState({
+                  error: error.title,
+                  loading: false,
+                });
+              }
+            }
           )
         )
       )

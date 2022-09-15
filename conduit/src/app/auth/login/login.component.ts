@@ -86,8 +86,8 @@ export class LoginComponent {
     password: ['', Validators.required],
   });
 
-  error$: Observable<string> = this.store.error$;
-  loginSuccess$: Observable<boolean> = this.store.loginSuccess$;
+  readonly error$: Observable<string> = this.store.error$;
+  readonly loginSuccess$: Observable<boolean> = this.store.loginSuccess$;
 
   constructor(private fb: FormBuilder, private store: LoginStore) {}
 

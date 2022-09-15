@@ -36,14 +36,16 @@ const initialState: AuthState = {
 
 @Injectable({ providedIn: 'root' })
 export class AuthStore extends ComponentStore<AuthState> {
-  isAuthenticated$: Observable<boolean> = this.select(
+  readonly isAuthenticated$: Observable<boolean> = this.select(
     (s: AuthState) => s.isAuthenticated
   );
 
   isAuthenticated: boolean = false;
 
-  user$: Observable<User | null> = this.select((s: AuthState) => s.user);
-  signOut = this.effect<void>(
+  readonly user$: Observable<User | null> = this.select(
+    (s: AuthState) => s.user
+  );
+  readonly signOut = this.effect<void>(
     exhaustMap(() =>
       this.apiService.signOut().pipe(
         tapResponse(

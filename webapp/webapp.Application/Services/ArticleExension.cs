@@ -1,3 +1,4 @@
+using System.Runtime.InteropServices;
 using webapp.Application.Interfaces;
 using webapp.Domain.Entities;
 
@@ -14,12 +15,12 @@ public static class ArticleExtension
 
         foreach (var article in source)
         {
-            foreach (var userFollower in userFollowers)
+            foreach (var userFollower in CollectionsMarshal.AsSpan(userFollowers))
             {
                 article.IsFollowing = userFollower == article.AuthorId;
             }
 
-            foreach (var userFavorite in userFavorites)
+            foreach (var userFavorite in CollectionsMarshal.AsSpan(userFavorites))
             {
                 article.IsFavorited = userFavorite.ArticleId == article.ArticleId;
             }

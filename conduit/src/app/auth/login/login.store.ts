@@ -23,7 +23,7 @@ export class LoginStore extends ComponentStore<LoginState> {
     (s: LoginState) => s.loginSuccess
   );
 
-  login = this.effect<LoginForm>(
+  readonly login = this.effect<LoginForm>(
     exhaustMap((loginForm: LoginForm) => {
       this.patchState({ error: '' });
       return this.apiService.login(loginForm).pipe(
@@ -37,8 +37,18 @@ export class LoginStore extends ComponentStore<LoginState> {
             });
             this.authStore.authenticate();
           },
-          ({ error }: HttpErrorResponse) => {
-            this.setState({ error: error.title, loginSuccess: false });
+          (errResponse: HttpErrorResponse) => {
+            if (errResponse.status == 0) {
+              this.setState({
+                error: 'Unable to reach the server. Please try again later!',
+                loginSuccess: false,
+              });
+            } else {
+              this.setState({
+                error: errResponse.error.title,
+                loginSuccess: false,
+              });
+            }
           }
         )
       );
