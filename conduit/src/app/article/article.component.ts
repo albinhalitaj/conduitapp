@@ -2,7 +2,13 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { provideComponentStore } from '@ngrx/component-store';
 import { ArticleStore, ArticleVm } from './article.store';
 import { Observable } from 'rxjs';
-import { AsyncPipe, DatePipe, NgForOf, NgIf } from '@angular/common';
+import {
+  AsyncPipe,
+  DatePipe,
+  NgForOf,
+  NgIf,
+  NgOptimizedImage,
+} from '@angular/common';
 import { Router, RouterLinkWithHref } from '@angular/router';
 import { CommentComponent } from '../ui/comment/comment.component';
 import { CommentFormComponent } from '../ui/comment/comment-form.component';
@@ -27,7 +33,7 @@ import { OwnerActionsComponent } from '../ui/owner-actions/owner-actions.compone
               <div class="article-meta">
                 <a [routerLink]="['/profile', vm.article.author.username]"
                   ><img
-                    [src]="
+                    [rawSrc]="
                       vm.article.author.image
                         ? vm.article.author.image
                         : 'https://api.realworld.io/images/smiley-cyrus.jpeg'
@@ -80,7 +86,7 @@ import { OwnerActionsComponent } from '../ui/owner-actions/owner-actions.compone
               <div class="article-meta">
                 <a [routerLink]="['/profile', vm.article.author.username]"
                   ><img
-                    [src]="
+                    [rawSrc]="
                       vm.article.author.image
                         ? vm.article.author.image
                         : 'https://api.realworld.io/images/smiley-cyrus.jpeg'
@@ -159,6 +165,7 @@ import { OwnerActionsComponent } from '../ui/owner-actions/owner-actions.compone
     SanitizerPipe,
     MarkdownPipe,
     OwnerActionsComponent,
+    NgOptimizedImage,
   ],
 })
 export class ArticleComponent {

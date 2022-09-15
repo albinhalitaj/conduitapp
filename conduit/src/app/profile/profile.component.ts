@@ -6,7 +6,13 @@ import {
   RouterOutlet,
 } from '@angular/router';
 import { Observable } from 'rxjs';
-import { AsyncPipe, DatePipe, NgForOf, NgIf } from '@angular/common';
+import {
+  AsyncPipe,
+  DatePipe,
+  NgForOf,
+  NgIf,
+  NgOptimizedImage,
+} from '@angular/common';
 import { Profile, ProfileStore, ProfileVm } from './profile.store';
 import { provideComponentStore } from '@ngrx/component-store';
 import Cookies from 'js-cookie';
@@ -21,7 +27,7 @@ import Cookies from 'js-cookie';
           <ng-container *ngIf="vm.profile">
             <div class="col-xs-12 col-md-10 offset-md-1">
               <img
-                [src]="
+                [rawSrc]="
                   !vm.profile.image
                     ? 'https://api.realworld.io/images/smiley-cyrus.jpeg'
                     : vm.profile.image
@@ -98,10 +104,11 @@ import Cookies from 'js-cookie';
     RouterLinkWithHref,
     RouterOutlet,
     RouterLinkActive,
+    NgOptimizedImage,
   ],
 })
 export class ProfileComponent {
-  vm$: Observable<ProfileVm> = this.store.vm$;
+  readonly vm$: Observable<ProfileVm> = this.store.vm$;
 
   constructor(private router: Router, private store: ProfileStore) {}
 

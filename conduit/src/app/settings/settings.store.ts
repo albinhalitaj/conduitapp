@@ -5,7 +5,7 @@ import {
   tapResponse,
 } from '@ngrx/component-store';
 import { Observable, switchMap } from 'rxjs';
-import { AuthStore } from '../auth/auth.store';
+import { AuthStore, User } from '../auth/auth.store';
 import { ApiService, UpdatedUser, UpdateUserForm } from '../api.service';
 import { Router } from '@angular/router';
 
@@ -23,10 +23,10 @@ export class SettingsStore
   implements OnStateInit
 {
   readonly profile$: Observable<UpdatedUser | null> = this.select(
-    (s) => s.profile
+    (s: SettingsState) => s.profile
   );
 
-  updateUser = this.effect<UpdateUserForm>(
+  readonly updateUser = this.effect<UpdateUserForm>(
     switchMap((user: UpdateUserForm) => {
       return this.apiService.updateUser(user).pipe(
         tapResponse(
@@ -40,11 +40,11 @@ export class SettingsStore
     })
   );
 
-  getUser = this.effect<void>(
+  readonly getUser = this.effect<void>(
     switchMap(() => {
       return this.apiService.get().pipe(
         tapResponse(
-          (user) => {
+          (user: User) => {
             const userSettings: UpdatedUser = {
               username: user.username,
               email: user.email,

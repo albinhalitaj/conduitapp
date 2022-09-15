@@ -19,18 +19,8 @@ export class EditArticleStore
   extends ComponentStore<EditArticleState>
   implements OnStateInit
 {
-  constructor(
-    private activatedRoute: ActivatedRoute,
-    private apiService: ApiService,
-    private authStore: AuthStore,
-    private router: Router
-  ) {
-    super({ article: null });
-  }
-
-  article$: Observable<Article | null> = this.select((s) => s.article);
-
-  getArticle = this.effect<Params>(
+  readonly article$: Observable<Article | null> = this.select((s) => s.article);
+  readonly getArticle = this.effect<Params>(
     pipe(
       map((params: Params) => params['slug']),
       switchMap((slug) => {
@@ -56,8 +46,7 @@ export class EditArticleStore
       })
     )
   );
-
-  updateArticle = this.effect<ArticleData>(
+  readonly updateArticle = this.effect<ArticleData>(
     exhaustMap((article: ArticleData) => {
       return this.activatedRoute.params.pipe(
         map((params: Params) => params['slug']),
@@ -74,6 +63,15 @@ export class EditArticleStore
       );
     })
   );
+
+  constructor(
+    private activatedRoute: ActivatedRoute,
+    private apiService: ApiService,
+    private authStore: AuthStore,
+    private router: Router
+  ) {
+    super({ article: null });
+  }
 
   ngrxOnStateInit(): void {
     this.getArticle(this.activatedRoute.params);

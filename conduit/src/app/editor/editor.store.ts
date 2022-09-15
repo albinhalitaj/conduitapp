@@ -1,12 +1,8 @@
 import { Injectable } from '@angular/core';
-import {
-  ComponentStore,
-  OnStateInit,
-  tapResponse,
-} from '@ngrx/component-store';
-import { exhaustMap, map, pipe, switchMap } from 'rxjs';
+import { ComponentStore, tapResponse } from '@ngrx/component-store';
+import { exhaustMap } from 'rxjs';
 import { HttpErrorResponse } from '@angular/common/http';
-import { ActivatedRoute, Params, Router } from '@angular/router';
+import { Router } from '@angular/router';
 import { ApiService, ArticleData } from '../api.service';
 import { Article } from '../home/home.store';
 
@@ -26,7 +22,7 @@ const initialState: EditorState = {
 
 @Injectable()
 export class EditorStore extends ComponentStore<EditorState> {
-  addArticle = this.effect(
+  readonly addArticle = this.effect(
     exhaustMap((article: ArticleData) => {
       this.patchState({ loading: true });
       return this.apiService.addArticle(article).pipe(

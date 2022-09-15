@@ -6,7 +6,7 @@ import {
   Output,
 } from '@angular/core';
 import { Comment } from '../../api.service';
-import { DatePipe, NgForOf, NgIf } from '@angular/common';
+import { DatePipe, NgForOf, NgIf, NgOptimizedImage } from '@angular/common';
 import { RouterLinkWithHref } from '@angular/router';
 
 @Component({
@@ -25,7 +25,7 @@ import { RouterLinkWithHref } from '@angular/router';
           [routerLink]="['/profile', comment.author.username]"
         >
           <img
-            [src]="
+            [rawSrc]="
               !comment.author.image
                 ? 'https://api.realworld.io/images/smiley-cyrus.jpeg'
                 : comment.author.image
@@ -51,7 +51,7 @@ import { RouterLinkWithHref } from '@angular/router';
     </div>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [NgForOf, NgIf, DatePipe, RouterLinkWithHref],
+  imports: [NgForOf, NgIf, DatePipe, RouterLinkWithHref, NgOptimizedImage],
 })
 export class CommentComponent {
   @Input() comments!: Comment[];

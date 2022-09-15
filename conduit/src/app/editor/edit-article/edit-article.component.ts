@@ -36,8 +36,10 @@ import { ArticleData } from '../../api.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class EditArticleComponent {
-  article: Observable<Article | null> = this.store.article$;
+  readonly article: Observable<Article | null> = this.store.article$;
+
   constructor(private store: EditArticleStore) {}
+
   update(article: ArticleData) {
     this.store.updateArticle(article);
   }

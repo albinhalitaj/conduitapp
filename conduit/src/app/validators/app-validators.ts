@@ -24,8 +24,8 @@ export function emailExistsValidator(
     return control.valueChanges.pipe(
       distinctUntilChanged(),
       debounceTime(1000),
-      switchMap((value) => apiService.emailExists(value)),
-      map((doesExists) => (doesExists ? { emailExists: true } : null)),
+      switchMap((value: string) => apiService.emailExists(value)),
+      map((doesExists: boolean) => (doesExists ? { emailExists: true } : null)),
       take(1),
       tap(() => cdr.markForCheck())
     );

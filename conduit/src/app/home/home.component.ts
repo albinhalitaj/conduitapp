@@ -11,15 +11,15 @@ import { AuthStore } from '../auth/auth.store';
   selector: 'app-home',
   standalone: true,
   template: `
-    <div class="home-page">
-      <div class="banner">
-        <div class="container">
-          <h1 class="logo-font">conduit</h1>
-          <p>A place to share your knowledge.</p>
+    <ng-container *ngIf="vm$ | async as vm">
+      <div class="home-page">
+        <div *ngIf="!vm.isAuthenticated" class="banner">
+          <div class="container">
+            <h1 class="logo-font">conduit</h1>
+            <p>A place to share your knowledge.</p>
+          </div>
         </div>
-      </div>
 
-      <ng-container *ngIf="vm$ | async as vm">
         <div class="container page">
           <div class="row">
             <div class="col-md-9">
@@ -81,8 +81,8 @@ import { AuthStore } from '../auth/auth.store';
             </div>
           </div>
         </div>
-      </ng-container>
-    </div>
+      </div>
+    </ng-container>
   `,
   providers: [provideComponentStore(HomeStore)],
   changeDetection: ChangeDetectionStrategy.OnPush,

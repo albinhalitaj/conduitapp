@@ -7,7 +7,6 @@ import {
 import { defer, exhaustMap, Observable, pipe, switchMap, tap } from 'rxjs';
 import { AuthStore } from '../auth/auth.store';
 import { ApiService } from '../api.service';
-import { Router } from '@angular/router';
 
 export interface Author {
   username: string;
@@ -56,47 +55,6 @@ export class HomeStore
   extends ComponentStore<HomeState>
   implements OnStateInit
 {
-  private readonly articles$: Observable<Article[]> = this.select(
-    (s: HomeState) => s.articles
-  );
-  private readonly tags$: Observable<string[]> = this.select(
-    (s: HomeState) => s.tags
-  );
-  private readonly articlesLoading$: Observable<boolean> = this.select(
-    (s: HomeState) => s.articlesLoading
-  );
-  private readonly tagsLoading$: Observable<boolean> = this.select(
-    (s: HomeState) => s.tagsLoading
-  );
-
-  readonly vm$: Observable<HomeVm> = this.select(
-    this.articles$,
-    this.tags$,
-    this.articlesLoading$,
-    this.tagsLoading$,
-    this.select((s: HomeState) => s.selectedTag),
-    this.select((s: HomeState) => s.type),
-    this.authStore.isAuthenticated$,
-    (
-      articles,
-      tags,
-      articlesLoading,
-      tagsLoading,
-      selectedTag,
-      type,
-      isAuthenticated
-    ) => ({
-      articles,
-      tags,
-      articlesLoading,
-      tagsLoading,
-      selectedTag,
-      type,
-      isAuthenticated,
-    }),
-    { debounce: true }
-  );
-
   readonly getArticles = this.effect<void>(
     pipe(
       tap(() => {
@@ -121,7 +79,6 @@ export class HomeStore
       )
     )
   );
-
   readonly getTags = this.effect<void>(
     pipe(
       tap(() => this.patchState({ tagsLoading: true })),
@@ -140,7 +97,6 @@ export class HomeStore
       )
     )
   );
-
   readonly getArticleByTags = this.effect(
     switchMap((selectedTag: string) => {
       this.patchState({ articlesLoading: true, selectedTag });
@@ -173,8 +129,7 @@ export class HomeStore
       );
     })
   );
-
-  toggleFavorite = this.effect<Article>(
+  readonly toggleFavorite = this.effect<Article>(
     exhaustMap((article: Article) =>
       defer(() => {
         if (article.isFavorited) {
@@ -201,15 +156,6 @@ export class HomeStore
       )
     )
   );
-
-  constructor(private apiService: ApiService, private authStore: AuthStore) {
-    super(initialState);
-  }
-
-  ngrxOnStateInit(): void {
-    this.init();
-  }
-
   init = this.effect<void>(
     switchMap(() => {
       return this.authStore.isAuthenticated$.pipe(
@@ -220,4 +166,51 @@ export class HomeStore
       );
     })
   );
+  private readonly articles$: Observable<Article[]> = this.select(
+    (s: HomeState) => s.articles
+  );
+  private readonly tags$: Observable<string[]> = this.select(
+    (s: HomeState) => s.tags
+  );
+  private readonly articlesLoading$: Observable<boolean> = this.select(
+    (s: HomeState) => s.articlesLoading
+  );
+  private readonly tagsLoading$: Observable<boolean> = this.select(
+    (s: HomeState) => s.tagsLoading
+  );
+  readonly vm$: Observable<HomeVm> = this.select(
+    this.articles$,
+    this.tags$,
+    this.articlesLoading$,
+    this.tagsLoading$,
+    this.select((s: HomeState) => s.selectedTag),
+    this.select((s: HomeState) => s.type),
+    this.authStore.isAuthenticated$,
+    (
+      articles,
+      tags,
+      articlesLoading,
+      tagsLoading,
+      selectedTag,
+      type,
+      isAuthenticated
+    ) => ({
+      articles,
+      tags,
+      articlesLoading,
+      tagsLoading,
+      selectedTag,
+      type,
+      isAuthenticated,
+    }),
+    { debounce: true }
+  );
+
+  constructor(private apiService: ApiService, private authStore: AuthStore) {
+    super(initialState);
+  }
+
+  ngrxOnStateInit(): void {
+    this.init();
+  }
 }

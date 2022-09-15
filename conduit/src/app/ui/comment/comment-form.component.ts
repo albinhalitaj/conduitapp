@@ -11,6 +11,7 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
+import { NgOptimizedImage } from '@angular/common';
 
 @Component({
   selector: 'app-comment-form',
@@ -31,7 +32,7 @@ import {
       </div>
       <div class="card-footer">
         <img
-          [src]="
+          [rawSrc]="
             !image ? 'https://api.realworld.io/images/smiley-cyrus.jpeg' : image
           "
           alt="Avatar"
@@ -42,22 +43,22 @@ import {
     </form>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, NgOptimizedImage],
 })
 export class CommentFormComponent {
   @Input() image!: string | undefined;
-  @Input() set comment(comment: string) {
-    this.commentForm.setValue({
-      body: comment,
-    });
-  }
-
   @Output() postComment = new EventEmitter<string>();
   commentForm: FormGroup = this.fb.nonNullable.group({
     body: ['', Validators.required],
   });
 
   constructor(private fb: FormBuilder) {}
+
+  @Input() set comment(comment: string) {
+    this.commentForm.setValue({
+      body: comment,
+    });
+  }
 
   add() {
     this.postComment.emit(this.commentForm.getRawValue());
