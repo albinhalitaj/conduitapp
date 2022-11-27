@@ -10,6 +10,7 @@
 
     <ItemGroup>
         <PackageReference Include="AutoFixture" Version="4.17.0" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="7.0.0" />
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.1.0" />
         <PackageReference Include="Moq" Version="4.18.2" />
         <PackageReference Include="Shouldly" Version="4.0.3" />
@@ -26,6 +27,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\..\webapp.Application\webapp.Application.csproj" />
+      <ProjectReference Include="..\..\webapp.Infrastructure\webapp.Infrastructure.csproj" />
     </ItemGroup>
 
 </Project>

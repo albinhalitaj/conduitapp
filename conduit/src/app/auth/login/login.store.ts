@@ -3,8 +3,7 @@ import { ComponentStore, tapResponse } from '@ngrx/component-store';
 import { exhaustMap, Observable } from 'rxjs';
 import { AuthStore } from '../auth.store';
 import { HttpErrorResponse } from '@angular/common/http';
-import Cookies from 'js-cookie';
-import { ApiService, LoginForm, LoginResponse } from '../../api.service';
+import { ApiService, LoginForm } from '../../api.service';
 
 interface LoginState {
   error: string;
@@ -27,21 +26,15 @@ export class LoginStore extends ComponentStore<LoginState> {
     exhaustMap((loginForm: LoginForm) => {
       this.patchState({ error: '' });
       return this.apiService.login(loginForm).pipe(
-        tapResponse(
-          (user: LoginResponse) => {
+        tapResponse(() => {
             this.patchState({ loginSuccess: true });
-            Cookies.set('user', JSON.stringify(user), {
-              expires: new Date(user.expiresAt),
-              secure: true,
-              sameSite: 'none',
-            });
             this.authStore.authenticate();
           },
           (errResponse: HttpErrorResponse) => {
             if (errResponse.status == 0) {
               this.setState({
                 error: 'Unable to reach the server. Please try again later!',
-                loginSuccess: false,
+                loginSuccess: false
               });
             } else {
               this.setState({

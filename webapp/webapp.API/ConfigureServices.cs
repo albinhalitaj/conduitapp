@@ -17,6 +17,8 @@ public static class ConfigureServices
         services.AddHttpContextAccessor();
         services.ConfigureFluentValidation();
 
+        services.AddSignalR();
+
         services.AddSwaggerGen(s =>
         {
             s.SwaggerDoc("v1", new OpenApiInfo {Title = "Real World Conduit App API", Version = "v1"});
@@ -30,16 +32,20 @@ public static class ConfigureServices
         return services;
     }
 
-    public static void ConfigureApp(this IApplicationBuilder app)
+    public static void ConfigureApp(this WebApplication app)
     {
-        app.UseDeveloperExceptionPage();
-        app.UseExceptionHandler("/error");
-        app.UseSwagger();
-        app.UseSwaggerUI(x =>
+        if (app.Environment.IsDevelopment())
         {
-            x.SwaggerEndpoint("/swagger/v1/swagger.json", "Version 1");
-            x.SwaggerEndpoint("/swagger/v2/swagger.json", "Version 2");
-        });
+            app.UseDeveloperExceptionPage();
+            app.UseExceptionHandler("/error");
+            app.UseSwagger();
+            app.UseSwaggerUI(x =>
+            {
+                x.SwaggerEndpoint("/swagger/v1/swagger.json", "Version 1");
+                x.SwaggerEndpoint("/swagger/v2/swagger.json", "Version 2");
+            });
+        }
+
         app.UseCors(x => x.AllowAnyHeader()
             .WithOrigins("http://localhost:4200")
             .AllowCredentials()

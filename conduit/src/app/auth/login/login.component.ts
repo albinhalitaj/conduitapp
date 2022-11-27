@@ -81,7 +81,7 @@ import { Observable } from 'rxjs';
   providers: [LoginStore],
 })
 export class LoginComponent {
-  loginForm: FormGroup = this.fb.group({
+  loginForm: FormGroup = this.fb.nonNullable.group({
     usernameOrEmail: ['', Validators.required],
     password: ['', Validators.required],
   });
@@ -102,8 +102,8 @@ export class LoginComponent {
   login(): void {
     if (this.loginForm.invalid) {
       this.loginForm.markAllAsTouched();
-    } else {
-      this.store.login(this.loginForm.getRawValue());
+      return;
     }
+    this.store.login(this.loginForm.getRawValue());
   }
 }

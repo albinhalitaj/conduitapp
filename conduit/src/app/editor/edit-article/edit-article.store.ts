@@ -28,7 +28,7 @@ export class EditArticleStore
           switchMap((article: Article) => {
             return this.authStore.user$.pipe(
               map((user: User | null) => {
-                if (user && user.username == article.author.username) {
+                if (user && user.Username == article.author.username) {
                   return article;
                 }
                 return null;

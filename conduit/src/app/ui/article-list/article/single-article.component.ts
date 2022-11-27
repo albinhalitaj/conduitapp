@@ -56,7 +56,6 @@ import { DatePipe, NgClass, NgForOf, NgIf } from '@angular/common';
     </ng-template>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  providers: [],
   imports: [RouterLinkWithHref, NgIf, NgForOf, DatePipe, NgClass],
 })
 export class SingleArticleComponent {

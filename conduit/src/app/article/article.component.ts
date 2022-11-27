@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { provideComponentStore } from '@ngrx/component-store';
 import { ArticleStore, ArticleVm } from './article.store';
-import { Observable } from 'rxjs';
+import { map, Observable, takeUntil, tap } from 'rxjs';
 import {
   AsyncPipe,
   DatePipe,
@@ -29,15 +29,16 @@ import { OwnerActionsComponent } from '../ui/owner-actions/owner-actions.compone
           <div class="banner">
             <div class="container">
               <h1>{{ vm.article.title }}</h1>
-
               <div class="article-meta">
                 <a [routerLink]="['/profile', vm.article.author.username]"
                   ><img
-                    [rawSrc]="
+                    [ngSrc]="
                       vm.article.author.image
                         ? vm.article.author.image
                         : 'https://api.realworld.io/images/smiley-cyrus.jpeg'
                     "
+                    width="100"
+                    height="100"
                     alt="Avatar"
                 /></a>
                 <div class="info">
@@ -86,11 +87,13 @@ import { OwnerActionsComponent } from '../ui/owner-actions/owner-actions.compone
               <div class="article-meta">
                 <a [routerLink]="['/profile', vm.article.author.username]"
                   ><img
-                    [rawSrc]="
+                    [ngSrc]="
                       vm.article.author.image
                         ? vm.article.author.image
                         : 'https://api.realworld.io/images/smiley-cyrus.jpeg'
                     "
+                    width="100"
+                    height="100"
                     alt="Avatar"
                 /></a>
                 <div class="info">
@@ -113,7 +116,6 @@ import { OwnerActionsComponent } from '../ui/owner-actions/owner-actions.compone
                   (favoriteArticle)="favoriteArticle(vm.article)"
                 >
                 </app-user-actions>
-
                 <ng-template #ownerActions>
                   <app-owner-actions
                     (editArticle)="editArticle(vm.article.slug)"
@@ -129,7 +131,7 @@ import { OwnerActionsComponent } from '../ui/owner-actions/owner-actions.compone
                 <app-comment-form
                   *ngIf="vm.user"
                   (postComment)="postComment($event)"
-                  [image]="vm.user.image"
+                  [image]="vm.user.Image"
                 >
                 </app-comment-form>
 
@@ -141,7 +143,7 @@ import { OwnerActionsComponent } from '../ui/owner-actions/owner-actions.compone
 
                 <app-comment
                   [comments]="vm.comments"
-                  [username]="vm.user?.username"
+                  [username]="vm.user?.Username"
                   (deleteComment)="deleteComment($event, vm.article.slug)"
                 ></app-comment>
               </div>
@@ -151,8 +153,8 @@ import { OwnerActionsComponent } from '../ui/owner-actions/owner-actions.compone
       </ng-container>
     </ng-container>
   `,
-  providers: [provideComponentStore(ArticleStore)],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  providers: [provideComponentStore(ArticleStore)],
   imports: [
     NgIf,
     AsyncPipe,
@@ -178,19 +180,27 @@ export class ArticleComponent {
   ) {}
 
   followUser(author: Author): void {
-    if (!this.authStore.isAuthenticated) {
-      void this.router.navigate(['/login']);
-    } else {
-      this.store.followUser(author);
-    }
+    this.authStore.isAuthenticated$
+      .pipe(
+        tap((isAuthenticated: boolean) => {
+          if (isAuthenticated) this.store.followUser(author);
+          void this.router.navigate(['/login']);
+        }),
+        takeUntil(this.store.destroy$)
+      )
+      .subscribe();
   }
 
   favoriteArticle(article: Article): void {
-    if (!this.authStore.isAuthenticated) {
-      void this.router.navigate(['/login']);
-    } else {
-      this.store.toggleFavorite(article);
-    }
+    this.authStore.isAuthenticated$
+      .pipe(
+        map((isAuthenticated: boolean) => {
+          if (isAuthenticated) this.store.toggleFavorite(article);
+          void this.router.navigate(['/login']);
+        }),
+        takeUntil(this.store.destroy$)
+      )
+      .subscribe();
   }
 
   postComment(body: string): void {

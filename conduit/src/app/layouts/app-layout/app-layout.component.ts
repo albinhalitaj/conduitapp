@@ -10,7 +10,6 @@ import { HeaderComponent } from '../../ui/header/header.component';
     <router-outlet></router-outlet>
     <app-footer></app-footer>
   </div>`,
-  styles: [],
   imports: [RouterOutlet, HeaderComponent, FooterComponent],
 })
 export class AppLayoutComponent {}

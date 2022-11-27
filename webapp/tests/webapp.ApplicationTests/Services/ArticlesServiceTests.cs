@@ -1,10 +1,13 @@
 ﻿using AutoFixture;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using Shouldly;
 using webapp.Application.Interfaces;
 using webapp.Contracts.Articles;
 using webapp.Contracts.Authors;
 using webapp.Contracts.Common;
+using webapp.Infrastructure.Data;
 
 namespace webapp.ApplicationTests.Services;
 
@@ -12,10 +15,13 @@ public class ArticlesServiceTests
 {
     private readonly IFixture _fixture = new Fixture();
     private readonly Mock<IArticleService> _articleService;
+    private readonly IAppDbContext _context;
 
     public ArticlesServiceTests()
     {
         _articleService = _fixture.Freeze<Mock<IArticleService>>();
+        var dbContextOptions = new DbContextOptionsBuilder<AppDbContext>().UseInMemoryDatabase("Testing");
+        _context = new AppDbContext(dbContextOptions.Options);
     }
 
     [Fact]

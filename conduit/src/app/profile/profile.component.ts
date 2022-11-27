@@ -5,7 +5,7 @@ import {
   RouterLinkWithHref,
   RouterOutlet,
 } from '@angular/router';
-import { Observable } from 'rxjs';
+import { Observable, takeUntil, tap } from 'rxjs';
 import {
   AsyncPipe,
   DatePipe,
@@ -15,7 +15,7 @@ import {
 } from '@angular/common';
 import { Profile, ProfileStore, ProfileVm } from './profile.store';
 import { provideComponentStore } from '@ngrx/component-store';
-import Cookies from 'js-cookie';
+import { AuthStore } from '../auth/auth.store';
 
 @Component({
   selector: 'app-profile',
@@ -27,11 +27,13 @@ import Cookies from 'js-cookie';
           <ng-container *ngIf="vm.profile">
             <div class="col-xs-12 col-md-10 offset-md-1">
               <img
-                [rawSrc]="
+                [ngSrc]="
                   !vm.profile.image
                     ? 'https://api.realworld.io/images/smiley-cyrus.jpeg'
                     : vm.profile.image
                 "
+                width="100"
+                height="100"
                 class="user-img"
                 alt="Avatar"
               />
@@ -110,14 +112,21 @@ import Cookies from 'js-cookie';
 export class ProfileComponent {
   readonly vm$: Observable<ProfileVm> = this.store.vm$;
 
-  constructor(private router: Router, private store: ProfileStore) {}
+  constructor(
+    private router: Router,
+    private auth: AuthStore,
+    private store: ProfileStore
+  ) {}
 
   followUser(profile: Profile) {
-    const user = Cookies.get('user');
-    if (!user) {
-      void this.router.navigate(['/login']);
-    } else {
-      this.store.followUser(profile);
-    }
+    this.auth.isAuthenticated$
+      .pipe(
+        tap((isAuthenticated: boolean) => {
+          if (isAuthenticated) this.store.followUser(profile);
+          void this.router.navigate(['/login']);
+        }),
+        takeUntil(this.store.destroy$)
+      )
+      .subscribe();
   }
 }

@@ -64,19 +64,19 @@ export class HomeStore
           type: 'global',
         });
       }),
-      switchMap(() =>
-        this.apiService.getArticles().pipe(
+      switchMap(() => {
+        return this.apiService.getArticles().pipe(
           tapResponse(
             (articles: Article[]) => {
               this.patchState({ articles, articlesLoading: false });
             },
             (error) => {
               this.patchState({ articlesLoading: false });
-              console.log('error while fetching articles', error);
+              console.error('error while fetching articles', error);
             }
           )
-        )
-      )
+        );
+      })
     )
   );
   readonly getTags = this.effect<void>(
@@ -89,7 +89,7 @@ export class HomeStore
               this.patchState({ tags, tagsLoading: false });
             },
             (error) => {
-              console.log('error while fetching tags', error);
+              console.error('error while fetching tags', error);
               this.patchState({ tagsLoading: false });
             }
           )
@@ -213,4 +213,6 @@ export class HomeStore
   ngrxOnStateInit(): void {
     this.init();
   }
+
+  readonly toggleFavoriteEffect = this.effect<void>(($) => $);
 }

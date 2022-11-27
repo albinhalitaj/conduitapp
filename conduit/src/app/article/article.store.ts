@@ -40,29 +40,26 @@ export type ArticleVm = ArticleState & {
   user: User | null;
 };
 
-@Injectable({ providedIn: 'root' })
+@Injectable()
 export class ArticleStore
   extends ComponentStore<ArticleState>
   implements OnStateInit
 {
   readonly vm$: Observable<ArticleVm> = this.select(
-    this.select((s: ArticleState) => s.article),
-    this.select((s: ArticleState) => s.comments),
-    this.select((s: ArticleState) => s.loading),
-    this.select((s: ArticleState) => s.error),
     this.authStore.user$,
-    (article, comments, loading, error, user) => ({
+    this.select((s) => s.article),
+    this.select((s) => s.comments),
+    this.select((s) => s.error),
+    this.select((s) => s.loading),
+    (user, article, comments, error, loading) => ({
       article,
       comments,
       loading,
       error,
-      isOwner: article?.author.username == user?.username,
+      isOwner: user?.Username === article?.author.username,
       user,
-    })
-  );
-
-  readonly title$: Observable<string | undefined> = this.select(
-    (s) => s.article?.title
+    }),
+    { debounce: true }
   );
 
   readonly getArticle = this.effect<Params>(
@@ -132,7 +129,7 @@ export class ArticleStore
                   };
                 });
               },
-              (error) => console.log(error)
+              (error) => console.error(error)
             )
           )
         )

@@ -45,10 +45,47 @@ public class ArticlesControllerTests
 
         var controller = new ArticlesController(_articleService.Object, _commentService.Object);
 
-        var result = await controller.GetArticles(queryParams);
+        var result = await controller.GetArticles(queryParams).ConfigureAwait(false);
 
         result.ShouldBeOfType<ObjectResult>()
             .Value.ShouldBeOfType<ProblemDetails>();
         result.ShouldBeAssignableTo<ActionResult>();
+    }
+
+    [Fact]
+    public async Task GetArticle_ReturnsArticle_WhenArticleFound()
+    {
+        var articleSlug = _fixture.Create<string>();
+        var article = _fixture.Create<ArticleResponse>();
+        _articleService.Setup(x => x.GetArticleAsync(articleSlug))
+            .ReturnsAsync(new ResultDto<ArticleResponse> { Value = article });
+
+        var controller = new ArticlesController(_articleService.Object, _commentService.Object);
+
+        var result = await controller.GetArticle(articleSlug).ConfigureAwait(false);
+        
+        result.ShouldNotBe(null);
+        result.ShouldBeOfType<OkObjectResult>()
+            .Value.ShouldBeOfType<ArticleResponse>();
+    }
+
+    [Fact]
+    public async Task GetArticle_ReturnsProblem_WhenArticleNotFound()
+    {
+        var articleSlug = _fixture.Create<string>();
+        _articleService.Setup(x => x.GetArticleAsync(articleSlug))
+            .ReturnsAsync(new ResultDto<ArticleResponse> { Errors = new List<ErrorDto>
+            {
+                new() {Message = $"Article with slug {articleSlug} was not found!"}
+            } });
+
+        var controller = new ArticlesController(_articleService.Object, _commentService.Object);
+
+        var result = await controller.GetArticle(articleSlug).ConfigureAwait(false);
+
+        result.ShouldBeAssignableTo<ActionResult>();
+        result.ShouldBeOfType<ObjectResult>()
+            .Value.ShouldBeOfType<ProblemDetails>()
+            .Title.ShouldBe($"Article with slug {articleSlug} was not found!");
     }
 }

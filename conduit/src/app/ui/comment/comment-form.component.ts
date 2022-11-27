@@ -32,10 +32,12 @@ import { NgOptimizedImage } from '@angular/common';
       </div>
       <div class="card-footer">
         <img
-          [rawSrc]="
+          [ngSrc]="
             !image ? 'https://api.realworld.io/images/smiley-cyrus.jpeg' : image
           "
           alt="Avatar"
+          width="100"
+          height="100"
           class="comment-author-img"
         />
         <button class="btn btn-sm btn-primary">Post Comment</button>

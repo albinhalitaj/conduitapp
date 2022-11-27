@@ -98,7 +98,7 @@ export class ProfileStore
     this.authStore.user$.pipe(
       map((user: User | null) => {
         if (user) {
-          return user.username;
+          return user.Username;
         }
         return '';
       })

@@ -5,7 +5,7 @@ import {
   tapResponse,
 } from '@ngrx/component-store';
 import { Observable, switchMap } from 'rxjs';
-import { AuthStore, User } from '../auth/auth.store';
+import { AuthStore } from '../auth/auth.store';
 import { ApiService, UpdatedUser, UpdateUserForm } from '../api.service';
 import { Router } from '@angular/router';
 
@@ -44,7 +44,7 @@ export class SettingsStore
     switchMap(() => {
       return this.apiService.get().pipe(
         tapResponse(
-          (user: User) => {
+          (user: any) => {
             const userSettings: UpdatedUser = {
               username: user.username,
               email: user.email,

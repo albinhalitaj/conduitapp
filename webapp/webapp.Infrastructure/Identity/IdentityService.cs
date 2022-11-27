@@ -1,6 +1,7 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using System.Text.Json;
 using Mapster;
 using MapsterMapper;
 using Microsoft.AspNetCore.Http;
@@ -93,8 +94,19 @@ public class IdentityService : IIdentityService
                     SameSite = SameSiteMode.None,
                     Expires = DateTimeOffset.UtcNow.AddMonths(1)
                 });
+                
                 response.Value = new User(userAccount.Id, userAccount.UserName, userAccount.Email, roles[0],
                     DateTimeOffset.UtcNow.AddMonths(1),userAccount.Bio,userAccount.Image);
+
+                var jsonString = JsonSerializer.Serialize(response.Value);
+                
+                _httpContextAccessor.HttpContext.Response.Cookies.Append("user",jsonString,new CookieOptions
+                {
+                    Secure = true,
+                    SameSite = SameSiteMode.None,
+                    Expires = response.Value.ExpiresAt
+                });
+                
                 return response;
             }
             
@@ -172,7 +184,7 @@ public class IdentityService : IIdentityService
             SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key),
                 SecurityAlgorithms.HmacSha256Signature),
             Issuer = "www.conduitapp.com/api",
-            IssuedAt = DateTime.Now,
+            IssuedAt = DateTime.UtcNow,
             Audience = "www.conduitapp.com"
         };
 

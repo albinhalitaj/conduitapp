@@ -15,13 +15,13 @@ import Cookies from 'js-cookie';
 import { ApiService } from '../api.service';
 
 export interface User {
-  id: string;
-  username: string;
-  email: string;
-  role: string;
-  expiresAt: string;
-  bio: string;
-  image: string;
+  Id: string;
+  Username: string;
+  Email: string;
+  Role: string;
+  ExpiresAt: string;
+  Bio: string;
+  Image: string;
 }
 
 export interface AuthState {
@@ -40,8 +40,6 @@ export class AuthStore extends ComponentStore<AuthState> {
     (s: AuthState) => s.isAuthenticated
   );
 
-  isAuthenticated: boolean = false;
-
   readonly user$: Observable<User | null> = this.select(
     (s: AuthState) => s.user
   );
@@ -49,9 +47,7 @@ export class AuthStore extends ComponentStore<AuthState> {
     exhaustMap(() =>
       this.apiService.signOut().pipe(
         tapResponse(
-          (resp: any) => {
-            console.log(resp);
-            Cookies.remove('user');
+          () => {
             this.setState({ user: null, isAuthenticated: false });
             void this.router.navigate(['/']);
           },
@@ -70,12 +66,7 @@ export class AuthStore extends ComponentStore<AuthState> {
         return of(JSON.parse(user) as User);
       }).pipe(
         tap((user: User | null) => {
-          if (user) {
-            this.isAuthenticated = true;
-            this.setState({ isAuthenticated: true, user });
-          } else {
-            this.setState({ isAuthenticated: false, user: null });
-          }
+          this.setState({ isAuthenticated: !!user, user });
         }),
         catchError(() => {
           this.setState({ user: null, isAuthenticated: false });
@@ -87,14 +78,12 @@ export class AuthStore extends ComponentStore<AuthState> {
 
   constructor(private router: Router, private apiService: ApiService) {
     super(initialState);
-    const user = Cookies.get('user');
-    this.isAuthenticated = !!user;
   }
 
   init() {
     this.refresh();
   }
-
+  
   authenticate(urlSegments: string[] = ['/']) {
     this.refresh();
     void this.router.navigate(urlSegments);

@@ -98,6 +98,7 @@ public class ProfileService : IProfileService
                 Profile = new ProfileResponse(x.User!.UserName, x.User.Bio, x.User.Image, false),
                 Id = x.UserFollowerId
             }).FirstOrDefaultAsync();
+        
         if (followedUser is null)
         {
             response.Errors = new List<ErrorDto> { new() { Message = $"You are not following {username}" } };

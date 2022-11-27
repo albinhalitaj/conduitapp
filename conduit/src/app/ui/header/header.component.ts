@@ -43,10 +43,10 @@ import { AsyncPipe, NgIf } from '@angular/common';
             <li class="nav-item">
               <a
                 class="nav-link"
-                [routerLink]="['/profile', user.username]"
+                [routerLink]="['/profile', user.Username]"
                 style="user-select: none;"
               >
-                {{ user.username }}
+                {{ user.Username }}
               </a>
             </li>
           </ng-container>

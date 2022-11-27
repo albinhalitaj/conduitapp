@@ -1,7 +1,13 @@
-import { ActivatedRouteSnapshot, Resolve, Routes } from '@angular/router';
-import { Injectable, InjectionToken, Provider } from '@angular/core';
-import { AuthGuard } from '../../guards/auth.guard';
-import { NonAuthGuard } from '../../guards/nonauth.guard';
+import {
+  ActivatedRouteSnapshot,
+  Resolve,
+  Router,
+  Routes,
+  UrlTree,
+} from '@angular/router';
+import { inject, Injectable, InjectionToken, Provider } from '@angular/core';
+import { AuthStore } from '../../auth/auth.store';
+import { map, Observable } from 'rxjs';
 
 export const articleType = new InjectionToken<string>('Article Type');
 
@@ -14,12 +20,28 @@ export function provideArticleType(type: string): Provider {
 
 @Injectable({ providedIn: 'root' })
 class ProfileTitle implements Resolve<string> {
-  constructor() {}
-
   resolve(route: ActivatedRouteSnapshot) {
     return `@${route.params['username']}`;
   }
 }
+
+const nonAuthGuard: () => Observable<UrlTree | boolean> = () => {
+  return inject(AuthStore).isAuthenticated$.pipe(
+    map((isAuthenticated: boolean) => {
+      if (isAuthenticated) return inject(Router).parseUrl('/');
+      return true;
+    })
+  );
+};
+
+const authGuard: () => Observable<boolean | UrlTree> = () => {
+  return inject(AuthStore).isAuthenticated$.pipe(
+    map((isAuthenticated: boolean) => {
+      if (isAuthenticated) return isAuthenticated;
+      return inject(Router).parseUrl('/');
+    })
+  );
+};
 
 export const routes: Routes = [
   {
@@ -31,16 +53,14 @@ export const routes: Routes = [
   {
     path: 'login',
     title: 'Sign in',
-    canLoad: [NonAuthGuard],
-    canActivate: [NonAuthGuard],
+    canMatch: [nonAuthGuard],
     loadComponent: () =>
       import('../../auth/login/login.component').then((l) => l.LoginComponent),
   },
   {
     path: 'register',
     title: 'Register',
-    canLoad: [NonAuthGuard],
-    canActivate: [NonAuthGuard],
+    canMatch: [nonAuthGuard],
     loadComponent: () =>
       import('../../auth/register/register.component').then(
         (r) => r.RegisterComponent
@@ -49,8 +69,7 @@ export const routes: Routes = [
   {
     path: 'settings',
     title: 'Settings',
-    canLoad: [AuthGuard],
-    canActivate: [AuthGuard],
+    canMatch: [authGuard],
     loadComponent: () =>
       import('../../settings/settings.component').then(
         (r) => r.SettingsComponent
@@ -64,15 +83,13 @@ export const routes: Routes = [
   {
     path: 'editor',
     title: 'Editor',
-    canLoad: [AuthGuard],
-    canActivate: [AuthGuard],
+    canMatch: [authGuard],
     loadComponent: () =>
       import('../../editor/editor.component').then((a) => a.EditorComponent),
   },
   {
     path: 'editor/:slug',
-    canLoad: [AuthGuard],
-    canActivate: [AuthGuard],
+    canMatch: [authGuard],
     loadComponent: () =>
       import('../../editor/edit-article/edit-article.component').then(
         (a) => a.EditArticleComponent

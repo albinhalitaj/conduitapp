@@ -25,7 +25,7 @@ import { RouterLinkWithHref } from '@angular/router';
           [routerLink]="['/profile', comment.author.username]"
         >
           <img
-            [rawSrc]="
+            [ngSrc]="
               !comment.author.image
                 ? 'https://api.realworld.io/images/smiley-cyrus.jpeg'
                 : comment.author.image

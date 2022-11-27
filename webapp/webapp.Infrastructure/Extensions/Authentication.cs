@@ -6,7 +6,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using webapp.Domain.Entities;
 using webapp.Infrastructure.Data;
-using webapp.Infrastructure.Identity;
 
 namespace webapp.Infrastructure.Extensions;
 
@@ -20,46 +19,46 @@ public static class Authentication
         var appSettings = appSettingsSection.Get<ApplicationSettings>();
         var key = Encoding.ASCII.GetBytes(appSettings.Secret ?? string.Empty);
         service.AddAuthentication(x =>
+        {
+            x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+            x.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+            x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+        })
+        .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, x =>
+        {
+            x.RequireHttpsMetadata = false;
+            x.SaveToken = true;
+            x.TokenValidationParameters = new TokenValidationParameters
             {
-                x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                x.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-                x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-            })
-            .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, x =>
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = new SymmetricSecurityKey(key),
+                ValidateIssuer = true,
+                ValidateAudience = true,
+                ValidIssuer = "www.conduitapp.com/api",
+                ValidAudience = "www.conduitapp.com"
+            };
+            x.Events = new JwtBearerEvents
             {
-                x.RequireHttpsMetadata = false;
-                x.SaveToken = true;
-                x.TokenValidationParameters = new TokenValidationParameters
+                OnMessageReceived = context =>
                 {
-                    ValidateIssuerSigningKey = true,
-                    IssuerSigningKey = new SymmetricSecurityKey(key),
-                    ValidateIssuer = true,
-                    ValidateAudience = true,
-                    ValidIssuer = "www.conduitapp.com/api",
-                    ValidAudience = "www.conduitapp.com"
-                };
-                x.Events = new JwtBearerEvents
-                {
-                    OnMessageReceived = context =>
-                    {
-                        var token = context.Request.Cookies["token"];
-                        context.Token = token;
-                        return Task.CompletedTask;
-                    }
-                };
-            });
+                    var token = context.Request.Cookies["token"];
+                    context.Token = token;
+                    return Task.CompletedTask;
+                }
+            };
+        });
     }
 
     public static void ConfigureIdentityProviders(this IServiceCollection services)
     {
         services.AddIdentity<ApplicationUser, IdentityRole>(opt =>
-            {
-                opt.Password.RequiredLength = 8;
-                opt.Password.RequireUppercase = true;
-                opt.Password.RequireLowercase = true;
-                opt.Password.RequireDigit = true;
-            })
-            .AddEntityFrameworkStores<AppDbContext>()
-            .AddDefaultTokenProviders();
+        {
+            opt.Password.RequiredLength = 8;
+            opt.Password.RequireUppercase = true;
+            opt.Password.RequireLowercase = true;
+            opt.Password.RequireDigit = true;
+        })
+        .AddEntityFrameworkStores<AppDbContext>()
+        .AddDefaultTokenProviders();
     }
 }

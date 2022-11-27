@@ -64,6 +64,12 @@ public class UserController : ApiController
             Secure = true,
             SameSite = SameSiteMode.None
         });
+        
+        if(Request.Cookies.ContainsKey("user")) Response.Cookies.Delete("user", new CookieOptions
+        {
+            Secure = true,
+            SameSite = SameSiteMode.None
+        });
 
         return NoContent();
     }

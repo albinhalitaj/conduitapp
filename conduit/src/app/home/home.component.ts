@@ -1,7 +1,7 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { Article, HomeStore, HomeVm } from './home.store';
 import { provideComponentStore } from '@ngrx/component-store';
-import { Observable } from 'rxjs';
+import { map, Observable } from 'rxjs';
 import { AsyncPipe, DatePipe, NgClass, NgForOf, NgIf } from '@angular/common';
 import { Router, RouterLinkWithHref } from '@angular/router';
 import { SingleArticleComponent } from '../ui/article-list/article/single-article.component';
@@ -130,10 +130,13 @@ export class HomeComponent {
   }
 
   toggleFavorite(article: Article) {
-    if (!this.authStore.isAuthenticated) {
-      void this.router.navigate(['/login']);
-    } else {
-      this.store.toggleFavorite(article);
-    }
+    this.store.toggleFavoriteEffect(
+      this.authStore.isAuthenticated$.pipe(
+        map((isAuthenticated: boolean) => {
+          if (isAuthenticated) this.store.toggleFavorite(article);
+          void this.router.navigate(['/login']);
+        })
+      )
+    );
   }
 }

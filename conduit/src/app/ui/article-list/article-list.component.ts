@@ -3,7 +3,7 @@ import { Router, RouterLinkWithHref } from '@angular/router';
 import { AsyncPipe, DatePipe, NgClass, NgForOf, NgIf } from '@angular/common';
 import { provideComponentStore } from '@ngrx/component-store';
 import { ArticleListState, ArticleListStore } from './article-list.store';
-import { Observable } from 'rxjs';
+import { Observable, takeUntil, tap } from 'rxjs';
 import { AuthStore } from '../../auth/auth.store';
 import { Article } from '../../home/home.store';
 import { SingleArticleComponent } from './article/single-article.component';
@@ -15,16 +15,14 @@ import { SingleArticleComponent } from './article/single-article.component';
     <ng-container *ngIf="vm$ | async as vm">
       <ng-container *ngIf="!vm.loading; else loading">
         <app-article
+          *ngIf="!vm.error"
           [articles]="vm.articles"
           (toggleFavorite)="toggleFavorite($event)"
         >
         </app-article>
       </ng-container>
+      <p *ngIf="vm.error" class="article-preview">{{ vm.error }}</p>
     </ng-container>
-
-    <ng-template #noArticles>
-      <p class="article-preview">No articles here yet.</p>
-    </ng-template>
 
     <ng-template #loading>
       <p class="article-preview">Loading...</p>
@@ -52,10 +50,14 @@ export class ArticleListComponent {
   ) {}
 
   toggleFavorite(article: Article) {
-    if (this.authStore.isAuthenticated) {
-      this.store.toggleFavorite(article);
-    } else {
-      void this.router.navigate(['/login']);
-    }
+    this.authStore.isAuthenticated$
+      .pipe(
+        tap((isAuthenticated: boolean) => {
+          if (isAuthenticated) this.store.toggleFavorite(article);
+          void this.router.navigate(['/login']);
+        }),
+        takeUntil(this.store.destroy$)
+      )
+      .subscribe();
   }
 }

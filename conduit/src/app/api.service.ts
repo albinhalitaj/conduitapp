@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable } from "rxjs";
 import { Article, Author } from './home/home.store';
 import { API_URL } from './app.component';
 import { Profile } from './profile/profile.store';
@@ -96,17 +96,11 @@ export class ApiService {
   }
 
   favoriteArticle(slug: string): Observable<Article> {
-    return this.http.post<Article>(
-      `${this.apiBase}/articles/${slug}/favorite`,
-      {}
-    );
+    return this.http.post<Article>(`${this.apiBase}/articles/${slug}/favorite`, {});
   }
 
   unFavoriteArticle(slug: string): Observable<Article> {
-    return this.http.delete<Article>(
-      `${this.apiBase}/articles/${slug}/favorite`,
-      {}
-    );
+    return this.http.delete<Article>(`${this.apiBase}/articles/${slug}/favorite`, {});
   }
 
   getArticle(id: string): Observable<Article> {
@@ -151,9 +145,7 @@ export class ApiService {
   }
 
   deleteComment(commentId: string, slug: string) {
-    return this.http.delete(
-      `${this.apiBase}/articles/${slug}/comments/${commentId}`
-    );
+    return this.http.delete(`${this.apiBase}/articles/${slug}/comments/${commentId}`);
   }
 
   getProfile(username: string) {
@@ -161,22 +153,15 @@ export class ApiService {
   }
 
   getArticlesByAuthor(username: string) {
-    return this.http.get<Article[]>(
-      `${this.apiBase}/articles/byAuthor?author=${username}`
-    );
+    return this.http.get<Article[]>(`${this.apiBase}/articles/byAuthor?author=${username}`);
   }
 
   followUser(username: string): Observable<Profile> {
-    return this.http.post<Profile>(
-      `${this.apiBase}/profiles/${username}/follow`,
-      {}
-    );
+    return this.http.post<Profile>(`${this.apiBase}/profiles/${username}/follow`, {});
   }
 
   unFollowUser(username: string): Observable<Profile> {
-    return this.http.delete<Profile>(
-      `${this.apiBase}/profiles/${username}/follow`
-    );
+    return this.http.delete<Profile>(`${this.apiBase}/profiles/${username}/follow`);
   }
 
   updateUser(user: UpdateUserForm): Observable<UpdatedUser> {
@@ -188,8 +173,6 @@ export class ApiService {
   }
 
   emailExists(email: string): Observable<boolean> {
-    return this.http.post<boolean>(`${this.apiBase}/user/emailexists`, {
-      email,
-    });
+    return this.http.post<boolean>(`${this.apiBase}/user/emailexists`, { email });
   }
 }

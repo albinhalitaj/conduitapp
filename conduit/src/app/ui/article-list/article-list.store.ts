@@ -9,15 +9,18 @@ import { Article } from '../../home/home.store';
 import { defer, exhaustMap, map, Observable, switchMap, tap } from 'rxjs';
 import { ApiService } from '../../api.service';
 import { ActivatedRoute, Params } from '@angular/router';
+import { HttpErrorResponse } from '@angular/common/http';
 
 export interface ArticleListState {
   articles: Article[];
   loading: boolean;
+  error: string | null;
 }
 
 const initialState: ArticleListState = {
   articles: [],
   loading: false,
+  error: null,
 };
 
 @Injectable()
@@ -25,13 +28,15 @@ export class ArticleListStore
   extends ComponentStore<ArticleListState>
   implements OnStateInit
 {
-  articles$ = this.select((s) => s.articles);
-  loading$ = this.select((s) => s.loading);
+  readonly articles$ = this.select((s) => s.articles);
+  readonly loading$ = this.select((s) => s.loading);
+  readonly error$ = this.select((s) => s.error);
 
   vm$: Observable<ArticleListState> = this.select(
     this.articles$,
     this.loading$,
-    (articles, loading) => ({ articles, loading }),
+    this.error$,
+    (articles, loading, error) => ({ articles, loading, error }),
     { debounce: true }
   );
 
@@ -49,9 +54,11 @@ export class ArticleListStore
           }).pipe(
             tapResponse(
               (articles: Article[]) => {
-                this.setState({ articles, loading: false });
+                this.patchState({ articles, loading: false });
               },
-              (error) => console.log(error)
+              (error: HttpErrorResponse) => {
+                this.patchState({ loading: false, error: error.message });
+              }
             )
           )
         )
@@ -86,7 +93,9 @@ export class ArticleListStore
               };
             });
           },
-          (error) => console.log(error)
+          (error: HttpErrorResponse) => {
+            this.patchState({ loading: false, error: error.message });
+          }
         )
       )
     )

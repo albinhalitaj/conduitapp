@@ -12,14 +12,21 @@ public static class ConfigureServices
 {
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddDbContext<AppDbContext>(
-            x => x.UseSqlServer(configuration.GetConnectionString("AppConn1"),
-                b => b.MigrationsAssembly(typeof(AppDbContext).Assembly.FullName)));
+        services.AddDbContext<AppDbContext>((sp,x ) =>
+        {
+            var interceptor = sp.GetRequiredService<AuditableEntityInterceptor>();
+            x.UseSqlServer(configuration.GetConnectionString("AppConn"),
+                    b => b.MigrationsAssembly(typeof(AppDbContext).Assembly.FullName))
+                .AddInterceptors(interceptor);
+        });
+        
+        services.AddSingleton<AuditableEntityInterceptor>();
         services.AddScoped<IAppDbContext>(provider =>
             provider.GetService<AppDbContext>() ?? throw new InvalidOperationException());
         services.AddScoped<IIdentityService, IdentityService>();
         services.AddJwtAuth(configuration);
         services.ConfigureIdentityProviders();
+        
         return services;
     }
 }
