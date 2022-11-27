@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { RouterLinkWithHref } from '@angular/router';
+import { RouterLink } from '@angular/router';
 import {
   FormBuilder,
   FormGroup,
@@ -77,7 +77,7 @@ import { Observable } from 'rxjs';
     </div>
   </div>`,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLinkWithHref, ReactiveFormsModule, NgIf, NgStyle, AsyncPipe],
+  imports: [RouterLink, ReactiveFormsModule, NgIf, NgStyle, AsyncPipe],
   providers: [LoginStore],
 })
 export class LoginComponent {

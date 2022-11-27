@@ -5,7 +5,7 @@ import {
   Input,
   Output,
 } from '@angular/core';
-import { RouterLinkWithHref } from '@angular/router';
+import { RouterLink } from '@angular/router';
 import { Article } from '../../../home/home.store';
 import { DatePipe, NgClass, NgForOf, NgIf } from '@angular/common';
 
@@ -56,7 +56,7 @@ import { DatePipe, NgClass, NgForOf, NgIf } from '@angular/common';
     </ng-template>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLinkWithHref, NgIf, NgForOf, DatePipe, NgClass],
+  imports: [RouterLink, NgIf, NgForOf, DatePipe, NgClass],
 })
 export class SingleArticleComponent {
   @Input() articles!: Article[];

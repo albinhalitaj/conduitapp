@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
 import {
   Router,
   RouterLinkActive,
-  RouterLinkWithHref,
+  RouterLink,
   RouterOutlet,
 } from '@angular/router';
 import { Observable, takeUntil, tap } from 'rxjs';
@@ -103,7 +103,7 @@ import { AuthStore } from '../auth/auth.store';
     AsyncPipe,
     NgForOf,
     DatePipe,
-    RouterLinkWithHref,
+    RouterLink,
     RouterOutlet,
     RouterLinkActive,
     NgOptimizedImage,

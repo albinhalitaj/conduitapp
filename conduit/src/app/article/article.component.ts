@@ -9,7 +9,7 @@ import {
   NgIf,
   NgOptimizedImage,
 } from '@angular/common';
-import { Router, RouterLinkWithHref } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { CommentComponent } from '../ui/comment/comment.component';
 import { CommentFormComponent } from '../ui/comment/comment-form.component';
 import { UserActionsComponent } from '../ui/user-actions/user-actions.component';
@@ -158,7 +158,7 @@ import { OwnerActionsComponent } from '../ui/owner-actions/owner-actions.compone
   imports: [
     NgIf,
     AsyncPipe,
-    RouterLinkWithHref,
+    RouterLink,
     NgForOf,
     DatePipe,
     CommentComponent,

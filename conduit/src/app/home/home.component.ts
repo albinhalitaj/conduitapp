@@ -3,7 +3,7 @@ import { Article, HomeStore, HomeVm } from './home.store';
 import { provideComponentStore } from '@ngrx/component-store';
 import { map, Observable } from 'rxjs';
 import { AsyncPipe, DatePipe, NgClass, NgForOf, NgIf } from '@angular/common';
-import { Router, RouterLinkWithHref } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { SingleArticleComponent } from '../ui/article-list/article/single-article.component';
 import { AuthStore } from '../auth/auth.store';
 
@@ -90,7 +90,7 @@ import { AuthStore } from '../auth/auth.store';
     NgIf,
     AsyncPipe,
     NgForOf,
-    RouterLinkWithHref,
+    RouterLink,
     DatePipe,
     NgClass,
     SingleArticleComponent,

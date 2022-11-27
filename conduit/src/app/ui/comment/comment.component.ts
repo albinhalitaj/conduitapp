@@ -7,7 +7,7 @@ import {
 } from '@angular/core';
 import { Comment } from '../../api.service';
 import { DatePipe, NgForOf, NgIf, NgOptimizedImage } from '@angular/common';
-import { RouterLinkWithHref } from '@angular/router';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-comment',
@@ -51,7 +51,7 @@ import { RouterLinkWithHref } from '@angular/router';
     </div>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [NgForOf, NgIf, DatePipe, RouterLinkWithHref, NgOptimizedImage],
+  imports: [NgForOf, NgIf, DatePipe, RouterLink, NgOptimizedImage],
 })
 export class CommentComponent {
   @Input() comments!: Comment[];

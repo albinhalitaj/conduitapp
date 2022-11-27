@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { Router, RouterLinkWithHref } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { AsyncPipe, DatePipe, NgClass, NgForOf, NgIf } from '@angular/common';
 import { provideComponentStore } from '@ngrx/component-store';
 import { ArticleListState, ArticleListStore } from './article-list.store';
@@ -31,7 +31,7 @@ import { SingleArticleComponent } from './article/single-article.component';
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [provideComponentStore(ArticleListStore)],
   imports: [
-    RouterLinkWithHref,
+    RouterLink,
     NgForOf,
     DatePipe,
     NgIf,

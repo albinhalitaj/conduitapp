@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { RouterLinkActive, RouterLinkWithHref } from '@angular/router';
+import { RouterLinkActive, RouterLink } from '@angular/router';
 import { Observable } from 'rxjs';
 import { AuthStore, User } from '../../auth/auth.store';
 import { AsyncPipe, NgIf } from '@angular/common';
@@ -73,7 +73,7 @@ import { AsyncPipe, NgIf } from '@angular/common';
     </div>
   </nav>`,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLinkWithHref, RouterLinkActive, AsyncPipe, NgIf],
+  imports: [RouterLink, RouterLinkActive, AsyncPipe, NgIf],
 })
 export class HeaderComponent {
   readonly isAuthenticated$: Observable<boolean> = this.store.isAuthenticated$;

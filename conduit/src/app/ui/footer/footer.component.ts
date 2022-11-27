@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { RouterLinkWithHref } from '@angular/router';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-footer',
@@ -15,6 +15,6 @@ import { RouterLinkWithHref } from '@angular/router';
     </div>
   </footer>`,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLinkWithHref],
+  imports: [RouterLink],
 })
 export class FooterComponent {}

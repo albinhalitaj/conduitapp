@@ -1,5 +1,5 @@
 import { ChangeDetectorRef, Component } from '@angular/core';
-import { RouterLinkWithHref } from '@angular/router';
+import { RouterLink } from '@angular/router';
 import {
   FormBuilder,
   FormGroup,
@@ -145,7 +145,7 @@ import { ApiService } from '../../api.service';
     </div>
   </div>`,
   imports: [
-    RouterLinkWithHref,
+    RouterLink,
     ReactiveFormsModule,
     NgStyle,
     NgIf,
